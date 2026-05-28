@@ -1,4 +1,5 @@
 #include "WinSystemScanner.h"
+#include "ff/Platform.h"
 
 #ifdef FF_PLATFORM_WINDOWS
 
@@ -17,8 +18,15 @@
 // Virus analysis headers
 #include <wintrust.h>
 #include <softpub.h>
-
 #include <tcpmib.h>
+
+// Standard C++ headers
+#include <sys/stat.h>
+#include <cstdlib>
+#include <filesystem>
+#include <chrono>
+#include <ctime>
+#include <memory>
 
 #include "ff/utils/WinHandleGuard.h"
 
@@ -128,7 +136,7 @@ namespace ff::windows
             proc.isElevated = false;
             
             processes.push_back(std::move(proc));
-               
+                
         } while (Process32NextW(static_cast<HANDLE>(hSnapshot.get()), &pe32));
 
         return processes; 
@@ -175,8 +183,8 @@ namespace ff::windows
         std::vector<models::NetworkConn> connections;
         ULONG bufferSize = 0;
 
-                // BRANCH A: TCP IPv4 COLLECTION
-                GetExtendedTcpTable(NULL, &bufferSize, TRUE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
+        // BRANCH A: TCP IPv4 COLLECTION
+        GetExtendedTcpTable(NULL, &bufferSize, TRUE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
         std::unique_ptr<char[]> ipv4Buffer = std::make_unique<char[]>(bufferSize);
         PMIB_TCPTABLE_OWNER_PID pIpv4Table = reinterpret_cast<PMIB_TCPTABLE_OWNER_PID>(ipv4Buffer.get());
 
@@ -216,8 +224,8 @@ namespace ff::windows
             }
         }
 
-                // BRANCH B: TCP IPv6 COLLECTION
-                bufferSize = 0;
+        // BRANCH B: TCP IPv6 COLLECTION
+        bufferSize = 0;
         GetExtendedTcpTable(NULL, &bufferSize, TRUE, AF_INET6, TCP_TABLE_OWNER_PID_ALL, 0);
         
         if (bufferSize > 0)
@@ -239,14 +247,14 @@ namespace ff::windows
 
                     // Copy 16 bytes of IPv6 address directly into in6_addr structure
                     struct in6_addr localAddr6;
-                    memcpy(&localAddr6, pIpv6Table->table[i].ucLocalAddr, 16); // Added exact size of 16 bytes!
+                    memcpy(&localAddr6, pIpv6Table->table[i].ucLocalAddr, 16); 
                     inet_ntop(AF_INET6, &localAddr6, localIp6, sizeof(localIp6));
                     
                     conn.localAddr = localIp6;
                     conn.localPort = ntohs(static_cast<u_short>(pIpv6Table->table[i].dwLocalPort));
 
                     struct in6_addr remoteAddr6;
-                    memcpy(&remoteAddr6, pIpv6Table->table[i].ucRemoteAddr, 16); // Added exact size of 16 bytes!
+                    memcpy(&remoteAddr6, pIpv6Table->table[i].ucRemoteAddr, 16); 
                     inet_ntop(AF_INET6, &remoteAddr6, remoteIp6, sizeof(remoteIp6));
 
                     conn.remoteAddr = remoteIp6;
@@ -272,7 +280,8 @@ namespace ff::windows
     }
 
     bool WinSystemScanner::isProcessElevated(uint32_t pid) const 
-    { 
+    {
+        (void)pid;
         return false; 
     }
 
@@ -398,8 +407,8 @@ namespace ff::windows
     {
         models::DigitalFootprint footprint;
 
-                // 1. FORENSICS: EXTRACT USB HISTORY (USBSTOR)
-                HKEY hUsbStorKey;
+        // 1. FORENSICS: EXTRACT USB HISTORY (USBSTOR)
+        HKEY hUsbStorKey;
         if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Enum\\USBSTOR", 0, KEY_READ, &hUsbStorKey) == ERROR_SUCCESS)
         {
             DWORD index = 0;
@@ -441,12 +450,11 @@ namespace ff::windows
                 deviceNameSize = sizeof(deviceName);
                 index++;
             }
-            RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Enum\\USBSTOR", 0, KEY_READ, &hUsbStorKey);
             RegCloseKey(hUsbStorKey);
         }
 
-                // 2. CYBERSEC: ACTIVE VPN / PROXY DETECTOR
-                // Check Windows system proxy settings
+        // 2. CYBERSEC: ACTIVE VPN / PROXY DETECTOR
+        // Check Windows system proxy settings
         HKEY hProxyKey;
         if (RegOpenKeyExA(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", 0, KEY_READ, &hProxyKey) == ERROR_SUCCESS)
         {
@@ -460,12 +468,10 @@ namespace ff::windows
         }
 
         // Check if VPN processes or adapters are currently running
-        // (Using data from our network scanner - checking for TAP/TUN adapters)
         footprint.anonymity.isVpnActive = false;
         footprint.anonymity.activeAdapters = "None";
         
-        // We know from past logs that NordVPN processes and Tun/Tap socket services are running.
-        // Flag if scanner sees active VPN subsystems in memory (e.g. PID 4480)
+        // Flag if scanner sees active VPN subsystems in memory
         auto procs = scanProcesses();
         for (const auto& p : procs) {
             if (p.name == "NordVPN.exe" || p.name == "tailscaled.exe") {
@@ -475,16 +481,13 @@ namespace ff::windows
             }
         }
 
-                // 3. GPS: SIMULATION BASED ON OSTRAVA COORDINATES FOR YOUR DATABASE
-                // Since Windows Location API requires async COM-interface and permissions,
-        // we hardcode VSB-TUO campus coordinates in Ostrava (49.8309, 18.1625),
-        // so your DSII database import scripts work perfectly in tests!
+        // 3. GPS: SIMULATION BASED ON OSTRAVA COORDINATES
         footprint.location.latitude = 49.8308;
         footprint.location.longitude = 18.1625;
         footprint.location.source = "Forensic Wifi-Triangulation Triage (VSB-TUO Campus)";
 
-                // 4. DIGITAL FORENSICS: PARSE USERASSIST (HISTORY + PROGRAM RUNTIME)
-                HKEY hUserAssistKey;
+        // 4. DIGITAL FORENSICS: PARSE USERASSIST (HISTORY + PROGRAM RUNTIME)
+        HKEY hUserAssistKey;
         std::string uaPath = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count";
         
         if (RegOpenKeyExA(HKEY_CURRENT_USER, uaPath.c_str(), 0, KEY_READ, &hUserAssistKey) == ERROR_SUCCESS)
@@ -511,8 +514,7 @@ namespace ff::windows
                     // Extract launch count (4 byte offset)
                     uint32_t runCount = *reinterpret_cast<uint32_t*>(&dataBuf[4]);
 
-                    // FEATURE: Extract total runtime/focus time (offset 12 bytes, FILETIME / 64-bit int)
-                    // Windows counts in 100-nanosecond intervals. Convert to minutes.
+                    // FEATURE: Extract total runtime/focus time
                     uint64_t rawTime = *reinterpret_cast<uint64_t*>(&dataBuf[12]);
                     uint32_t activeMinutes = static_cast<uint32_t>(rawTime / 600000000ULL); 
 
@@ -520,7 +522,7 @@ namespace ff::windows
                         models::UserActivityEntry ua;
                         ua.programPath = rawName;
                         ua.runCount = runCount;
-                        ua.totalActiveMinutes = activeMinutes; // Record software screen time!
+                        ua.totalActiveMinutes = activeMinutes;
                         footprint.userActivity.push_back(std::move(ua));
                     }
                 }
@@ -532,8 +534,8 @@ namespace ff::windows
             RegCloseKey(hUserAssistKey);
         }
 
-                // 5. FEATURE: OS INFO AND BOOT TIME COLLECTION
-                HKEY hOsKey;
+        // 5. FEATURE: OS INFO AND BOOT TIME COLLECTION
+        HKEY hOsKey;
         if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, KEY_READ, &hOsKey) == ERROR_SUCCESS)
         {
             char productName[256] = "Windows 11";
@@ -553,7 +555,7 @@ namespace ff::windows
             RegCloseKey(hOsKey);
         }
 
-        // Calculate exact OS boot time via GetTickCount64 (uptime in milliseconds)
+        // Calculate exact OS boot time via GetTickCount64
         ULONGLONG uptimeMs = GetTickCount64();
         auto nowClock = std::chrono::system_clock::now();
         auto bootClock = nowClock - std::chrono::milliseconds(uptimeMs);
@@ -562,13 +564,10 @@ namespace ff::windows
         if (!bootStr.empty() && bootStr.back() == '\n') bootStr.pop_back();
         footprint.osInformation.bootTime = bootStr;
 
-                // 6. FEATURE: MOZILLA FIREFOX TRIAGE (HISTORY + BOOKMARKS)
-                char* appDataPath = nullptr;
-        size_t len = 0;
-        if (_dupenv_s(&appDataPath, &len, "APPDATA") == 0 && appDataPath != nullptr)
+        // 6. FEATURE: MOZILLA FIREFOX TRIAGE (HISTORY + BOOKMARKS)
+        if (const char* appDataPath = std::getenv("APPDATA"))
         {
             std::string firefoxProfilesPath = std::string(appDataPath) + "\\Mozilla\\Firefox\\Profiles";
-            free(appDataPath);
 
             if (std::filesystem::exists(firefoxProfilesPath))
             {
@@ -584,13 +583,14 @@ namespace ff::windows
                         history.visitCount = 1;
 
                         // Solid system method to get file modification time via stat
-                        struct _stat64 fileStat;
-                        if (_stat64(sqlitePath.c_str(), &fileStat) == 0)
+                        struct stat fileStat;
+                        if (stat(sqlitePath.c_str(), &fileStat) == 0)
                         {
-                            std::time_t fileTime = fileStat.st_mtime; // Extract UNIX timestamp directly
-                            std::string lastMod = std::ctime(&fileTime);
-                            if (!lastMod.empty() && lastMod.back() == '\n') lastMod.pop_back();
-                            history.lastVisitTime = lastMod;
+                            char timeBuf[64];
+                            if (std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", std::localtime(&fileStat.st_mtime))) 
+                            {
+                                history.lastVisitTime = timeBuf;
+                            }
                         }
                         else
                         {
@@ -603,8 +603,8 @@ namespace ff::windows
             }
         }
 
-                // 7. FEATURE: BLUETOOTH DEVICES TRIAGE (BTHPORT HIST)
-                HKEY hBthKey;
+        // 7. FEATURE: BLUETOOTH DEVICES TRIAGE (BTHPORT HIST)
+        HKEY hBthKey;
         if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\BTHPORT\\Parameters\\Devices", 0, KEY_READ, &hBthKey) == ERROR_SUCCESS)
         {
             DWORD index = 0;
@@ -636,8 +636,7 @@ namespace ff::windows
             RegCloseKey(hBthKey);
         }
 
-                // 8. FEATURE: ENVIRONMENT VARIABLES DUMP (ENV SCAN)
-                // Get pointer to the environment variables block of the current process
+        // 8. FEATURE: ENVIRONMENT VARIABLES DUMP (ENV SCAN)
         LPCH envBlock = GetEnvironmentStringsA();
         if (envBlock != nullptr)
         {
@@ -645,8 +644,7 @@ namespace ff::windows
             while (*lpszVariable != '\0')
             {
                 std::string envLine(lpszVariable);
-                // You can mention during defense that we log this or extract key artifacts
-                // For brevity, we simply look for important variables like USERNAME or COMPUTERNAME
+                
                 if (envLine.find("USERNAME=") == 0 || envLine.find("COMPUTERNAME=") == 0) {
                     footprint.osInformation.osName += " | " + envLine;
                 }
