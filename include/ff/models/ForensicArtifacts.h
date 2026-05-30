@@ -91,7 +91,8 @@ namespace ff::models
         std::string activeAdapters = "None";
     };
 
-    // Process environment and file descriptor artifacts
+    // LINUX
+    // Process environment and file descriptor artifacts 
     struct ProcEnvEntry
     {
         std::string pid;
@@ -101,6 +102,20 @@ namespace ff::models
     {
         std::string pid;
         std::string openFiles;
+    };
+
+    // Process credentials and cgroup artifacts
+    struct ProcCredEntry
+    {
+        std::string pid;
+        std::string uid_info;
+        std::string gid_info;
+    };
+    struct ProcCgroupEntry
+    {
+        std::string pid;
+        std::string containerPath;
+        bool isContainerized = false;
     };
 
     // Global structure to hold all forensic artifacts and information
@@ -130,5 +145,9 @@ namespace ff::models
         // Process environment and file descriptor artifacts
         std::vector<ProcEnvEntry> processEnvironments;
         std::vector<ProcFdEntry> processFileDescriptors;
+
+        // Process credentials and cgroup artifacts
+        std::vector<ProcCredEntry> processCredentials;
+        std::vector<ProcCgroupEntry> processCgroups;
     };
 }
