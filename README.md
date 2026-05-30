@@ -3,6 +3,7 @@
 > A high-performance, cross-platform (Windows WinAPI / Linux Pseudo-FS) forensic live response triage collection tool. Implemented in pure C++20 with an automated, self-registering plugin architecture and built-in anti-reverse engineering protections.
 
 ## 🚀 Architecture Overview
+
 * **Zero-Dependency Core:** Only relies on native OS APIs (`<windows.h>`, `<iphlpapi.h>`, `/proc`).
 * **Autopilot Plugin System:** Modules self-register into the RAM at runtime before `main()` executes via static initialization vectors.
 * **Stealth & Evasion:** Includes XOR string obfuscation and Anti-Debugging Honeypot mechanics to feed fake Decoy data to debuggers (IDA Pro / x64dbg).
@@ -10,76 +11,109 @@
 
 ---
 
-## 🎓 Academic Integrity & Contribution Matrix
+## 🎓 Academic Integrity & 50 Forensic Artifacts Matrix
 
-*Note for Reviewers: This table demonstrates full transparency regarding the development process of the 50 core forensic capabilities.* * **Idea:** Who architected the forensic logic and selected the artifact vector.
-* **Realization:** Who wrote the actual C++ implementation (Me = Student, AI = LLM Assistant, AI+Me = Pair Programming/Refactoring).
+*Note for Reviewers: These tables demonstrate full transparency regarding the development process of the 50 core forensic capabilities.* 
+* **Idea:** Who architected the forensic logic and selected the artifact vector.
+* **Realization:** Who wrote the actual C++ implementation (Me = Student, AI = LLM Assistant, AI+Me = Pair Programming/Refactoring, Pending = Planned).
 
-| ID | Function / Forensic Artifact | Platform | Idea | Realization |
-|:---|:---|:---:|:---:|:---|
-| **01** | Cross-Platform Factory Architecture | Core | Me | AI + Me |
-| **02** | Automated Plugin Registry System | Core | Me | AI |
-| **03** | JSON Exporter & Serialization | Core | Me | AI + Me |
-| **04** | Decoupled Console Printer Triage | Core | Me | AI + Me |
-| **05** | Anti-Debug Honeypot (Decoy System) | Core | Me | AI + Me |
-| **06** | OS Name & Install Date Extraction | Win / Lin | Me | AI + Me |
-| **07** | Precise System Boot Time (Uptime) | Win / Lin | Me | Me |
-| **08** | Process Snapshot (Toolhelp32) | Windows | Me | Me |
-| **09** | Process Executable Path Resolution | Windows | Me | AI + Me |
-| **10** | Authenticode Signature Check (WinTrust) | Windows | Me | AI |
-| **11** | Elevated Privileges Detection (Token) | Windows | Me | Me |
-| **12** | TCP IPv4 Active Connections (tcpmib) | Windows | Me | AI + Me |
-| **13** | TCP IPv6 Active Connections | Windows | Me | AI + Me |
-| **14** | Persistence: HKCU Registry Run Keys | Windows | Me | Me |
-| **15** | Persistence: HKLM Registry Run Keys | Windows | Me | Me |
-| **16** | Service Control Manager (SCM) Dump | Windows | Me | AI + Me |
-| **17** | Native Kernel Driver Detection (.sys) | Windows | Me | Me |
-| **18** | USB History Extraction (USBSTOR) | Windows | Me | AI + Me |
-| **19** | USB Device Serial Number Parsing | Windows | Me | AI + Me |
-| **20** | Active VPN / Proxy Status Detection | Windows | Me | Me |
-| **21** | Geolocation Triage (Campus GPS) | Cross | Me | Me |
-| **22** | UserAssist Execution History | Windows | Me | AI + Me |
-| **23** | UserAssist ROT13 Decoder | Windows | Me | Me |
-| **24** | UserAssist Focus Time Calculator | Windows | Me | AI + Me |
-| **25** | Mozilla Firefox `places.sqlite` Triage | Windows | Me | Me |
-| **26** | SQLite Modification Timestamp Parsing | Windows | Me | AI + Me |
-| **27** | Bluetooth Paired Devices (BTHPORT) | Windows | Me | Me |
-| **28** | Environment Variables Memory Dump | Windows | Me | Me |
-| **29** | Pseudo-FS Process Iteration (`/proc`) | Linux | Me | AI + Me |
-| **30** | **Resident Kernel Modules (LKM)** | Linux | Me | AI + Me |
-| **31** | Network Interfaces Status Triage | Linux | Me | Me |
-| **32** | **Kernel ARP Table Extraction** | Windows | Me | AI + Me |
-| **33** | **Active Firewall Rules Triage** | Windows | Me | AI + Me |
-| **34** | **SSH Authorized Keys Extraction** | Linux | Me | AI + Me |
-| **35** | Process Environment (`/proc/pid/environ`) | Linux | Me | Pending |
-| **36** | Open File Descriptors (`/proc/pid/fd`) | Linux | Me | Pending |
-| **37** | Process Credentials (UID/GID parsing) | Linux | Me | Pending |
-| **38** | TCP Connections (`/proc/net/tcp`) | Linux | Me | Me |
-| **39** | TCPv6 Connections (`/proc/net/tcp6`) | Linux | Me | Me |
-| **40** | Linux Scheduled Tasks (Cron) | Linux | Me | Pending |
-| **41** | Linux Bash History Scan | Linux | Me | Pending |
-| **42** | Process Command Line (`cmdline`) | Linux | Me | Pending |
-| **43** | Sudoers Configuration Check | Linux | Me | Pending |
-| **44** | Shadow Hash Presence Validation | Linux | Me | Pending |
-| **45** | Memory Mappings (`/proc/pid/maps`) | Linux | Me | Pending |
-| **46** | Windows Prefetch Parsing | Windows | Me | Pending |
-| **47** | Windows Event Logs (Sec 4624) | Windows | Me | Pending |
-| **48** | Active RDP Sessions Triage | Windows | Me | Pending |
-| **49** | Amcache Triage Execution Logs | Windows | Me | Pending |
-| **50** | Unified JSON Report Marshalling | Core | Me | AI + Me |
+### 🖥️ Windows — Processes & Memory (`WinSystemScanner.cpp`)
+
+| # | Function / Capability | Description | Idea | Realization |
+|:---|:---|:---|:---:|:---:|
+| **1** | `scanHiddenProcesses()` | Hidden processes search via `NtQuerySystemInformation` | Me | AI + Me |
+| **2** | `extractProcessMemory()` | `MiniDumpWriteDump` implementation for critical processes | Me | Pending |
+| **3** | `getProcessHash()` | SHA256 hashing of running executable files | Me | AI + Me |
+| **4** | `scanProcessThreads()` | Thread entry enumeration for each process | Me | Pending |
+| **5** | `getProcessEnvironment()` | Process environment variables extraction | Me | Me |
+| **6** | `scanInjectedDLLs()` | DLL injection detection via `ReadProcessMemory` | Me | Pending |
+| **7** | `getProcessStartTime()` | Exact process launch timestamp calculation | Me | AI + Me |
+| **8** | `scanProcessHandles()` | Open process handles enumeration | Me | Pending |
+| **9** | `extractProcessCommandLine()`| Command-line arguments extraction | Me | AI + Me |
+| **10** | `getProcessIntegrityLevel()` | Integrity level check (Low/Medium/High/System) | Me | Me |
+
+### 🖥️ Windows — Registry & Autorun (`WinSystemScanner.cpp`)
+
+| # | Function / Capability | Description | Idea | Realization |
+|:---|:---|:---|:---:|:---:|
+| **11** | `scanHKLM_Run()` | `HKLM\Software\Microsoft\Windows\CurrentVersion\Run` | Me | Me |
+| **12** | `scanHKCU_Run()` | `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` | Me | Me |
+| **13** | `scanStartupFolder()` | Startup folder parsing for current and all users | Me | AI + Me |
+| **14** | `scanScheduledTasks()` | TaskScheduler COM interface enumeration | Me | Pending |
+| **15** | `scanBootExecute()` | `HKLM\System\CurrentControlSet\Control\Session Manager` | Me | Me |
+| **16** | `scanWinlogonNotify()` | DLLs in `Winlogon\Notify` registry key | Me | AI + Me |
+| **17** | `scanBrowserExtensions()` | Browser extensions analysis in the registry | Me | Pending |
+| **18** | `scanShellExtensions()` | `ShellExecuteHooks` analysis in the registry | Me | Pending |
+| **19** | `scanAppInitDLLs()` | `AppInit_DLLs` persistence check | Me | Me |
+| **20** | `scanImageFileExecution()` | IFEO hierarchy check for process hollowing/replacement | Me | AI + Me |
+
+### 🖥️ Windows — System & Drivers (`WinSystemScanner.cpp`)
+
+| # | Function / Capability | Description | Idea | Realization |
+|:---|:---|:---|:---:|:---:|
+| **21** | `scanKernelDrivers()` | `EnumServicesStatusExW` with `SERVICE_KERNEL_DRIVER` | Me | AI + Me |
+| **22** | `verifyDriverSignature()` | Authenticode validation via `WinVerifyTrust` | Me | AI |
+| **23** | `scanFailedDriverLoads()` | EventLog: System, source `ServiceControlManager` | Me | Pending |
+| **24** | `scanBootDrivers()` | Boot-start and System-start drivers enumeration | Me | Pending |
+| **25** | `getWindowsInstallDate()` | `InstallDate` in `HKLM\Software\Microsoft\Windows NT` | Me | Me |
+| **26** | `getWindowsLastShutdown()` | Last shutdown timestamp from EventLog: System | Me | Pending |
+| **27** | `scanPagefileUsage()` | Size and exact location of `pagefile.sys` | Me | Pending |
+| **28** | `scanHibernationFile()` | Hibernate file analysis (`hiberfil.sys`) | Me | Pending |
+| **29** | `scanSwapFileUsage()` | `swapfile.sys` extraction for Windows 10/11 | Me | Pending |
+| **30** | `scanTempFiles()` | Triage of `C:\Windows\Temp` and `%TEMP%` directories | Me | Me |
+
+### 🌐 Windows — Network & Connections (`WinSystemScanner.cpp`)
+
+| # | Function / Capability | Description | Idea | Realization |
+|:---|:---|:---|:---:|:---:|
+| **31** | `getTCPConnections()` | `GetExtendedTcpTable` mapping for IPv4 and IPv6 | Me | AI + Me |
+| **32** | `getUDPConnections()` | `GetExtendedUdpTable` extraction | Me | Me |
+| **33** | `scanDNSCache()` | `DnsFlushResolverCache` and DNS Cache analysis | Me | Pending |
+| **34** | `scanARPTable()` | `GetIpNetTable` implementation for MAC addresses | Me | AI + Me |
+| **35** | `getNetworkAdapters()` | `GetAdaptersInfo` for all network interfaces | Me | Me |
+| **36** | `scanFirewallRules()` | `netsh advshow firewall rule` logic extraction | Me | AI + Me |
+| **37** | `getProxySettings()` | WinINET and `CurrentVersion\Internet Settings` | Me | Me |
+| **38** | `scanHostsFile()` | Parse and analyze `C:\Windows\System32\drivers\etc\hosts` | Me | AI + Me |
+| **39** | `getWinsockProviders()` | Winsock LSP check for hidden proxy layers | Me | Pending |
+| **40** | `scanRecentConnections()` | Recent WiFi networks (`HKLM\Software\Microsoft\WlanSvc`) | Me | Me |
+
+### 🐧 Linux — Processes & Memory (`artifacts/`)
+
+| # | Function / Capability | Description | Idea | Realization |
+|:---|:---|:---|:---:|:---:|
+| **41** | `scanKernelModules()` | Parse `/proc/modules` for resident loaded modules (LKM) | Me | AI + Me |
+| **42** | `getProcessOpenFiles()` | Read `/proc/[pid]/fd` for active file descriptors | Me | Pending |
+| **43** | `getProcessEnvironment()` | Read `/proc/[pid]/environ` for active variables | Me | Pending |
+| **44** | `getProcessCredentials()` | Parse UID/GID security context from `/proc/[pid]/status` | Me | Pending |
+| **45** | `scanCgroups()` | `cgroups` isolation checks for containers (Docker/LXC) | Me | Pending |
+
+### 🐧 Linux — Filesystem & Packages (`artifacts/`)
+
+| # | Function / Capability | Description | Idea | Realization |
+|:---|:---|:---|:---:|:---:|
+| **46** | `scanInstalledPackages()` | `dpkg -l` (Debian/Ubuntu) or `rpm -qa` (Fedora/RHEL) | Me | Pending |
+| **47** | `scanScheduledTasks()` | Triage of `/etc/crontab` and `/var/spool/cron/` | Me | Pending |
+| **48** | `scanSystemdUnits()` | Execution of `systemctl list-units --type=service` | Me | Pending |
+| **49** | `scanMountPoints()` | Dump `/proc/mounts` for all mounted filesystems | Me | Me |
+| **50** | `scanSSHKeys()` | Parse `~/.ssh/authorized_keys` for remote access traces | Me | AI + Me |
 
 ---
 
 ## 🛠️ Build Instructions
+
 This project uses CMake and requires a compiler with C++20 support (MSVC `/std:c++20` or GCC `-std=c++20`).
 
 **Windows (MinGW/GCC or MSVC):**
+
 ```bash
 mkdir build && cd build
 cmake ..
 cmake --build . --config Release
 
+---
+
 **Linux (WSL / Debian):**
+
 ```bash
 mkdir build_linux && cd build_linux
 cmake ..
