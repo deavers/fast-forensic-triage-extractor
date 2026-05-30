@@ -36,7 +36,9 @@ elseif(WIN32)
         src/linux/artifacts/process/ProcEnvScanner.cpp
         src/linux/artifacts/process/ProcFdScanner.cpp
         src/linux/artifacts/process/ProcCredScanner.cpp
-        src/linux/artifacts/process/CgroupScanner.cpp)
+        src/linux/artifacts/process/CgroupScanner.cpp
+        src/linux/artifacts/filesystem/CronScanner.cpp
+        src/linux/artifacts/filesystem/SystemdScanner.cpp)
     target_compile_definitions(fastforensics PRIVATE FF_PLATFORM_WINDOWS)
     
     # System libraries for WinAPI low-level forensic functions for network and signatures

@@ -118,6 +118,28 @@ namespace ff::models
         bool isContainerized = false;
     };
 
+    // Linux-specific infrastructure artifacts
+    struct PkgInfo
+    {
+        std::string name;
+        std::string version;
+    };
+    struct CronTask
+    {
+        std::string taskLine;
+        std::string filePath;
+    };
+    struct SystemdUnit
+    {
+        std::string name;
+        std::string state;
+    };
+
+
+
+
+
+    
     // Global structure to hold all forensic artifacts and information
     struct DigitalFootprint
     {
@@ -130,7 +152,6 @@ namespace ff::models
         std::vector<UserActivityEntry> userActivity;
         std::vector<BrowserHistoryEntry> browserHistory;
         std::vector<BluetoothDeviceEntry> bluetoothHistory;
-
 
         // Vectors to hold cross-platform artifacts
         std::vector<std::string> installedSoftware; // Active software and low-level processes
@@ -149,5 +170,10 @@ namespace ff::models
         // Process credentials and cgroup artifacts
         std::vector<ProcCredEntry> processCredentials;
         std::vector<ProcCgroupEntry> processCgroups;
+
+        // Linux-specific infrastructure artifacts
+        std::vector<PkgInfo> installedPackages;
+        std::vector<CronTask> scheduledTasks;
+        std::vector<SystemdUnit> systemdUnits;
     };
 }
