@@ -77,9 +77,9 @@
 | **43** | `getProcessEnvironment()` | Null-byte separated `/proc/[pid]/environ` | AI | ✅ AI + Me |
 | **44** | `getProcessCredentials()` | Real/Effective UID & GID from `status` | AI | ✅ AI + Me |
 | **45** | `scanCgroups()` | Isolation paths (Docker/Kubernetes/LXC) | AI | ✅ AI + Me |
-| **46** | `scanInstalledPackages()` | DPKG/RPM software inventory lists | Me | ❌ Pending |
-| **47** | `scanScheduledTasks()` | Contents of `/etc/crontab` | Me | ❌ Pending |
-| **48** | `scanSystemdUnits()` | Enabled `systemctl` services | AI | ❌ Pending |
+| **46** | `scanInstalledPackages()` | `/var/lib/dpkg/status` software inventory | Me | ✅ AI + Me |
+| **47** | `scanScheduledTasks()` | Contents of `/etc/crontab` | Me | ✅ AI + Me |
+| **48** | `scanSystemdUnits()` | Enabled `systemctl` services (`multi-user.target`) | AI | ✅ AI + Me |
 | **49** | `scanMountPoints()` | `/proc/mounts` remote/local drives | Me | ✅ Me |
 | **50** | `scanSSHKeys()` | `~/.ssh/authorized_keys` persistence | Me | ✅ AI + Me |
 
