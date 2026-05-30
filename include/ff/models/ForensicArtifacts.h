@@ -41,7 +41,7 @@ namespace ff::models
         std::string macAddress;
     };
 
-    // Linux Specific Function 30
+    // Linux Kernel Modules (Function 30)
     struct KernelModule
     {
         std::string name;
@@ -56,7 +56,7 @@ namespace ff::models
         std::string keyContent;
     };
 
-    // Windows Specific Function 32
+    // Windows Network Artifacts (Function 32)
     struct ArpTableEntry
     {
         std::string ipAddress;
@@ -64,7 +64,7 @@ namespace ff::models
         std::string type;
     };
 
-    // Windows Specific Function 33
+    // Windows Firewall Rules (Function 33)
     struct FirewallRuleEntry
     {
         std::string ruleName;
@@ -78,19 +78,29 @@ namespace ff::models
         std::string installDate = "Unknown";
         std::string bootTime = "Unknown";
     };
-
     struct GeoLocation
     {
         double latitude = 0.0;
         double longitude = 0.0;
         std::string source = "None";
     };
-
     struct AnonymityStatus
     {
         bool isProxyActive = false;
         bool isVpnActive = false;
         std::string activeAdapters = "None";
+    };
+
+    // Process environment and file descriptor artifacts
+    struct ProcEnvEntry
+    {
+        std::string pid;
+        std::string envDump;
+    };
+    struct ProcFdEntry
+    {
+        std::string pid;
+        std::string openFiles;
     };
 
     // Global structure to hold all forensic artifacts and information
@@ -116,5 +126,9 @@ namespace ff::models
         std::vector<SshKeyEntry> sshKeys;
         std::vector<ArpTableEntry> arpEntries;
         std::vector<FirewallRuleEntry> firewallRules;
+
+        // Process environment and file descriptor artifacts
+        std::vector<ProcEnvEntry> processEnvironments;
+        std::vector<ProcFdEntry> processFileDescriptors;
     };
 }

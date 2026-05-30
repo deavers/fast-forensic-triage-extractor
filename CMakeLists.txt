@@ -32,7 +32,9 @@ elseif(WIN32)
     
     add_executable(fastforensics ${CORE_SOURCES} ${WIN_SOURCES}
         src/linux/artifacts/filesystem/SshKeyScanner.cpp
-        src/windows/WinRegistry.h)
+        src/windows/WinRegistry.h
+        src/linux/artifacts/process/ProcEnvScanner.cpp
+        src/linux/artifacts/process/ProcFdScanner.cpp)
     target_compile_definitions(fastforensics PRIVATE FF_PLATFORM_WINDOWS)
     
     # System libraries for WinAPI low-level forensic functions for network and signatures

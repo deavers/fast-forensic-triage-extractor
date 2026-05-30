@@ -17,6 +17,9 @@ namespace ff::linux_os
             {
                 std::string line;
                 uint32_t limit = 0;
+
+                // Format of /proc/modules: name size uses state ...
+                // Limit to first 15 modules for our report
                 while (std::getline(modulesFile, line) && limit++ < 15)
                 {
                     std::istringstream iss(line);
