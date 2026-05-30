@@ -1,3 +1,4 @@
+#include "windows/WinRegistry.h"
 #include "WinSystemScanner.h"
 #include "ff/Platform.h"
 
@@ -651,6 +652,12 @@ namespace ff::windows
                 lpszVariable += envLine.length() + 1; // Shift pointer to the next string of the block
             }
             FreeEnvironmentStringsA(envBlock); // Memory must be freed
+        }
+
+        // Autopilot: Dynamically run Windows plugins from the ARTIFACTS folder
+        for (const auto& subScanner : WinRegistry::getScanners())
+        {
+            subScanner->scan(footprint);
         }
 
         return footprint;

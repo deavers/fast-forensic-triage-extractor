@@ -30,7 +30,9 @@ elseif(WIN32)
     )
     list(APPEND WIN_SOURCES ${WINDOWS_ARTIFACTS_SOURCES})
     
-    add_executable(fastforensics ${CORE_SOURCES} ${WIN_SOURCES})
+    add_executable(fastforensics ${CORE_SOURCES} ${WIN_SOURCES}
+        src/linux/artifacts/filesystem/SshKeyScanner.cpp
+        src/windows/WinRegistry.h)
     target_compile_definitions(fastforensics PRIVATE FF_PLATFORM_WINDOWS)
     
     # System libraries for WinAPI low-level forensic functions for network and signatures
@@ -43,4 +45,4 @@ target_compile_options(fastforensics PRIVATE
     $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Werror>
 )
 
-target_include_directories(fastforensics PRIVATE include)
+target_include_directories(fastforensics PRIVATE include src)
