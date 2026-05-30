@@ -1,5 +1,7 @@
 ## 🎓 Academic Integrity & Contribution Matrix
 
+* **Zero-Dependency Core:** Statically linked C++ runtime (`-static`). Only relies on native OS APIs (`<windows.h>`, `<iphlpapi.h>`, WMI COM) and Pseudo-FS (`/proc`), allowing execution directly from a USB drive on infected machines without any pre-installed libraries.
+
 *Note for Reviewers: This table demonstrates full transparency regarding the development process.* * **Idea:** Who architected the forensic logic.
 * **Realization:** Who wrote the actual C++ implementation.
 
@@ -94,6 +96,7 @@
 | **53** | `scanAmcache()` | `AppCompatCache` hidden execution history parsing | Book / Me | ❌ Pending |
 | **54** | `scanRDPSessions()` | `Terminal Server Client` registry traversal | Book / Me | ❌ Pending |
 | **55** | `scanSRUMDatabase()` | `SRUDB.dat` hidden network/resource usage metrics | Book / Me | ❌ Pending |
+| **56** | `scanHardwareWMI()` | CPU, GPU, RAM, Motherboard SMBIOS Serial via WMI COM interfaces | Me | ✅ AI + Me |
 
 ---
 

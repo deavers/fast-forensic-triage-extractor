@@ -100,10 +100,18 @@ namespace ff::core
         
         report["metadata"]["tool_name"] = "Fast Forensic Triage Extractor (FFTE)";
         report["metadata"]["version"] = "1.0.0-Epoch1";
+
         // Safe time formatting, remove newline from ctime
         std::string timeStr = std::ctime(&now_time);
         if (!timeStr.empty() && timeStr.back() == '\n') timeStr.pop_back();
         report["metadata"]["scan_timestamp"] = timeStr;
+
+        report["artifacts"]["digital_footprint"]["hw_info"] = {
+            {"cpuName", footprint.hw_info.cpuName},
+            {"gpuName", footprint.hw_info.gpuName},
+            {"totalRamGB", footprint.hw_info.totalRamGB},
+            {"motherboardSerial", footprint.hw_info.motherboardSerial}
+        };
 
         // Populate process array
         report["artifacts"]["processes"] = nlohmann::json::array();

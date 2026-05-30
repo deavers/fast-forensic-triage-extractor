@@ -28,6 +28,12 @@ namespace ff::utils
     // BOTH PLATFORMS - COMMON DATA OUTPUT
     void ConsolePrinter::printCommonData(const models::DigitalFootprint& footprint)
     {
+        std::cout << "[Extracted Hardware Triage (WMI)]:\n";
+        std::cout << "  -> CPU: " << footprint.hw_info.cpuName << "\n";
+        std::cout << "  -> GPU: " << footprint.hw_info.gpuName << "\n";
+        std::cout << "  -> RAM: " << footprint.hw_info.totalRamGB << "\n";
+        std::cout << "  -> SMBIOS Serial: " << footprint.hw_info.motherboardSerial << "\n\n";
+
         std::cout << "[Extracted OS Environment Data]:\n";
         std::cout << "  -> Operating System: " << footprint.osInformation.osName << "\n";
         std::cout << "  -> OS Install Date:  " << footprint.osInformation.installDate << "\n";

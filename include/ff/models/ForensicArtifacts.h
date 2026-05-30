@@ -5,6 +5,14 @@
 
 namespace ff::models
 {
+    struct HardwareInfo
+    {
+        std::string cpuName;
+        std::string gpuName;
+        std::string totalRamGB;
+        std::string motherboardSerial; // SMBIOS
+    };
+
     enum class BrowserType
     {
         MozillaFirefox,
@@ -150,6 +158,7 @@ namespace ff::models
     // Global structure to hold all forensic artifacts and information
     struct DigitalFootprint
     {
+        HardwareInfo hw_info;
         OsInfo osInformation;
         GeoLocation location;
         AnonymityStatus anonymity;
