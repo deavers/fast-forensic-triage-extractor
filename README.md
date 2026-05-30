@@ -75,8 +75,8 @@
 | **41** | `scanKernelModules()` | `/proc/modules` load base and sizes | AI | ✅ AI + Me |
 | **42** | `getProcessOpenFiles()` | Symlinks from `/proc/[pid]/fd` | AI | ✅ AI + Me |
 | **43** | `getProcessEnvironment()` | Null-byte separated `/proc/[pid]/environ` | AI | ✅ AI + Me |
-| **44** | `getProcessCredentials()` | Real/Effective UID & GID from `status` | AI | ❌ Pending |
-| **45** | `scanCgroups()` | Isolation paths (Docker/Kubernetes/LXC) | AI | ❌ Pending |
+| **44** | `getProcessCredentials()` | Real/Effective UID & GID from `status` | AI | ✅ AI + Me |
+| **45** | `scanCgroups()` | Isolation paths (Docker/Kubernetes/LXC) | AI | ✅ AI + Me |
 | **46** | `scanInstalledPackages()` | DPKG/RPM software inventory lists | Me | ❌ Pending |
 | **47** | `scanScheduledTasks()` | Contents of `/etc/crontab` | Me | ❌ Pending |
 | **48** | `scanSystemdUnits()` | Enabled `systemctl` services | AI | ❌ Pending |

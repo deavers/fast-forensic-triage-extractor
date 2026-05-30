@@ -178,6 +178,36 @@ namespace ff::core
             });
         }
 
+        for (const auto& env : footprint.processEnvironments) {
+            report["artifacts"]["digital_footprint"]["process_environments"].push_back({
+                {"pid", env.pid},
+                {"envDump", env.envDump}
+            });
+        }
+
+        for (const auto& fd : footprint.processFileDescriptors) {
+            report["artifacts"]["digital_footprint"]["process_open_files"].push_back({
+                {"pid", fd.pid},
+                {"openFiles", fd.openFiles}
+            });
+        }
+
+        for (const auto& cred : footprint.processCredentials) {
+            report["artifacts"]["digital_footprint"]["process_credentials"].push_back({
+                {"pid", cred.pid},
+                {"uid_info", cred.uid_info},
+                {"gid_info", cred.gid_info}
+            });
+        }
+
+        for (const auto& cg : footprint.processCgroups) {
+            report["artifacts"]["digital_footprint"]["process_cgroups"].push_back({
+                {"pid", cg.pid},
+                {"containerPath", cg.containerPath},
+                {"isContainerized", cg.isContainerized}
+            });
+        }
+
         // 7. Save file to disk
         std::ofstream file(std::string{outputPath});
         if (!file.is_open()) return false;

@@ -41,16 +41,19 @@ namespace ff::utils
         if (!footprint.installedSoftware.empty()) 
         {
             std::cout << "[Active Software & Low-Level Process Tracking]:\n";
+
             for (const auto& sw : footprint.installedSoftware) 
             {
                 std::cout << "  -> " << sw << "\n";
             }
+
             std::cout << "\n";
         }
 
         if (!footprint.hostsLines.empty()) 
         {
             std::cout << "[Network Socket Bindings & Hosts Interceptions]:\n";
+
             for (const auto& hl : footprint.hostsLines) 
             {
                 std::cout << "  -> " << hl << "\n";
@@ -59,13 +62,14 @@ namespace ff::utils
         }
     }
 
-    // LINUX-SPECIFIC OUTPUT (FUNCTIONS 30,34)
+    // LINUX-SPECIFIC OUTPUT
     void ConsolePrinter::printLinuxSpecifics(const models::DigitalFootprint& footprint)
     {
         #if defined(FF_PLATFORM_LINUX)
             if (!footprint.linuxModules.empty()) 
             {
                 std::cout << "[Linux Resident Kernel Modules (LKM - Function 30)]:\n";
+
                 for (const auto& mod : footprint.linuxModules) 
                 {
                     std::cout << "  -> Module: " << mod.name << " | Size: " << mod.size << " bytes | State: " << mod.state << "\n";
@@ -76,11 +80,63 @@ namespace ff::utils
             if (!footprint.sshKeys.empty()) 
             {
                 std::cout << "[Linux Remote Access Artifacts (SSH Keys - Function 34)]:\n";
+
                 for (const auto& key : footprint.sshKeys) 
                 {
                     std::cout << "  -> File: " << key.path << " | Snapshot: " << key.keyContent << "\n";
                 }
                 std::cout << "\n";
+            }
+
+            if (!footprint.processCredentials.empty())
+            {
+                std::cout << "\n[Linux Process Credentials (UID/GID - Function 44)]:\n";
+                int count = 0;
+            
+                for (const auto& cred : footprint.processCredentials) 
+                {
+                    if (count++ > 5) 
+                    { 
+                        std::cout << "  ... (more processes hidden for console brevity. See JSON.)\n";
+                        break; 
+                    }
+                    std::cout << "  -> PID: " << cred.pid << " | UID: " << cred.uid_info << " | GID: " << cred.gid_info << "\n";
+                }
+            }
+
+            if (!footprint.processFileDescriptors.empty())
+            {
+                std::cout << "\n[Linux Open File Descriptors (Function 36)]:\n";
+                int count = 0;
+
+                for (const auto& fd : footprint.processFileDescriptors) 
+                {
+                    if (count++ > 5) 
+                        break;
+                    std::cout << "  -> PID: " << fd.pid << " | Open FDs: " << fd.openFiles << "\n";
+                }
+            }
+
+            if (!footprint.processEnvironments.empty())
+            {
+                std::cout << "\n[Linux Process Environment Variables (Function 35)]:\n";
+                int count = 0;
+
+                for (const auto& env : footprint.processEnvironments)
+                 {
+                    if (count++ > 5) 
+                        break;
+                    std::cout << "  -> PID: " << env.pid << " | ENV: " << env.envDump << "\n";
+                }
+            }
+
+            if (!footprint.processCgroups.empty())
+            {
+                std::cout << "\n[Linux Container Isolation Triage (cgroups - Function 45)]:\n";
+                for (const auto& cg : footprint.processCgroups) 
+                {
+                    std::cout << "  -> PID: " << cg.pid << " | Container: " << cg.containerPath << "\n";
+                }
             }
         #else
             // Professionally silencing the unused parameter warning on Windows
@@ -95,20 +151,24 @@ namespace ff::utils
             if (!footprint.arpEntries.empty()) 
             {
                 std::cout << "[Windows Kernel ARP Table (Function 32)]:\n";
+
                 for (const auto& arp : footprint.arpEntries) 
                 {
                     std::cout << "  -> IP: " << arp.ipAddress << " \tMAC: " << arp.macAddress << " [" << arp.type << "]\n";
                 }
+                
                 std::cout << "\n";
             }
 
             if (!footprint.firewallRules.empty()) 
             {
                 std::cout << "[Windows Active Firewall Rules Triage (Function 33)]:\n";
+
                 for (const auto& rule : footprint.firewallRules) 
                 {
                     std::cout << "  -> Rule: " << rule.ruleName << "\n";
                 }
+
                 std::cout << "\n";
             }
         #else
