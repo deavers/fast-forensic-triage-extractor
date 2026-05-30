@@ -109,6 +109,7 @@ This project uses CMake and requires a compiler with C++20 support (MSVC `/std:c
 mkdir build && cd build
 cmake ..
 cmake --build . --config Release
+```
 
 ---
 
@@ -118,3 +119,4 @@ cmake --build . --config Release
 mkdir build_linux && cd build_linux
 cmake ..
 cmake --build .
+```
