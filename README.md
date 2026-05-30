@@ -83,6 +83,18 @@
 | **49** | `scanMountPoints()` | `/proc/mounts` remote/local drives | Me | ✅ Me |
 | **50** | `scanSSHKeys()` | `~/.ssh/authorized_keys` persistence | Me | ✅ AI + Me |
 
+### 📖 Advanced DFIR Research (Based on "Windows Forensics Analyst Field Guide 2023")
+
+*Note: These modules were conceptualized using professional DFIR literature to extract deep-system artifacts beyond standard API calls.*
+
+| # | Capability | Data Extracted / Method | Idea | Status / Coder |
+|:---:|:---|:---|:---:|:---:|
+| **51** | `scanPrefetchFiles()` | `.pf` files execution evidence & precise timestamps | Book / Me | ✅ AI + Me |
+| **52** | `scanEventLogs()` | High-risk Security IDs (4624, 4625, 7045) via `EvtQuery` | Book / Me | ❌ Pending |
+| **53** | `scanAmcache()` | `AppCompatCache` hidden execution history parsing | Book / Me | ❌ Pending |
+| **54** | `scanRDPSessions()` | `Terminal Server Client` registry traversal | Book / Me | ❌ Pending |
+| **55** | `scanSRUMDatabase()` | `SRUDB.dat` hidden network/resource usage metrics | Book / Me | ❌ Pending |
+
 ---
 
 ## 🛠️ Build Instructions

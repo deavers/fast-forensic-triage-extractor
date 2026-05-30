@@ -35,6 +35,13 @@ namespace ff::models
         std::string lastVisitTime;
     };
 
+    struct PrefetchEntry
+    {
+        std::string executableName;
+        std::string prefetchFileName;
+        std::string lastRunTime;
+    };
+
     struct BluetoothDeviceEntry
     {
         std::string name;
@@ -139,7 +146,7 @@ namespace ff::models
 
 
 
-    
+
     // Global structure to hold all forensic artifacts and information
     struct DigitalFootprint
     {
@@ -152,6 +159,9 @@ namespace ff::models
         std::vector<UserActivityEntry> userActivity;
         std::vector<BrowserHistoryEntry> browserHistory;
         std::vector<BluetoothDeviceEntry> bluetoothHistory;
+
+        // Windows-specific artifacts
+        std::vector<PrefetchEntry> prefetchFiles;
 
         // Vectors to hold cross-platform artifacts
         std::vector<std::string> installedSoftware; // Active software and low-level processes

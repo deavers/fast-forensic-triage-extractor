@@ -144,7 +144,7 @@ namespace ff::utils
         #endif
     }
 
-    // WINDOWS-SPECIFIC OUTPUT (FUNCTIONS 32,33)
+    // WINDOWS-SPECIFIC OUTPUT
     void ConsolePrinter::printWindowsSpecifics(const models::DigitalFootprint& footprint)
     {
         #if defined(FF_PLATFORM_WINDOWS)
@@ -156,7 +156,7 @@ namespace ff::utils
                 {
                     std::cout << "  -> IP: " << arp.ipAddress << " \tMAC: " << arp.macAddress << " [" << arp.type << "]\n";
                 }
-                
+
                 std::cout << "\n";
             }
 
@@ -170,6 +170,16 @@ namespace ff::utils
                 }
 
                 std::cout << "\n";
+            }
+
+            if (!footprint.prefetchFiles.empty())
+            {
+                std::cout << "\n[Windows Prefetch Execution Triage (Function 46)]:\n";
+                for (const auto& pf : footprint.prefetchFiles) {
+                    std::cout << "  -> Executable: " << pf.executableName 
+                            << " | File: " << pf.prefetchFileName 
+                            << " | Last Run: " << pf.lastRunTime << "\n";
+                }
             }
         #else
             // Professionally silencing the unused parameter warning on Linux

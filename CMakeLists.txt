@@ -38,7 +38,8 @@ elseif(WIN32)
         src/linux/artifacts/process/ProcCredScanner.cpp
         src/linux/artifacts/process/CgroupScanner.cpp
         src/linux/artifacts/filesystem/CronScanner.cpp
-        src/linux/artifacts/filesystem/SystemdScanner.cpp)
+        src/linux/artifacts/filesystem/SystemdScanner.cpp
+        src/windows/artifacts/system/PrefetchScanner.cpp)
     target_compile_definitions(fastforensics PRIVATE FF_PLATFORM_WINDOWS)
     
     # System libraries for WinAPI low-level forensic functions for network and signatures
@@ -52,3 +53,8 @@ target_compile_options(fastforensics PRIVATE
 )
 
 target_include_directories(fastforensics PRIVATE include src)
+
+# STATIC LINKING FOR ZERO-DEPENDENCY DFIR TOOL
+if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_link_options(fastforensics PRIVATE "-static" "-static-libgcc" "-static-libstdc++")
+endif()

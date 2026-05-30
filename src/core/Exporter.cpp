@@ -94,7 +94,7 @@ namespace ff::core
     {
         nlohmann::json report;
 
-        // 1. Report metadata
+        // Report metadata
         auto now = std::chrono::system_clock::now();
         std::time_t now_time = std::chrono::system_clock::to_time_t(now);
         
@@ -105,31 +105,31 @@ namespace ff::core
         if (!timeStr.empty() && timeStr.back() == '\n') timeStr.pop_back();
         report["metadata"]["scan_timestamp"] = timeStr;
 
-        // 2. Populate process array
+        // Populate process array
         report["artifacts"]["processes"] = nlohmann::json::array();
         for (const auto& p : procs) {
             report["artifacts"]["processes"].push_back(processTo_json(p));
         }
 
-        // 3. Autostarts / Persistence
+        // Autostarts / Persistence
         report["artifacts"]["persistence"] = nlohmann::json::array();
         for (const auto& e : autostarts) {
             report["artifacts"]["persistence"].push_back(persistenceTo_json(e));
         }
 
-        // 4. Network connections
+        // Network connections
         report["artifacts"]["network_connections"] = nlohmann::json::array();
         for (const auto& c : connections) {
             report["artifacts"]["network_connections"].push_back(networkTo_json(c));
         }
 
-        // 5. Services and drivers
+        // Services and drivers
         report["artifacts"]["services_and_drivers"] = nlohmann::json::array();
         for (const auto& s : services) {
             report["artifacts"]["services_and_drivers"].push_back(serviceTo_json(s));
         }
 
-        // 6. Digital footprint (USB, Location, VPN)
+        // Digital footprint (USB, Location, VPN)
         report["artifacts"]["digital_footprint"]["anonymity"]["isProxyActive"] = footprint.anonymity.isProxyActive;
         report["artifacts"]["digital_footprint"]["anonymity"]["isVpnActive"] = footprint.anonymity.isVpnActive;
         report["artifacts"]["digital_footprint"]["anonymity"]["activeAdapters"] = footprint.anonymity.activeAdapters;
@@ -208,7 +208,15 @@ namespace ff::core
             });
         }
 
-        // 7. Save file to disk
+        for (const auto& pf : footprint.prefetchFiles) {
+            report["artifacts"]["digital_footprint"]["prefetch_files"].push_back({
+                {"executableName", pf.executableName},
+                {"prefetchFileName", pf.prefetchFileName},
+                {"lastRunTime", pf.lastRunTime}
+            });
+        }
+
+        // Save file to disk
         std::ofstream file(std::string{outputPath});
         if (!file.is_open()) return false;
 
