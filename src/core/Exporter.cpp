@@ -99,6 +99,7 @@ namespace ff::core
         const models::DigitalFootprint& footprint
     )
     {
+        (void)autostarts;
         nlohmann::json report;
 
         // Report metadata
@@ -129,8 +130,7 @@ namespace ff::core
         }
 
         report["artifacts"]["persistence"] = nlohmann::json::array();
-        for (const auto& e : autostarts) 
-        {
+        for (const auto& e : footprint.persistence) {
             report["artifacts"]["persistence"].push_back(persistenceTo_json(e));
         }
 

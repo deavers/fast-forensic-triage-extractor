@@ -3,6 +3,8 @@
 #include <vector>
 #include <cstdint>
 
+#include "PersistenceEntry.h"
+
 namespace ff::models
 {
     struct HardwareInfo
@@ -232,5 +234,8 @@ namespace ff::models
 
         // Memory injection artifacts
         std::vector<InjectedMemoryEntry> injectedMemory;
+
+        // Persistence artifacts (cross-platform)
+        std::vector<PersistenceEntry> persistence;
     };
 }

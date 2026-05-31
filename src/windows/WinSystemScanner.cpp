@@ -192,54 +192,9 @@ namespace ff::windows
         return false; 
     }
 
-    std::vector<models::PersistenceEntry> WinSystemScanner::scanPersistence()
+    std::vector<ff::models::PersistenceEntry> ff::windows::WinSystemScanner::scanPersistence()
     {
-        std::vector<models::PersistenceEntry> entries;
-
-        struct RegistryLocation {
-            HKEY hKeyRoot;
-            const char* subKey;
-            const char* locationName;
-        } locations[] = {
-            { HKEY_CURRENT_USER, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", "HKCU Run" },
-            { HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", "HKLM Run" }
-        };
-
-        for (const auto& loc : locations)
-        {
-            HKEY hKey;
-            if (RegOpenKeyExA(loc.hKeyRoot, loc.subKey, 0, KEY_READ, &hKey) == ERROR_SUCCESS)
-            {
-                DWORD index = 0;
-                char valueName[16383]; 
-                DWORD valueNameSize = sizeof(valueName);
-                BYTE valueData[MAX_PATH];
-                DWORD valueDataSize = sizeof(valueData);
-                DWORD type;
-
-                while (RegEnumValueA(hKey, index, valueName, &valueNameSize, NULL, &type, valueData, &valueDataSize) == ERROR_SUCCESS)
-                {
-                    if (type == REG_SZ) 
-                    {
-                        models::PersistenceEntry entry;
-                        entry.type = models::PersistenceType::RegistryRun;
-                        entry.name = valueName;
-                        entry.trigger = loc.locationName;
-                        entry.imagePath = reinterpret_cast<char*>(valueData);
-
-                        entries.push_back(std::move(entry));
-                    }
-
-                    valueNameSize = sizeof(valueName);
-                    valueDataSize = sizeof(valueData);
-                    index++;
-                }
-
-                RegCloseKey(hKey);
-            }
-        }
-
-        return entries;
+        return {};
     }
 
     std::vector<ff::models::ServiceInfo> ff::windows::WinSystemScanner::scanServices()
