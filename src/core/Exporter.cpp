@@ -34,6 +34,7 @@ namespace ff::core
             j["memoryKB"] = p.memoryKB;
             j["isElevated"] = p.isElevated;
             j["isSignatureValid"] = p.isSignatureValid;
+            j["sha256Hash"] = p.sha256Hash;
             return j;
         }
 
@@ -263,6 +264,7 @@ namespace ff::core
             });
         }
 
+        // Systemd Units
         for (const auto& unit : footprint.systemdUnits) 
         {
             report["artifacts"]["digital_footprint"]["systemd_units"].push_back({
@@ -271,6 +273,7 @@ namespace ff::core
             });
         }
 
+        // Injected Memory Artifacts
         for (const auto& mem : footprint.injectedMemory) 
         {
             report["artifacts"]["digital_footprint"]["injected_memory"].push_back({
@@ -278,6 +281,16 @@ namespace ff::core
                 {"processName", mem.processName},
                 {"memoryAddress", mem.memoryAddress},
                 {"protection", mem.protection}
+            });
+        }
+
+        // Clipboard Data
+        for (const auto& clip : footprint.clipboardData) 
+        {
+            report["artifacts"]["digital_footprint"]["clipboard_triage"].push_back({
+                {"format", clip.format},
+                {"sizeBytes", clip.sizeBytes},
+                {"content", clip.content}
             });
         }
 

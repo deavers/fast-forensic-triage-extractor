@@ -185,6 +185,12 @@ namespace ff::models
         std::string protection;
     };
 
+    struct ClipboardEntry
+    {
+        std::string format;
+        std::string content;
+        std::string sizeBytes;
+    };
 
 
     // Global structure to hold all forensic artifacts and information
@@ -243,5 +249,8 @@ namespace ff::models
         // Legacy artifacts (for backward compatibility and reporting)
         std::vector<ProcessInfo> processes;
         std::vector<ServiceInfo> services;
+
+        // Clipboard artifacts (cross-platform)
+        std::vector<ClipboardEntry> clipboardData;
     };
 }

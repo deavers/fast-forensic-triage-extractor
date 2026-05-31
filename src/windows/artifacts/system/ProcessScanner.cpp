@@ -10,6 +10,11 @@
 #include <string>
 #include <vector>
 
+#include <wincrypt.h>
+#include <iomanip>
+#include <sstream>
+#include <fstream>
+
 #include <cstring>
 
 namespace ff::windows
@@ -65,8 +70,15 @@ namespace ff::windows
                             pInfo.memoryKB = pmc.WorkingSetSize / 1024;
 
                         // Check digital signature validity (Function 29)
-                        if (pInfo.exePath)
+                        if (pInfo.exePath) 
+                        {
                             pInfo.isSignatureValid = checkSignature(*pInfo.exePath);
+                            pInfo.sha256Hash = calculateSHA256(*pInfo.exePath);
+                        } 
+                        else 
+                        {
+                            pInfo.sha256Hash = "ACCESS_DENIED";
+                        }
 
                         CloseHandle(hProcess);
                     }
@@ -75,6 +87,7 @@ namespace ff::windows
                         pInfo.isElevated = false; 
                         pInfo.memoryKB = 0;
                         pInfo.isSignatureValid = false;
+                        pInfo.sha256Hash = "ACCESS_DENIED";
                     }
 
                     footprint.processes.push_back(std::move(pInfo));
@@ -110,6 +123,64 @@ namespace ff::windows
             WinVerifyTrust(NULL, &actionGuid, &trustData);
 
             return (status == ERROR_SUCCESS);
+        }
+
+        std::string calculateSHA256(const std::string& filePath) const
+        {
+            HCRYPTPROV hProv = 0;
+            HCRYPTHASH hHash = 0;
+            std::string hashStr = "ERROR";
+
+            // Open Binary file for reading
+            // CreateFileA(path to file, read access, allow other processes to read, default security, only open if exists, optimize for sequential reading, no template)
+            HANDLE hFile = CreateFileA(filePath.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+            if (hFile == INVALID_HANDLE_VALUE) 
+                return "ACCESS_DENIED";
+
+            // Init CryptoAPI and create a SHA-256 hash object
+            if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
+            {
+                if (CryptCreateHash(hProv, CALG_SHA_256, 0, 0, &hHash))
+                {
+                    const DWORD buffSize = 1024 * 32; // Read by 32 KB blocks
+                    std::vector<BYTE> buffer(buffSize);
+                    DWORD bytesRead = 0;
+                    bool success = true;
+
+                    while (ReadFile(hFile, buffer.data(), buffSize, &bytesRead, NULL) && bytesRead > 0)
+                    {
+                        if (!CryptHashData(hHash, buffer.data(), bytesRead, 0)) 
+                        {
+                            success = false;
+                            break;
+                        }
+                    }
+
+                    if (success)
+                    {
+                        DWORD hashLen = 0;
+                        DWORD hashLenSize = sizeof(DWORD);
+
+                        if (CryptGetHashParam(hHash, HP_HASHSIZE, reinterpret_cast<BYTE*>(&hashLen), &hashLenSize, 0))
+                        {
+                            std::vector<BYTE> hashValue(hashLen);
+                            if (CryptGetHashParam(hHash, HP_HASHVAL, hashValue.data(), &hashLen, 0))
+                            {
+                                std::stringstream ss;
+                                for (DWORD i = 0; i < hashLen; i++) 
+                                {
+                                    ss << std::hex << std::setw(2) << std::setfill('0') << (int)hashValue[i];
+                                }
+                                hashStr = ss.str();
+                            }
+                        }
+                    }
+                    CryptDestroyHash(hHash);
+                }
+                CryptReleaseContext(hProv, 0);
+            }
+            CloseHandle(hFile);
+            return hashStr;
         }
     };
 

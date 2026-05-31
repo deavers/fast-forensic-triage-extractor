@@ -50,7 +50,8 @@ elseif(WIN32)
         src/windows/artifacts/system/BrowserScanner.cpp
         src/windows/artifacts/registry/PersistenceScanner.cpp
         src/windows/artifacts/system/ProcessScanner.cpp
-        src/windows/artifacts/system/ServiceScanner.cpp)
+        src/windows/artifacts/system/ServiceScanner.cpp
+        src/windows/artifacts/system/ClipboardScanner.cpp)
     target_compile_definitions(fastforensics PRIVATE FF_PLATFORM_WINDOWS)
     
     # System libraries for WinAPI low-level forensic functions for network and signatures

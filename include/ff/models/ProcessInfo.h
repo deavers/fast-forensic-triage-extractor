@@ -16,6 +16,7 @@ namespace ff::models
         uint64_t    memoryKB;
         bool        isElevated;
         bool isSignatureValid = false;
+        std::string sha256Hash;
 
         std::optional<std::string> exePath;
         std::optional<std::string> username;

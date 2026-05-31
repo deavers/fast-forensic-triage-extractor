@@ -223,6 +223,16 @@ namespace ff::utils
                               << mem.memoryAddress << " [" << mem.protection << "]\n";
                 }
             }
+
+            if (!footprint.clipboardData.empty())
+            {
+                std::cout << "\n[Windows Live Clipboard Triage (Data Exfiltration Risk)]:\n";
+                for (const auto& clip : footprint.clipboardData) {
+                    std::cout << "  [!] CLIPPED DATA -> Format: " << clip.format 
+                              << " | Size: " << clip.sizeBytes << "\n"
+                              << "      Content: " << clip.content << "\n";
+                }
+            }
         #else
             // Silencing the unused parameter warning on Linux
             (void)footprint; 
