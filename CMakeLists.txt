@@ -42,11 +42,13 @@ elseif(WIN32)
         src/windows/artifacts/system/PrefetchScanner.cpp
         src/windows/artifacts/system/WmiHardwareScanner.cpp
         src/windows/artifacts/registry/RdpScanner.cpp
-        src/windows/artifacts/network/NetworkConnectionsScanner.cpp)
+        src/windows/artifacts/network/NetworkConnectionsScanner.cpp
+        src/windows/artifacts/system/EventLogScanner.cpp
+        src/windows/artifacts/system/MemHuntScanner.cpp)
     target_compile_definitions(fastforensics PRIVATE FF_PLATFORM_WINDOWS)
     
     # System libraries for WinAPI low-level forensic functions for network and signatures
-    target_link_libraries(fastforensics PRIVATE ws2_32 iphlpapi wbemuuid ole32 oleaut32 wintrust wevtapi)
+    target_link_libraries(fastforensics PRIVATE ws2_32 iphlpapi wbemuuid ole32 oleaut32 wintrust wevtapi psapi)
 endif()
 
 # Strict code quality flags (Warnings are treated as compilation errors)

@@ -31,6 +31,21 @@
 
 ---
 
+### 🕵️‍♂️ Digital Footprint & Triage (Core System)
+
+| # | Capability | Data Extracted / Method | Idea | Status |
+|:---:|:---|:---|:---:|:---:|
+| **01** | `scanUSBHistory()` | `USBSTOR` registry keys for plugged physical devices | Me | ✅ |
+| **02** | `scanBluetoothHistory()`| `BTHPORT` device MAC addresses and names | Me | ✅ |
+| **03** | `scanBrowserHistory()` | Parses `places.sqlite` / `History` DBs for web footprints | Me | ✅ |
+| **04** | `checkAnonymity()` | Detects active VPN (Nord/Tailscale) and Proxy software | Me | ✅ |
+| **05** | `getWifiLocation()` | Triangulates GPS coordinates via BSSID endpoints | Me | ✅ |
+| **06** | `getFocusTime()` | Translates 64-bit Windows FILETIME into active screen-time| Me | ✅ |
+| **07** | `scanServices()` | Enumerate Windows SCM for persistence/drivers | Me | ✅ |
+| **08** | `scanFirewallRules()` | Dump of active allowed/blocked ports | AI | ✅ |
+| **09** | `getArpTable()` | Queries `GetIpNetTable` for routing spoofing | Me | ✅ |
+| **10** | `scanOSEnvironment()`| Boot time, Install Date, and Environment variables | Me | ✅ |
+
 ### 🖥️ Windows — Processes & Memory (`src/windows/artifacts/system/`)
 
 | # | Capability | Data Extracted / Method | Idea | Status / Coder |

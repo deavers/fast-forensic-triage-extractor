@@ -296,6 +296,16 @@ namespace ff::core
             });
         }
 
+        for (const auto& mem : footprint.injectedMemory) 
+        {
+            report["artifacts"]["digital_footprint"]["injected_memory"].push_back({
+                {"pid", mem.pid},
+                {"processName", mem.processName},
+                {"memoryAddress", mem.memoryAddress},
+                {"protection", mem.protection}
+            });
+        }
+
         // Save file to disk
         std::ofstream file(std::string{outputPath});
         if (!file.is_open()) 
@@ -303,7 +313,7 @@ namespace ff::core
 
         file << report.dump(4);
         file.close();
-        
+
         return true;
     }
 } // namespace ff::core

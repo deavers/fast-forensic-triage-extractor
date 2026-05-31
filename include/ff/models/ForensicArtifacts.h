@@ -173,6 +173,13 @@ namespace ff::models
         std::string details;
     };
 
+    struct InjectedMemoryEntry
+    {
+        std::string pid;
+        std::string processName;
+        std::string memoryAddress;
+        std::string protection;
+    };
 
 
 
@@ -222,5 +229,8 @@ namespace ff::models
 
         std::vector<NetworkConnEntry> networkConnections;
         std::vector<ArpTableEntry> arpTable;
+
+        // Memory injection artifacts
+        std::vector<InjectedMemoryEntry> injectedMemory;
     };
 }

@@ -213,8 +213,18 @@ namespace ff::utils
                               << " | Last Run: " << pf.lastRunTime << "\n";
                 }
             }
+
+            if (!footprint.injectedMemory.empty())
+            {
+                std::cout << "\n[Windows Process Memory Anomalies (Injected DLL / Shellcode)]:\n";
+                for (const auto& mem : footprint.injectedMemory) {
+                    std::cout << "  [!] ALERT -> Process: " << mem.processName
+                              << " (PID: " << mem.pid << ") | Unbacked Executable Memory at " 
+                              << mem.memoryAddress << " [" << mem.protection << "]\n";
+                }
+            }
         #else
-            // Professionally silencing the unused parameter warning on Linux
+            // Silencing the unused parameter warning on Linux
             (void)footprint; 
         #endif
     }
