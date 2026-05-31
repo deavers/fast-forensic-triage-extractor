@@ -15,10 +15,6 @@ namespace ff::linux_os
 
         std::string_view platformName() const override;
         
-        std::vector<models::ProcessInfo> scanProcesses() override;
-        std::vector<models::NetworkConn> scanNetwork() override;
-        std::vector<models::PersistenceEntry> scanPersistence() override;
-        std::vector<models::ServiceInfo> scanServices() override;
         models::DigitalFootprint scanDigitalFootprint() override;
 
     private:

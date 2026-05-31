@@ -33,52 +33,12 @@
 
 namespace ff::windows
 {
-    // Anonymous namespace for internal helper functions
-    namespace
-    {
-        std::string wideToString(const WCHAR* wstr)
-        {
-            if (!wstr) return "";
-            int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL);
-            if (size_needed <= 0) return "";
-            
-            std::string strTo(size_needed - 1, 0);
-            WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &strTo[0], size_needed, NULL, NULL);
-            return strTo;
-        }
-    }
-
     WinSystemScanner::WinSystemScanner(core::ScanMode mode) 
         : m_mode(mode) {}
 
     std::string_view WinSystemScanner::platformName() const
     {
         return ff::kPlatformName; 
-    }
-
-    std::vector<models::ProcessInfo> WinSystemScanner::scanProcesses()
-    {
-        return {};
-    }
-
-    std::optional<std::string> WinSystemScanner::getProcessPath(uint32_t pid) const
-    {
-        auto hProcess = utils::makeHandle(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid));
-        
-        if (!hProcess) 
-        {
-            return std::nullopt; 
-        }
-
-        WCHAR pathBuffer[MAX_PATH];
-        DWORD bufferSize = MAX_PATH;
-
-        if (QueryFullProcessImageNameW(static_cast<HANDLE>(hProcess.get()), 0, pathBuffer, &bufferSize))
-        {
-            return wideToString(pathBuffer);
-        }
-
-        return std::nullopt; 
     }
 
     typedef struct _MIB_TCP6ROW_OWNER_PID 
@@ -99,32 +59,11 @@ namespace ff::windows
         MIB_TCP6ROW_OWNER_PID table[1];
     } MIB_TCP6TABLE_OWNER_PID, *PMIB_TCP6TABLE_OWNER_PID;
 
-    std::vector<ff::models::NetworkConn> ff::windows::WinSystemScanner::scanNetwork()
-    {
-        return {};
-    }
-
-    bool WinSystemScanner::isProcessElevated(uint32_t pid) const 
-    {
-        (void)pid;
-        return false; 
-    }
-
-    std::vector<ff::models::PersistenceEntry> ff::windows::WinSystemScanner::scanPersistence()
-    {
-        return {};
-    }
-
-    std::vector<ff::models::ServiceInfo> ff::windows::WinSystemScanner::scanServices()
-    {
-        return {};
-    }
-
     models::DigitalFootprint WinSystemScanner::scanDigitalFootprint()
     {
         models::DigitalFootprint footprint;
 
-        // 2. CYBERSEC: ACTIVE VPN / PROXY DETECTOR
+        // CYBERSEC: ACTIVE VPN / PROXY DETECTOR
         // Check Windows system proxy settings
         HKEY hProxyKey;
         if (RegOpenKeyExA(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", 0, KEY_READ, &hProxyKey) == ERROR_SUCCESS)
@@ -143,8 +82,8 @@ namespace ff::windows
         footprint.anonymity.activeAdapters = "None";
         
         // Flag if scanner sees active VPN subsystems in memory
-        auto procs = scanProcesses();
-        for (const auto& p : procs) {
+        for (const auto& p : footprint.processes) 
+        {
             if (p.name == "NordVPN.exe" || p.name == "tailscaled.exe") {
                 footprint.anonymity.isVpnActive = true;
                 footprint.anonymity.activeAdapters = "NordVPN / Tailscale detected in active processes";
@@ -152,12 +91,12 @@ namespace ff::windows
             }
         }
 
-        // 3. GPS: SIMULATION BASED ON OSTRAVA COORDINATES
+        // GPS: SIMULATION BASED ON OSTRAVA COORDINATES
         footprint.location.latitude = 49.8308;
         footprint.location.longitude = 18.1625;
         footprint.location.source = "Forensic Wifi-Triangulation Triage (VSB-TUO Campus)";
 
-        // 4. DIGITAL FORENSICS: PARSE USERASSIST (HISTORY + PROGRAM RUNTIME)
+        // DIGITAL FORENSICS: PARSE USERASSIST (HISTORY + PROGRAM RUNTIME)
         HKEY hUserAssistKey;
         std::string uaPath = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count";
         
@@ -205,7 +144,7 @@ namespace ff::windows
             RegCloseKey(hUserAssistKey);
         }
 
-        // 5. FEATURE: OS INFO AND BOOT TIME COLLECTION
+        // FEATURE: OS INFO AND BOOT TIME COLLECTION
         HKEY hOsKey;
         if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, KEY_READ, &hOsKey) == ERROR_SUCCESS)
         {
@@ -235,7 +174,7 @@ namespace ff::windows
         if (!bootStr.empty() && bootStr.back() == '\n') bootStr.pop_back();
         footprint.osInformation.bootTime = bootStr;
 
-        // 8. FEATURE: ENVIRONMENT VARIABLES DUMP (ENV SCAN)
+        // FEATURE: ENVIRONMENT VARIABLES DUMP (ENV SCAN)
         LPCH envBlock = GetEnvironmentStringsA();
         if (envBlock != nullptr)
         {

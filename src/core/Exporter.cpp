@@ -37,35 +37,6 @@ namespace ff::core
             return j;
         }
 
-        nlohmann::json networkTo_json(const models::NetworkConn& c)
-        {
-            std::string stateStr = "UNKNOWN";
-            if (c.state == models::State::Listen) stateStr = "LISTEN";
-            else if (c.state == models::State::Established) stateStr = "ESTABLISHED";
-            else if (c.state == models::State::TimeWait) stateStr = "TIME_WAIT";
-            else if (c.state == models::State::CloseWait) stateStr = "CLOSE_WAIT";
-
-            nlohmann::json j;
-            j["protocol"] = (c.protocol == models::Protocol::TCP ? "TCP" : "UDP");
-            j["localAddr"] = c.localAddr;
-            j["localPort"] = c.localPort;
-            j["remoteAddr"] = c.remoteAddr;
-            j["remotePort"] = c.remotePort;
-            j["state"] = stateStr;
-            
-            if (c.ownerPid) 
-            {
-                j["ownerPid"] = *c.ownerPid;
-            } 
-            else 
-            {
-                j["ownerPid"] = nullptr;
-            }
-            
-            j["uid"] = c.uid;
-            return j;
-        }
-
         nlohmann::json persistenceTo_json(const models::PersistenceEntry& e)
         {
             return nlohmann::json
@@ -92,16 +63,9 @@ namespace ff::core
 
     bool Exporter::saveToJson(
         std::string_view outputPath,
-        const std::vector<models::ProcessInfo>& procs,
-        const std::vector<models::PersistenceEntry>& autostarts,
-        const std::vector<models::NetworkConn>& connections,
-        const std::vector<models::ServiceInfo>& services,
         const models::DigitalFootprint& footprint
     )
     {
-        (void)autostarts;
-        (void)procs;
-        (void)services;
         nlohmann::json report;
 
         // Report metadata
@@ -135,13 +99,6 @@ namespace ff::core
         report["artifacts"]["persistence"] = nlohmann::json::array();
         for (const auto& e : footprint.persistence) {
             report["artifacts"]["persistence"].push_back(persistenceTo_json(e));
-        }
-
-        // Network connections (legacy)
-        report["artifacts"]["network_connections_legacy"] = nlohmann::json::array();
-        for (const auto& c : connections) 
-        {
-            report["artifacts"]["network_connections_legacy"].push_back(networkTo_json(c));
         }
 
         // Services and Drivers

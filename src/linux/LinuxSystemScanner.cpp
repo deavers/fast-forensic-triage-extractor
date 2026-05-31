@@ -14,11 +14,6 @@ namespace ff::linux_os
         return ff::kPlatformName; 
     }
 
-    std::vector<models::ProcessInfo> LinuxSystemScanner::scanProcesses() { return {}; }
-    std::vector<models::NetworkConn> LinuxSystemScanner::scanNetwork() { return {}; }
-    std::vector<models::PersistenceEntry> LinuxSystemScanner::scanPersistence() { return {}; }
-    std::vector<models::ServiceInfo> LinuxSystemScanner::scanServices() { return {}; }
-
     // The main method for collecting the digital footprint of Linux
     models::DigitalFootprint LinuxSystemScanner::scanDigitalFootprint()
     {
