@@ -314,52 +314,6 @@ namespace ff::windows
     {
         models::DigitalFootprint footprint;
 
-        // 1. FORENSICS: EXTRACT USB HISTORY (USBSTOR)
-        HKEY hUsbStorKey;
-        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Enum\\USBSTOR", 0, KEY_READ, &hUsbStorKey) == ERROR_SUCCESS)
-        {
-            DWORD index = 0;
-            char deviceName[256];
-            DWORD deviceNameSize = sizeof(deviceName);
-
-            // Iterate over device folders (these are USB vendor IDs)
-            while (RegEnumKeyExA(hUsbStorKey, index, deviceName, &deviceNameSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
-            {
-                HKEY hDeviceKey;
-                if (RegOpenKeyExA(hUsbStorKey, deviceName, 0, KEY_READ, &hDeviceKey) == ERROR_SUCCESS)
-                {
-                    DWORD subIndex = 0;
-                    char serialNumber[256];
-                    DWORD serialNumberSize = sizeof(serialNumber);
-
-                    // Go inside folder - it contains the specific USB flash drive serial number
-                    if (RegEnumKeyExA(hDeviceKey, subIndex, serialNumber, &serialNumberSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
-                    {
-                        HKEY hSerialKey;
-                        if (RegOpenKeyExA(hDeviceKey, serialNumber, 0, KEY_READ, &hSerialKey) == ERROR_SUCCESS)
-                        {
-                            char friendlyNameBuf[256] = "Unknown USB Device";
-                            DWORD friendlyNameSize = sizeof(friendlyNameBuf);
-                            
-                            // Read "FriendlyName" parameter (readable device name)
-                            RegQueryValueExA(hSerialKey, "FriendlyName", NULL, NULL, reinterpret_cast<LPBYTE>(friendlyNameBuf), &friendlyNameSize);
-
-                            models::UsbHistoryEntry usb;
-                            usb.deviceInstanceId = serialNumber;
-                            usb.friendlyName = friendlyNameBuf;
-                            footprint.usbHistory.push_back(std::move(usb));
-
-                            RegCloseKey(hSerialKey);
-                        }
-                    }
-                    RegCloseKey(hDeviceKey);
-                }
-                deviceNameSize = sizeof(deviceName);
-                index++;
-            }
-            RegCloseKey(hUsbStorKey);
-        }
-
         // 2. CYBERSEC: ACTIVE VPN / PROXY DETECTOR
         // Check Windows system proxy settings
         HKEY hProxyKey;
@@ -470,78 +424,6 @@ namespace ff::windows
         std::string bootStr = std::ctime(&bootTimeT);
         if (!bootStr.empty() && bootStr.back() == '\n') bootStr.pop_back();
         footprint.osInformation.bootTime = bootStr;
-
-        // 6. FEATURE: MOZILLA FIREFOX TRIAGE (HISTORY + BOOKMARKS)
-        if (const char* appDataPath = std::getenv("APPDATA"))
-        {
-            std::string firefoxProfilesPath = std::string(appDataPath) + "\\Mozilla\\Firefox\\Profiles";
-
-            if (std::filesystem::exists(firefoxProfilesPath))
-            {
-                for (const auto& entry : std::filesystem::directory_iterator(firefoxProfilesPath))
-                {
-                    std::string sqlitePath = entry.path().string() + "\\places.sqlite";
-                    if (std::filesystem::exists(sqlitePath))
-                    {
-                        models::BrowserHistoryEntry history;
-                        history.browser = models::BrowserType::MozillaFirefox;
-                        history.url = sqlitePath;
-                        history.title = "Firefox Places Database (History Scan Stack)";
-                        history.visitCount = 1;
-
-                        // Solid system method to get file modification time via stat
-                        struct stat fileStat;
-                        if (stat(sqlitePath.c_str(), &fileStat) == 0)
-                        {
-                            char timeBuf[64];
-                            if (std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", std::localtime(&fileStat.st_mtime))) 
-                            {
-                                history.lastVisitTime = timeBuf;
-                            }
-                        }
-                        else
-                        {
-                            history.lastVisitTime = "Unknown Modification Time";
-                        }
-                        
-                        footprint.browserHistory.push_back(std::move(history));
-                    }
-                }
-            }
-        }
-
-        // 7. FEATURE: BLUETOOTH DEVICES TRIAGE (BTHPORT HIST)
-        HKEY hBthKey;
-        if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Services\\BTHPORT\\Parameters\\Devices", 0, KEY_READ, &hBthKey) == ERROR_SUCCESS)
-        {
-            DWORD index = 0;
-            char macKeyName[256];
-            DWORD macKeyNameSize = sizeof(macKeyName);
-
-            // Iterate over folders whose names are MAC addresses of Bluetooth devices
-            while (RegEnumKeyExA(hBthKey, index, macKeyName, &macKeyNameSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
-            {
-                HKEY hDeviceSubKey;
-                if (RegOpenKeyExA(hBthKey, macKeyName, 0, KEY_READ, &hDeviceSubKey) == ERROR_SUCCESS)
-                {
-                    char bthNameBuf[256] = "Unknown Bluetooth Device";
-                    DWORD bthNameSize = sizeof(bthNameBuf);
-                    
-                    // Extract Name parameter saved by Windows for the paired device
-                    RegQueryValueExA(hDeviceSubKey, "Name", NULL, NULL, reinterpret_cast<LPBYTE>(bthNameBuf), &bthNameSize);
-
-                    models::BluetoothDeviceEntry bth;
-                    bth.macAddress = macKeyName;
-                    bth.name = bthNameBuf;
-                    footprint.bluetoothHistory.push_back(std::move(bth));
-
-                    RegCloseKey(hDeviceSubKey);
-                }
-                macKeyNameSize = sizeof(macKeyName);
-                index++;
-            }
-            RegCloseKey(hBthKey);
-        }
 
         // 8. FEATURE: ENVIRONMENT VARIABLES DUMP (ENV SCAN)
         LPCH envBlock = GetEnvironmentStringsA();

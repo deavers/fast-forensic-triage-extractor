@@ -44,7 +44,10 @@ elseif(WIN32)
         src/windows/artifacts/registry/RdpScanner.cpp
         src/windows/artifacts/network/NetworkConnectionsScanner.cpp
         src/windows/artifacts/system/EventLogScanner.cpp
-        src/windows/artifacts/system/MemHuntScanner.cpp)
+        src/windows/artifacts/system/MemHuntScanner.cpp
+        src/windows/artifacts/registry/UsbScanner.cpp
+        src/windows/artifacts/registry/BluetoothScanner.cpp
+        src/windows/artifacts/system/BrowserScanner.cpp)
     target_compile_definitions(fastforensics PRIVATE FF_PLATFORM_WINDOWS)
     
     # System libraries for WinAPI low-level forensic functions for network and signatures
