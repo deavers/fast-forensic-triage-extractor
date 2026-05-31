@@ -46,47 +46,6 @@ namespace ff::windows
             WideCharToMultiByte(CP_UTF8, 0, wstr, -1, &strTo[0], size_needed, NULL, NULL);
             return strTo;
         }
-
-        bool checkSignature(const std::string& filePath)
-        {
-            if (filePath.empty()) return false;
-
-            // Convert path from UTF-8 std::string to WCHAR for Windows API
-            int size_needed = MultiByteToWideChar(CP_UTF8, 0, filePath.c_str(), -1, NULL, 0);
-            std::wstring wPath(size_needed, 0);
-            MultiByteToWideChar(CP_UTF8, 0, filePath.c_str(), -1, &wPath[0], size_needed);
-
-            LONG lStatus;
-            WINTRUST_FILE_INFO fileInfo;
-            memset(&fileInfo, 0, sizeof(fileInfo));
-            fileInfo.cbStruct = sizeof(WINTRUST_FILE_INFO);
-            fileInfo.pcwszFilePath = wPath.c_str();
-            fileInfo.hFile = NULL;
-            fileInfo.pgKnownSubject = NULL;
-
-            WINTRUST_DATA trustData;
-            memset(&trustData, 0, sizeof(trustData));
-            trustData.cbStruct = sizeof(WINTRUST_DATA);
-            trustData.pPolicyCallbackData = NULL;
-            trustData.pSIPClientData = NULL;
-            trustData.dwUIChoice = WTD_UI_NONE; // Fully hidden execution (no popups!)
-            trustData.fdwRevocationChecks = WTD_REVOKE_NONE;
-            trustData.dwUnionChoice = WTD_CHOICE_FILE;
-            trustData.pFile = &fileInfo;
-            trustData.dwStateAction = WTD_STATEACTION_IGNORE;
-            trustData.hWVTStateData = NULL;
-            trustData.pwszURLReference = NULL;
-            trustData.dwProvFlags = WTD_CACHE_ONLY_URL_RETRIEVAL;
-
-            // Official GUID for Authenticode verification function
-            GUID v2PolicyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
-
-            // Call Windows Security Core
-            lStatus = WinVerifyTrust(NULL, &v2PolicyGUID, &trustData);
-
-            // If ERROR_SUCCESS, the signature is genuine, valid, and intact
-            return (lStatus == ERROR_SUCCESS);
-        }
     }
 
     WinSystemScanner::WinSystemScanner(core::ScanMode mode) 
@@ -99,48 +58,7 @@ namespace ff::windows
 
     std::vector<models::ProcessInfo> WinSystemScanner::scanProcesses()
     {
-        std::vector<models::ProcessInfo> processes;
-
-        auto hSnapshot = utils::makeHandle(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0));
-        
-        if (!hSnapshot)
-        {
-            throw std::runtime_error("CreateToolhelp32Snapshot failed");
-        }
-
-        PROCESSENTRY32W pe32;
-        pe32.dwSize = sizeof(PROCESSENTRY32W);
-
-        if (!Process32FirstW(static_cast<HANDLE>(hSnapshot.get()), &pe32))
-        {
-            return processes; 
-        }
-
-        do 
-        {
-            models::ProcessInfo proc;
-            proc.pid = pe32.th32ProcessID;
-            proc.ppid = pe32.th32ParentProcessID;
-            proc.name = wideToString(pe32.szExeFile);
-            proc.exePath = getProcessPath(proc.pid);
-            
-            if (proc.exePath)
-            {
-                proc.isSignatureValid = checkSignature(*proc.exePath);
-            }
-            else
-            {
-                proc.isSignatureValid = false; // System processes or Access Denied
-            }
-            
-            proc.memoryKB = 0; 
-            proc.isElevated = false;
-            
-            processes.push_back(std::move(proc));
-                
-        } while (Process32NextW(static_cast<HANDLE>(hSnapshot.get()), &pe32));
-
-        return processes; 
+        return {};
     }
 
     std::optional<std::string> WinSystemScanner::getProcessPath(uint32_t pid) const
@@ -199,70 +117,7 @@ namespace ff::windows
 
     std::vector<ff::models::ServiceInfo> ff::windows::WinSystemScanner::scanServices()
     {
-        std::vector<models::ServiceInfo> servicesList;
-
-        // 1. Open Windows Service Control Manager (SCM) with enumerate rights
-        SC_HANDLE hSCM = OpenSCManagerA(NULL, NULL, SC_MANAGER_ENUMERATE_SERVICE);
-        if (!hSCM) return servicesList;
-
-        DWORD bytesNeeded = 0;
-        DWORD servicesCount = 0;
-        DWORD resumeHandle = 0;
-
-        // 2. First attempt: find out how much memory is needed to store all system services
-        EnumServicesStatusExA(
-            hSCM, SC_ENUM_PROCESS_INFO, SERVICE_TYPE_ALL, SERVICE_STATE_ALL,
-            NULL, 0, &bytesNeeded, &servicesCount, &resumeHandle, NULL
-        );
-
-        if (bytesNeeded == 0) {
-            CloseServiceHandle(hSCM);
-            return servicesList;
-        }
-
-        std::unique_ptr<char[]> buffer = std::make_unique<char[]>(bytesNeeded);
-        ENUM_SERVICE_STATUS_PROCESSA* pServices = reinterpret_cast<ENUM_SERVICE_STATUS_PROCESSA*>(buffer.get());
-
-        // 3. Retrieve actual service data
-        if (EnumServicesStatusExA(
-            hSCM, SC_ENUM_PROCESS_INFO, SERVICE_TYPE_ALL, SERVICE_STATE_ALL,
-            reinterpret_cast<LPBYTE>(pServices), bytesNeeded, &bytesNeeded,
-            &servicesCount, &resumeHandle, NULL))
-        {
-            for (DWORD i = 0; i < servicesCount; i++)
-            {
-                models::ServiceInfo sInfo;
-                sInfo.name = pServices[i].lpServiceName;
-                sInfo.displayName = pServices[i].lpDisplayName;
-
-                // Determine type (Regular software or Kernel Driver - critical for forensics!)
-                if (pServices[i].ServiceStatusProcess.dwServiceType & SERVICE_KERNEL_DRIVER) {
-                    sInfo.serviceType = "KERNEL_DRIVER (SYS)";
-                } else {
-                    sInfo.serviceType = "WIN32_SERVICE (EXE)";
-                }
-
-                // Attempt to extract service file path from SCM registry
-                HKEY hKey;
-                std::string regPath = "SYSTEM\\CurrentControlSet\\Services\\" + sInfo.name;
-                if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, regPath.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS)
-                {
-                    char pathBuf[MAX_PATH];
-                    DWORD pathBufSize = sizeof(pathBuf);
-                    DWORD type;
-                    if (RegQueryValueExA(hKey, "ImagePath", NULL, &type, reinterpret_cast<LPBYTE>(pathBuf), &pathBufSize) == ERROR_SUCCESS)
-                    {
-                        sInfo.imagePath = pathBuf;
-                    }
-                    RegCloseKey(hKey);
-                }
-
-                servicesList.push_back(std::move(sInfo));
-            }
-        }
-
-        CloseServiceHandle(hSCM);
-        return servicesList;
+        return {};
     }
 
     models::DigitalFootprint WinSystemScanner::scanDigitalFootprint()

@@ -100,6 +100,8 @@ namespace ff::core
     )
     {
         (void)autostarts;
+        (void)procs;
+        (void)services;
         nlohmann::json report;
 
         // Report metadata
@@ -115,34 +117,36 @@ namespace ff::core
             timeStr.pop_back();
         report["metadata"]["scan_timestamp"] = timeStr;
 
-        report["artifacts"]["digital_footprint"]["hw_info"] = {
+        report["artifacts"]["digital_footprint"]["hw_info"] = 
+        {
             {"cpuName", footprint.hw_info.cpuName},
             {"gpuName", footprint.hw_info.gpuName},
             {"totalRamGB", footprint.hw_info.totalRamGB},
             {"motherboardSerial", footprint.hw_info.motherboardSerial}
         };
 
-        // Populate arrays (Old Architecture compatibility)
+        // Processes
         report["artifacts"]["processes"] = nlohmann::json::array();
-        for (const auto& p : procs) 
-        {
+        for (const auto& p : footprint.processes) {
             report["artifacts"]["processes"].push_back(processTo_json(p));
         }
 
+        // Persistence entries
         report["artifacts"]["persistence"] = nlohmann::json::array();
         for (const auto& e : footprint.persistence) {
             report["artifacts"]["persistence"].push_back(persistenceTo_json(e));
         }
 
+        // Network connections (legacy)
         report["artifacts"]["network_connections_legacy"] = nlohmann::json::array();
         for (const auto& c : connections) 
         {
             report["artifacts"]["network_connections_legacy"].push_back(networkTo_json(c));
         }
 
+        // Services and Drivers
         report["artifacts"]["services_and_drivers"] = nlohmann::json::array();
-        for (const auto& s : services) 
-        {
+        for (const auto& s : footprint.services) {
             report["artifacts"]["services_and_drivers"].push_back(serviceTo_json(s));
         }
 
@@ -155,6 +159,7 @@ namespace ff::core
         report["artifacts"]["digital_footprint"]["location"]["longitude"] = footprint.location.longitude;
         report["artifacts"]["digital_footprint"]["location"]["source"] = footprint.location.source;
 
+        // USB History
         report["artifacts"]["digital_footprint"]["usb_history"] = nlohmann::json::array();
         for (const auto& usb : footprint.usbHistory) 
         {
@@ -164,6 +169,7 @@ namespace ff::core
             });
         }
 
+        // User Activity
         report["artifacts"]["digital_footprint"]["user_activity"] = nlohmann::json::array();
         for (const auto& ua : footprint.userActivity) 
         {
@@ -174,10 +180,12 @@ namespace ff::core
             });
         }
 
+        // OS Information
         report["artifacts"]["digital_footprint"]["os_info"]["name"] = footprint.osInformation.osName;
         report["artifacts"]["digital_footprint"]["os_info"]["install_date"] = footprint.osInformation.installDate;
         report["artifacts"]["digital_footprint"]["os_info"]["boot_time"] = footprint.osInformation.bootTime;
 
+        // Browser History
         report["artifacts"]["digital_footprint"]["browser_history"] = nlohmann::json::array();
         for (const auto& b : footprint.browserHistory) 
         {
@@ -190,6 +198,7 @@ namespace ff::core
             });
         }
 
+        // Bluetooth History
         report["artifacts"]["digital_footprint"]["bluetooth_history"] = nlohmann::json::array();
         for (const auto& b : footprint.bluetoothHistory) 
         {
@@ -199,7 +208,7 @@ namespace ff::core
             });
         }
 
-        // NEW MODULAR AUTOPILOT ARTIFACTS
+        // Process Environments
         for (const auto& env : footprint.processEnvironments) 
         {
             report["artifacts"]["digital_footprint"]["process_environments"].push_back({
@@ -208,6 +217,7 @@ namespace ff::core
             });
         }
 
+        // Process File Descriptors
         for (const auto& fd : footprint.processFileDescriptors) 
         {
             report["artifacts"]["digital_footprint"]["process_open_files"].push_back({
@@ -216,6 +226,7 @@ namespace ff::core
             });
         }
 
+        // Process Credentials
         for (const auto& cred : footprint.processCredentials) 
         {
             report["artifacts"]["digital_footprint"]["process_credentials"].push_back({
@@ -225,6 +236,7 @@ namespace ff::core
             });
         }
 
+        // CGroups (Linux-specific)
         for (const auto& cg : footprint.processCgroups) 
         {
             report["artifacts"]["digital_footprint"]["process_cgroups"].push_back({
@@ -234,6 +246,7 @@ namespace ff::core
             });
         }
 
+        // Prefetch Files
         for (const auto& pf : footprint.prefetchFiles) 
         {
             report["artifacts"]["digital_footprint"]["prefetch_files"].push_back({
@@ -243,6 +256,7 @@ namespace ff::core
             });
         }
 
+        // Network Connections 
         for (const auto& conn : footprint.networkConnections) 
         {
             report["artifacts"]["digital_footprint"]["network_connections"].push_back({
@@ -255,6 +269,7 @@ namespace ff::core
             });
         }
 
+        // RDP Sessions
         for (const auto& rdp : footprint.rdpSessions) 
         {
             report["artifacts"]["digital_footprint"]["rdp_sessions"].push_back({
@@ -263,6 +278,7 @@ namespace ff::core
             });
         }
 
+        // Event Logs
         for (const auto& evt : footprint.eventLogs) 
         {
             report["artifacts"]["digital_footprint"]["event_logs"].push_back({
@@ -272,6 +288,7 @@ namespace ff::core
             });
         }
 
+        // Installed Software
         for (const auto& pkg : footprint.installedPackages) 
         {
             report["artifacts"]["digital_footprint"]["installed_packages"].push_back({
@@ -280,6 +297,7 @@ namespace ff::core
             });
         }
 
+        // Scheduled Tasks
         for (const auto& cron : footprint.scheduledTasks) 
         {
             report["artifacts"]["digital_footprint"]["scheduled_tasks"].push_back({

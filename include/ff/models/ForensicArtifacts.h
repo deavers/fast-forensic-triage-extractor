@@ -4,6 +4,8 @@
 #include <cstdint>
 
 #include "PersistenceEntry.h"
+#include "ProcessInfo.h"
+#include "ServiceInfo.h"
 
 namespace ff::models
 {
@@ -237,5 +239,9 @@ namespace ff::models
 
         // Persistence artifacts (cross-platform)
         std::vector<PersistenceEntry> persistence;
+
+        // Legacy artifacts (for backward compatibility and reporting)
+        std::vector<ProcessInfo> processes;
+        std::vector<ServiceInfo> services;
     };
 }
