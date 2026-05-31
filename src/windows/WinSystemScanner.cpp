@@ -163,7 +163,8 @@ namespace ff::windows
         return std::nullopt; 
     }
 
-    typedef struct _MIB_TCP6ROW_OWNER_PID {
+    typedef struct _MIB_TCP6ROW_OWNER_PID 
+    {
         UCHAR ucLocalAddr[16];
         DWORD dwLocalScopeId;
         DWORD dwLocalPort;
@@ -174,110 +175,15 @@ namespace ff::windows
         DWORD dwOwningPid;
     } MIB_TCP6ROW_OWNER_PID, *PMIB_TCP6ROW_OWNER_PID;
 
-    typedef struct _MIB_TCP6TABLE_OWNER_PID {
+    typedef struct _MIB_TCP6TABLE_OWNER_PID 
+    {
         DWORD dwNumEntries;
         MIB_TCP6ROW_OWNER_PID table[1];
     } MIB_TCP6TABLE_OWNER_PID, *PMIB_TCP6TABLE_OWNER_PID;
 
     std::vector<ff::models::NetworkConn> ff::windows::WinSystemScanner::scanNetwork()
     {
-        std::vector<models::NetworkConn> connections;
-        ULONG bufferSize = 0;
-
-        // BRANCH A: TCP IPv4 COLLECTION
-        GetExtendedTcpTable(NULL, &bufferSize, TRUE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0);
-        std::unique_ptr<char[]> ipv4Buffer = std::make_unique<char[]>(bufferSize);
-        PMIB_TCPTABLE_OWNER_PID pIpv4Table = reinterpret_cast<PMIB_TCPTABLE_OWNER_PID>(ipv4Buffer.get());
-
-        if (GetExtendedTcpTable(pIpv4Table, &bufferSize, TRUE, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0) == NO_ERROR)
-        {
-            for (DWORD i = 0; i < pIpv4Table->dwNumEntries; i++)
-            {
-                models::NetworkConn conn;
-                conn.protocol = models::Protocol::TCP;
-
-                char localIp[INET_ADDRSTRLEN] = { 0 };
-                char remoteIp[INET_ADDRSTRLEN] = { 0 };
-                struct in_addr addr;
-
-                addr.S_un.S_addr = pIpv4Table->table[i].dwLocalAddr;
-                inet_ntop(AF_INET, &addr, localIp, sizeof(localIp));
-                conn.localAddr = localIp;
-                conn.localPort = ntohs(static_cast<u_short>(pIpv4Table->table[i].dwLocalPort));
-
-                addr.S_un.S_addr = pIpv4Table->table[i].dwRemoteAddr;
-                inet_ntop(AF_INET, &addr, remoteIp, sizeof(remoteIp));
-                conn.remoteAddr = remoteIp;
-                conn.remotePort = ntohs(static_cast<u_short>(pIpv4Table->table[i].dwRemotePort));
-
-                switch (pIpv4Table->table[i].dwState)
-                {
-                    case MIB_TCP_STATE_LISTEN: conn.state = models::State::Listen; break;
-                    case MIB_TCP_STATE_ESTAB:  conn.state = models::State::Established; break;
-                    case MIB_TCP_STATE_TIME_WAIT: conn.state = models::State::TimeWait; break;
-                    case MIB_TCP_STATE_CLOSE_WAIT: conn.state = models::State::CloseWait; break;
-                    default: conn.state = models::State::Unknown; break;
-                }
-
-                conn.ownerPid = pIpv4Table->table[i].dwOwningPid;
-                conn.uid = 0;
-                connections.push_back(std::move(conn));
-            }
-        }
-
-        // BRANCH B: TCP IPv6 COLLECTION
-        bufferSize = 0;
-        GetExtendedTcpTable(NULL, &bufferSize, TRUE, AF_INET6, TCP_TABLE_OWNER_PID_ALL, 0);
-        
-        if (bufferSize > 0)
-        {
-            std::unique_ptr<char[]> ipv6Buffer = std::make_unique<char[]>(bufferSize);
-            void* pTableVoid = ipv6Buffer.get();
-
-            if (GetExtendedTcpTable(pTableVoid, &bufferSize, TRUE, AF_INET6, TCP_TABLE_OWNER_PID_ALL, 0) == NO_ERROR)
-            {
-                MIB_TCP6TABLE_OWNER_PID* pIpv6Table = reinterpret_cast<MIB_TCP6TABLE_OWNER_PID*>(pTableVoid);
-
-                for (DWORD i = 0; i < pIpv6Table->dwNumEntries; i++)
-                {
-                    models::NetworkConn conn;
-                    conn.protocol = models::Protocol::TCP;
-
-                    char localIp6[INET6_ADDRSTRLEN] = { 0 };
-                    char remoteIp6[INET6_ADDRSTRLEN] = { 0 };
-
-                    // Copy 16 bytes of IPv6 address directly into in6_addr structure
-                    struct in6_addr localAddr6;
-                    memcpy(&localAddr6, pIpv6Table->table[i].ucLocalAddr, 16); 
-                    inet_ntop(AF_INET6, &localAddr6, localIp6, sizeof(localIp6));
-                    
-                    conn.localAddr = localIp6;
-                    conn.localPort = ntohs(static_cast<u_short>(pIpv6Table->table[i].dwLocalPort));
-
-                    struct in6_addr remoteAddr6;
-                    memcpy(&remoteAddr6, pIpv6Table->table[i].ucRemoteAddr, 16); 
-                    inet_ntop(AF_INET6, &remoteAddr6, remoteIp6, sizeof(remoteIp6));
-
-                    conn.remoteAddr = remoteIp6;
-                    conn.remotePort = ntohs(static_cast<u_short>(pIpv6Table->table[i].dwRemotePort));
-
-                    switch (pIpv6Table->table[i].dwState)
-                    {
-                        case MIB_TCP_STATE_LISTEN: conn.state = models::State::Listen; break;
-                        case MIB_TCP_STATE_ESTAB:  conn.state = models::State::Established; break;
-                        case MIB_TCP_STATE_TIME_WAIT: conn.state = models::State::TimeWait; break;
-                        case MIB_TCP_STATE_CLOSE_WAIT: conn.state = models::State::CloseWait; break;
-                        default: conn.state = models::State::Unknown; break;
-                    }
-
-                    conn.ownerPid = pIpv6Table->table[i].dwOwningPid;
-                    conn.uid = 0;
-                    connections.push_back(std::move(conn));
-                }
-            }
-        }
-
-        return connections;
+        return {};
     }
 
     bool WinSystemScanner::isProcessElevated(uint32_t pid) const 

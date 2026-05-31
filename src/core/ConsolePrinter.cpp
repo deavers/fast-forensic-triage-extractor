@@ -15,7 +15,7 @@ namespace ff::utils
         // Print common data for both platforms
         printCommonData(footprint);
 
-        // 2. Call platform-specific output modules
+        // Call platform-specific output modules
         #if defined(FF_PLATFORM_LINUX)
             printLinuxSpecifics(footprint);
         #elif defined(FF_PLATFORM_WINDOWS)
@@ -47,19 +47,16 @@ namespace ff::utils
         if (!footprint.installedSoftware.empty()) 
         {
             std::cout << "[Active Software & Low-Level Process Tracking]:\n";
-
             for (const auto& sw : footprint.installedSoftware) 
             {
                 std::cout << "  -> " << sw << "\n";
             }
-
             std::cout << "\n";
         }
 
         if (!footprint.hostsLines.empty()) 
         {
             std::cout << "[Network Socket Bindings & Hosts Interceptions]:\n";
-
             for (const auto& hl : footprint.hostsLines) 
             {
                 std::cout << "  -> " << hl << "\n";
@@ -74,8 +71,7 @@ namespace ff::utils
         #if defined(FF_PLATFORM_LINUX)
             if (!footprint.linuxModules.empty()) 
             {
-                std::cout << "[Linux Resident Kernel Modules (LKM - Function 30)]:\n";
-
+                std::cout << "[Linux Resident Kernel Modules (LKM - Function 47)]:\n";
                 for (const auto& mod : footprint.linuxModules) 
                 {
                     std::cout << "  -> Module: " << mod.name << " | Size: " << mod.size << " bytes | State: " << mod.state << "\n";
@@ -85,8 +81,7 @@ namespace ff::utils
 
             if (!footprint.sshKeys.empty()) 
             {
-                std::cout << "[Linux Remote Access Artifacts (SSH Keys - Function 34)]:\n";
-
+                std::cout << "[Linux Remote Access Artifacts (SSH Keys - Function 56)]:\n";
                 for (const auto& key : footprint.sshKeys) 
                 {
                     std::cout << "  -> File: " << key.path << " | Snapshot: " << key.keyContent << "\n";
@@ -96,52 +91,53 @@ namespace ff::utils
 
             if (!footprint.processCredentials.empty())
             {
-                std::cout << "\n[Linux Process Credentials (UID/GID - Function 44)]:\n";
+                std::cout << "\n[Linux Process Credentials (Function 50)]:\n";
                 int count = 0;
-            
                 for (const auto& cred : footprint.processCredentials) 
                 {
-                    if (count++ > 5) 
-                    { 
-                        std::cout << "  ... (more processes hidden for console brevity. See JSON.)\n";
-                        break; 
-                    }
+                    if (count++ > 5) { std::cout << "  ... (more processes hidden. See JSON.)\n"; break; }
                     std::cout << "  -> PID: " << cred.pid << " | UID: " << cred.uid_info << " | GID: " << cred.gid_info << "\n";
                 }
             }
 
             if (!footprint.processFileDescriptors.empty())
             {
-                std::cout << "\n[Linux Open File Descriptors (Function 36)]:\n";
+                std::cout << "\n[Linux Open File Descriptors (Function 48)]:\n";
                 int count = 0;
-
                 for (const auto& fd : footprint.processFileDescriptors) 
                 {
-                    if (count++ > 5) 
-                        break;
+                    if (count++ > 5) break;
                     std::cout << "  -> PID: " << fd.pid << " | Open FDs: " << fd.openFiles << "\n";
                 }
             }
 
             if (!footprint.processEnvironments.empty())
             {
-                std::cout << "\n[Linux Process Environment Variables (Function 35)]:\n";
+                std::cout << "\n[Linux Process Environment Variables (Function 49)]:\n";
                 int count = 0;
-
                 for (const auto& env : footprint.processEnvironments)
                  {
-                    if (count++ > 5) 
-                        break;
+                    if (count++ > 5) break;
                     std::cout << "  -> PID: " << env.pid << " | ENV: " << env.envDump << "\n";
                 }
             }
 
             if (!footprint.processCgroups.empty())
             {
-                std::cout << "\n[Linux Container Isolation Triage (cgroups - Function 45)]:\n";
+                std::cout << "\n[Linux Container Isolation Triage (Function 51)]:\n";
                 for (const auto& cg : footprint.processCgroups) 
                 {
                     std::cout << "  -> PID: " << cg.pid << " | Container: " << cg.containerPath << "\n";
+                }
+            }
+            
+            if (!footprint.installedPackages.empty())
+            {
+                std::cout << "\n[Linux Installed Packages Inventory (Function 52)]:\n";
+                int count = 0;
+                for (const auto& pkg : footprint.installedPackages) {
+                    if (count++ > 10) break;
+                    std::cout << "  -> Package: " << pkg.name << " | Version: " << pkg.version << "\n";
                 }
             }
         #else
@@ -156,35 +152,65 @@ namespace ff::utils
         #if defined(FF_PLATFORM_WINDOWS)
             if (!footprint.arpEntries.empty()) 
             {
-                std::cout << "[Windows Kernel ARP Table (Function 32)]:\n";
-
+                std::cout << "[Windows Kernel ARP Table (Function 43)]:\n";
                 for (const auto& arp : footprint.arpEntries) 
                 {
                     std::cout << "  -> IP: " << arp.ipAddress << " \tMAC: " << arp.macAddress << " [" << arp.type << "]\n";
                 }
-
                 std::cout << "\n";
             }
 
             if (!footprint.firewallRules.empty()) 
             {
-                std::cout << "[Windows Active Firewall Rules Triage (Function 33)]:\n";
-
+                std::cout << "[Windows Active Firewall Rules Triage (Function 39)]:\n";
                 for (const auto& rule : footprint.firewallRules) 
                 {
                     std::cout << "  -> Rule: " << rule.ruleName << "\n";
                 }
-
                 std::cout << "\n";
+            }
+
+            if (!footprint.networkConnections.empty())
+            {
+                std::cout << "\n[Windows Network Connections Triage (Function 35 & 36)]:\n";
+                
+                int count = 0;
+                for (const auto& conn : footprint.networkConnections) 
+                {
+                    if (count++ > 10) { std::cout << "  ... (more connections hidden for console brevity. See JSON.)\n"; break; }
+                    std::cout << "  -> [" << conn.protocol << "] " 
+                              << conn.localIp << ":" << conn.localPort << " --> " 
+                              << conn.remoteIp << ":" << conn.remotePort 
+                              << " | State: " << conn.state << "\n";
+                }
+            }
+
+            if (!footprint.rdpSessions.empty())
+            {
+                std::cout << "\n[Windows RDP Lateral Movement Triage (Function 20)]:\n";
+                for (const auto& rdp : footprint.rdpSessions) 
+                {
+                    std::cout << "  -> Target Host: " << rdp.targetHost << " | Hint: " << rdp.usernameHint << "\n";
+                }
+            }
+
+            if (!footprint.eventLogs.empty())
+            {
+                std::cout << "\n[Windows Event Log Security Triage (Function 03)]:\n";
+                for (const auto& evt : footprint.eventLogs) 
+                {
+                    std::cout << "  -> Event: " << evt.eventId << " | Time: " << evt.timestamp << " | " << evt.details << "\n";
+                }
             }
 
             if (!footprint.prefetchFiles.empty())
             {
-                std::cout << "\n[Windows Prefetch Execution Triage (Function 46)]:\n";
-                for (const auto& pf : footprint.prefetchFiles) {
+                std::cout << "\n[Windows Prefetch Execution Triage (Function 02)]:\n";
+                for (const auto& pf : footprint.prefetchFiles) 
+                {
                     std::cout << "  -> Executable: " << pf.executableName 
-                            << " | File: " << pf.prefetchFileName 
-                            << " | Last Run: " << pf.lastRunTime << "\n";
+                              << " | File: " << pf.prefetchFileName 
+                              << " | Last Run: " << pf.lastRunTime << "\n";
                 }
             }
         #else

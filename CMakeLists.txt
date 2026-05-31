@@ -41,7 +41,8 @@ elseif(WIN32)
         src/linux/artifacts/filesystem/SystemdScanner.cpp
         src/windows/artifacts/system/PrefetchScanner.cpp
         src/windows/artifacts/system/WmiHardwareScanner.cpp
-        src/windows/artifacts/registry/RdpScanner.cpp)
+        src/windows/artifacts/registry/RdpScanner.cpp
+        src/windows/artifacts/network/NetworkConnectionsScanner.cpp)
     target_compile_definitions(fastforensics PRIVATE FF_PLATFORM_WINDOWS)
     
     # System libraries for WinAPI low-level forensic functions for network and signatures

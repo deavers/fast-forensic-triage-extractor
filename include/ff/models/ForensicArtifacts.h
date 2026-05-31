@@ -79,6 +79,16 @@ namespace ff::models
         std::string type;
     };
 
+    struct NetworkConnEntry
+    {
+        std::string protocol;
+        std::string localIp;
+        std::string localPort;
+        std::string remoteIp;
+        std::string remotePort;
+        std::string state;
+    };
+
     // Windows Firewall Rules (Function 33)
     struct FirewallRuleEntry
     {
@@ -209,5 +219,8 @@ namespace ff::models
         // Remote access and event log artifacts
         std::vector<RdpSession> rdpSessions;
         std::vector<EventLogEntry> eventLogs;
+
+        std::vector<NetworkConnEntry> networkConnections;
+        std::vector<ArpTableEntry> arpTable;
     };
 }

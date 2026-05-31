@@ -22,9 +22,12 @@ namespace ff::core
             j["ppid"] = p.ppid;
             j["name"] = p.name;
             
-            if (p.exePath) {
+            if (p.exePath) 
+            {
                 j["exePath"] = *p.exePath;
-            } else {
+            } 
+            else 
+            {
                 j["exePath"] = nullptr;
             }
             
@@ -50,10 +53,12 @@ namespace ff::core
             j["remotePort"] = c.remotePort;
             j["state"] = stateStr;
             
-            // Fixed: Avoid ternary for ownerPid as well
-            if (c.ownerPid) {
+            if (c.ownerPid) 
+            {
                 j["ownerPid"] = *c.ownerPid;
-            } else {
+            } 
+            else 
+            {
                 j["ownerPid"] = nullptr;
             }
             
@@ -63,7 +68,8 @@ namespace ff::core
 
         nlohmann::json persistenceTo_json(const models::PersistenceEntry& e)
         {
-            return nlohmann::json{
+            return nlohmann::json
+            {
                 {"type", e.type == models::PersistenceType::RegistryRun ? "RegistryRun" : "ScheduledTask"},
                 {"name", e.name},
                 {"trigger", e.trigger},
@@ -73,7 +79,8 @@ namespace ff::core
 
         nlohmann::json serviceTo_json(const models::ServiceInfo& s)
         {
-            return nlohmann::json{
+            return nlohmann::json
+            {
                 {"name", s.name},
                 {"displayName", s.displayName},
                 {"imagePath", s.imagePath},
@@ -103,7 +110,8 @@ namespace ff::core
 
         // Safe time formatting, remove newline from ctime
         std::string timeStr = std::ctime(&now_time);
-        if (!timeStr.empty() && timeStr.back() == '\n') timeStr.pop_back();
+        if (!timeStr.empty() && timeStr.back() == '\n') 
+            timeStr.pop_back();
         report["metadata"]["scan_timestamp"] = timeStr;
 
         report["artifacts"]["digital_footprint"]["hw_info"] = {
@@ -113,27 +121,28 @@ namespace ff::core
             {"motherboardSerial", footprint.hw_info.motherboardSerial}
         };
 
-        // Populate process array
+        // Populate arrays (Old Architecture compatibility)
         report["artifacts"]["processes"] = nlohmann::json::array();
-        for (const auto& p : procs) {
+        for (const auto& p : procs) 
+        {
             report["artifacts"]["processes"].push_back(processTo_json(p));
         }
 
-        // Autostarts / Persistence
         report["artifacts"]["persistence"] = nlohmann::json::array();
-        for (const auto& e : autostarts) {
+        for (const auto& e : autostarts) 
+        {
             report["artifacts"]["persistence"].push_back(persistenceTo_json(e));
         }
 
-        // Network connections
-        report["artifacts"]["network_connections"] = nlohmann::json::array();
-        for (const auto& c : connections) {
-            report["artifacts"]["network_connections"].push_back(networkTo_json(c));
+        report["artifacts"]["network_connections_legacy"] = nlohmann::json::array();
+        for (const auto& c : connections) 
+        {
+            report["artifacts"]["network_connections_legacy"].push_back(networkTo_json(c));
         }
 
-        // Services and drivers
         report["artifacts"]["services_and_drivers"] = nlohmann::json::array();
-        for (const auto& s : services) {
+        for (const auto& s : services) 
+        {
             report["artifacts"]["services_and_drivers"].push_back(serviceTo_json(s));
         }
 
@@ -147,7 +156,8 @@ namespace ff::core
         report["artifacts"]["digital_footprint"]["location"]["source"] = footprint.location.source;
 
         report["artifacts"]["digital_footprint"]["usb_history"] = nlohmann::json::array();
-        for (const auto& usb : footprint.usbHistory) {
+        for (const auto& usb : footprint.usbHistory) 
+        {
             report["artifacts"]["digital_footprint"]["usb_history"].push_back({
                 {"deviceInstanceId", usb.deviceInstanceId},
                 {"friendlyName", usb.friendlyName}
@@ -155,11 +165,12 @@ namespace ff::core
         }
 
         report["artifacts"]["digital_footprint"]["user_activity"] = nlohmann::json::array();
-        for (const auto& ua : footprint.userActivity) {
+        for (const auto& ua : footprint.userActivity) 
+        {
             report["artifacts"]["digital_footprint"]["user_activity"].push_back({
                 {"programPath", ua.programPath},
                 {"runCount", ua.runCount},
-                {"totalActiveMinutes", ua.totalActiveMinutes} // minutes json
+                {"totalActiveMinutes", ua.totalActiveMinutes}
             });
         }
 
@@ -168,7 +179,8 @@ namespace ff::core
         report["artifacts"]["digital_footprint"]["os_info"]["boot_time"] = footprint.osInformation.bootTime;
 
         report["artifacts"]["digital_footprint"]["browser_history"] = nlohmann::json::array();
-        for (const auto& b : footprint.browserHistory) {
+        for (const auto& b : footprint.browserHistory) 
+        {
             report["artifacts"]["digital_footprint"]["browser_history"].push_back({
                 {"browser", b.browser == models::BrowserType::MozillaFirefox ? "MozillaFirefox" : "Other"},
                 {"url", b.url},
@@ -179,28 +191,33 @@ namespace ff::core
         }
 
         report["artifacts"]["digital_footprint"]["bluetooth_history"] = nlohmann::json::array();
-        for (const auto& b : footprint.bluetoothHistory) {
+        for (const auto& b : footprint.bluetoothHistory) 
+        {
             report["artifacts"]["digital_footprint"]["bluetooth_history"].push_back({
                 {"name", b.name},
                 {"macAddress", b.macAddress}
             });
         }
 
-        for (const auto& env : footprint.processEnvironments) {
+        // NEW MODULAR AUTOPILOT ARTIFACTS
+        for (const auto& env : footprint.processEnvironments) 
+        {
             report["artifacts"]["digital_footprint"]["process_environments"].push_back({
                 {"pid", env.pid},
                 {"envDump", env.envDump}
             });
         }
 
-        for (const auto& fd : footprint.processFileDescriptors) {
+        for (const auto& fd : footprint.processFileDescriptors) 
+        {
             report["artifacts"]["digital_footprint"]["process_open_files"].push_back({
                 {"pid", fd.pid},
                 {"openFiles", fd.openFiles}
             });
         }
 
-        for (const auto& cred : footprint.processCredentials) {
+        for (const auto& cred : footprint.processCredentials) 
+        {
             report["artifacts"]["digital_footprint"]["process_credentials"].push_back({
                 {"pid", cred.pid},
                 {"uid_info", cred.uid_info},
@@ -208,7 +225,8 @@ namespace ff::core
             });
         }
 
-        for (const auto& cg : footprint.processCgroups) {
+        for (const auto& cg : footprint.processCgroups) 
+        {
             report["artifacts"]["digital_footprint"]["process_cgroups"].push_back({
                 {"pid", cg.pid},
                 {"containerPath", cg.containerPath},
@@ -216,7 +234,8 @@ namespace ff::core
             });
         }
 
-        for (const auto& pf : footprint.prefetchFiles) {
+        for (const auto& pf : footprint.prefetchFiles) 
+        {
             report["artifacts"]["digital_footprint"]["prefetch_files"].push_back({
                 {"executableName", pf.executableName},
                 {"prefetchFileName", pf.prefetchFileName},
@@ -224,12 +243,67 @@ namespace ff::core
             });
         }
 
+        for (const auto& conn : footprint.networkConnections) 
+        {
+            report["artifacts"]["digital_footprint"]["network_connections"].push_back({
+                {"protocol", conn.protocol},
+                {"localIp", conn.localIp},
+                {"localPort", conn.localPort},
+                {"remoteIp", conn.remoteIp},
+                {"remotePort", conn.remotePort},
+                {"state", conn.state}
+            });
+        }
+
+        for (const auto& rdp : footprint.rdpSessions) 
+        {
+            report["artifacts"]["digital_footprint"]["rdp_sessions"].push_back({
+                {"targetHost", rdp.targetHost},
+                {"usernameHint", rdp.usernameHint}
+            });
+        }
+
+        for (const auto& evt : footprint.eventLogs) 
+        {
+            report["artifacts"]["digital_footprint"]["event_logs"].push_back({
+                {"eventId", evt.eventId},
+                {"timestamp", evt.timestamp},
+                {"details", evt.details}
+            });
+        }
+
+        for (const auto& pkg : footprint.installedPackages) 
+        {
+            report["artifacts"]["digital_footprint"]["installed_packages"].push_back({
+                {"name", pkg.name},
+                {"version", pkg.version}
+            });
+        }
+
+        for (const auto& cron : footprint.scheduledTasks) 
+        {
+            report["artifacts"]["digital_footprint"]["scheduled_tasks"].push_back({
+                {"filePath", cron.filePath},
+                {"taskLine", cron.taskLine}
+            });
+        }
+
+        for (const auto& unit : footprint.systemdUnits) 
+        {
+            report["artifacts"]["digital_footprint"]["systemd_units"].push_back({
+                {"name", unit.name},
+                {"state", unit.state}
+            });
+        }
+
         // Save file to disk
         std::ofstream file(std::string{outputPath});
-        if (!file.is_open()) return false;
+        if (!file.is_open()) 
+            return false;
 
         file << report.dump(4);
         file.close();
+        
         return true;
     }
 } // namespace ff::core
