@@ -1,29 +1,37 @@
-## 🎓 Academic Integrity & Contribution Matrix
+# 🛡️ Fast Forensic Triage Extractor (FFTE)
 
+> A high-performance, cross-platform (Windows WinAPI / Linux Pseudo-FS) forensic live response triage collection tool. Implemented in pure C++20 with an automated, self-registering plugin architecture and built-in anti-reverse engineering protections.
+
+## 🚀 Architecture Overview
 * **Zero-Dependency Core:** Statically linked C++ runtime (`-static`). Only relies on native OS APIs (`<windows.h>`, `<iphlpapi.h>`, WMI COM) and Pseudo-FS (`/proc`), allowing execution directly from a USB drive on infected machines without any pre-installed libraries.
-
-*Note for Reviewers: This table demonstrates full transparency regarding the development process.* * **Idea:** Who architected the forensic logic.
-* **Realization:** Who wrote the actual C++ implementation.
-
-### 🔥 Top 10 Advanced DFIR Capabilities (High Complexity)
-*These modules interact directly with OS kernels, undocumented structures, or advanced evasion techniques.*
-
-| # | Forensic Module | Data Extracted / Method | Idea | Status / Coder |
-|:---:|:---|:---|:---:|:---:|
-| **1** | **Authenticode Verification** | Calls `WinVerifyTrust` to detect unsigned Rootkit `.sys` drivers. | AI | ✅ AI |
-| **2** | **LKM Triage (Linux)** | Parses `/proc/modules` to detect hidden Linux Kernel Modules. | AI | ✅ AI + Me |
-| **3** | **IFEO / AppInit Persistence** | Extracts stealthy registry hooking mechanisms used by APTs. | AI | ❌ Pending |
-| **4** | **Injected DLL Detection** | Reads process memory to find unbacked executable memory regions. | AI | ❌ Pending |
-| **5** | **Process Memory MiniDump** | Executes `MiniDumpWriteDump` for offline Yara scanning. | Me | ❌ Pending |
-| **6** | **Kernel ARP Table** | Queries `GetIpNetTable` to bypass user-land network spoofing. | Me | ✅ AI + Me |
-| **7** | **Hidden Processes Scan** | Uses `NtQuerySystemInformation` to bypass Task Manager hooks. | AI | ❌ Pending |
-| **8** | **Container Isolation (cgroups)** | Detects if the malware/system is running inside Docker/LXC. | AI | ❌ Pending |
-| **9** | **Winsock LSP Hijacks** | Inspects hidden proxy layers intercepting network traffic. | AI | ❌ Pending |
-| **10** | **Focus Time Calculator** | Translates 64-bit Windows FILETIME into active user screen-time. | Me | ✅ AI + Me |
+* **Autopilot Plugin System:** Modules self-register into the RAM at runtime before `main()` executes via static initialization vectors.
+* **Stealth & Evasion:** Includes XOR string obfuscation and Anti-Debugging Honeypot mechanics to feed fake Decoy data to debuggers (IDA Pro / x64dbg).
+* **Const-Correctness & RAII:** Strictly follows modern C++20 resource management principles to prevent memory leaks during forensic data extraction.
 
 ---
 
-### 🖥️ Windows — Processes & Memory (`WinSystemScanner.cpp`)
+## 🎓 Academic Integrity & Contribution Matrix
+
+*Note for Reviewers: This table demonstrates full transparency regarding the development process. Original function numbers are preserved to match Git commit logs exactly.*
+* **Idea:** Who architected the forensic logic.
+* **Realization:** Who wrote the actual C++ implementation.
+* 🔥 = *Advanced execution evasion/kernel structures.*
+* 📖 = *Based on "Windows Forensics Analyst Field Guide 2023" methodology.*
+
+### 🏆 Top 5 Advanced DFIR & Academic Research Capabilities
+*This highlight matrix showcases the most technically complex modules developed in this project, including low-level kernel interactions, memory analysis, and methodologies derived from professional DFIR literature.*
+
+| # | Forensic Module | Technical Implementation & Data Extracted | Idea Source | Status |
+|:---:|:---|:---|:---:|:---:|
+| **56** | **WMI Hardware Telemetry** | Interacts with complex Windows COM interfaces (`wbemuuid`) to extract raw SMBIOS motherboard serials and CPU/GPU data. | Me | ✅ |
+| **52** | **Event Logs Security** 📖 | Uses `EvtQuery` API to parse low-level XML payloads detecting Brute-Force attacks (Event ID 4625). | Book | ✅ |
+| **29** | **Authenticode Verification** 🔥| Calls `WinVerifyTrust` kernel API to detect unsigned `.sys` Rootkits injected into the operating system. | AI | ✅ |
+| **41** | **Linux Kernel Modules** 🔥| Parses Ring-0 `/proc/modules` to detect hidden Linux Kernel Modules (LKM). | AI | ✅ |
+| **51** | **Prefetch Execution Triage** 📖| Deep filesystem parsing of restricted `.pf` execution artifacts to extract precise historical timestamps. | Book | ✅ |
+
+---
+
+### 🖥️ Windows — Processes & Memory (`src/windows/artifacts/system/`)
 
 | # | Capability | Data Extracted / Method | Idea | Status / Coder |
 |:---:|:---|:---|:---:|:---:|
@@ -34,7 +42,7 @@
 | **15** | `scanProcessHandles()` | Locked files, mutexes, and registry keys | Me | ❌ Pending |
 | **16** | `getProcessIntegrity()` | Security tokens (Low/Medium/High/System) | Me | ✅ Me |
 
-### 🖥️ Windows — Registry & Autorun (`WinSystemScanner.cpp`)
+### 🖥️ Windows — Registry & Autorun (`src/windows/artifacts/registry/`)
 
 | # | Capability | Data Extracted / Method | Idea | Status / Coder |
 |:---:|:---|:---|:---:|:---:|
@@ -46,7 +54,7 @@
 | **22** | `scanWinlogonNotify()` | Logon notification stealth DLLs | AI | ✅ AI + Me |
 | **23** | `scanBrowserExtensions()`| Malicious registry browser hooks | Me | ❌ Pending |
 
-### 🖥️ Windows — System & Drivers (`WinSystemScanner.cpp`)
+### 🖥️ Windows — System & Drivers (`src/windows/artifacts/system/`)
 
 | # | Capability | Data Extracted / Method | Idea | Status / Coder |
 |:---:|:---|:---|:---:|:---:|
@@ -55,10 +63,10 @@
 | **26** | `getWindowsLastShutdown()`| Dirty/Clean shutdown logs | Me | ❌ Pending |
 | **27** | `scanPagefileUsage()` | Size and path of `pagefile.sys` RAM dump | AI | ❌ Pending |
 | **28** | `scanHibernationFile()` | Size and path of `hiberfil.sys` | AI | ❌ Pending |
-| **29** | `scanSwapFileUsage()` | Size and path of `swapfile.sys` | AI | ❌ Pending |
-| **30** | `scanTempFiles()` | Triage of `%TEMP%` executable payloads | Me | ✅ Me |
+| **29** | **Authenticode Verify** 🔥| Calls `WinVerifyTrust` to detect unsigned `.sys` Rootkits | AI | ✅ AI |
+| **30** | `scanSwapFileUsage()` | Size and path of `swapfile.sys` | AI | ❌ Pending |
 
-### 🌐 Windows — Network (`WinSystemScanner.cpp`)
+### 🌐 Windows — Network Interface (`src/windows/artifacts/network/`)
 
 | # | Capability | Data Extracted / Method | Idea | Status / Coder |
 |:---:|:---|:---|:---:|:---:|
@@ -70,33 +78,36 @@
 | **36** | `getProxySettings()` | WinINET default gateway overrides | Me | ✅ Me |
 | **37** | `scanHostsFile()` | Contents of `etc/hosts` DNS hijacking | Me | ✅ AI + Me |
 
-### 🐧 Linux — Processes & Filesystem (`artifacts/`)
+### 🐧 Linux — Processes & Memory (`src/linux/artifacts/process/`)
 
 | # | Capability | Data Extracted / Method | Idea | Status / Coder |
 |:---:|:---|:---|:---:|:---:|
-| **41** | `scanKernelModules()` | `/proc/modules` load base and sizes | AI | ✅ AI + Me |
+| **41** | **LKM Triage** 🔥 | `/proc/modules` load base and sizes | AI | ✅ AI + Me |
 | **42** | `getProcessOpenFiles()` | Symlinks from `/proc/[pid]/fd` | AI | ✅ AI + Me |
-| **43** | `getProcessEnvironment()` | Null-byte separated `/proc/[pid]/environ` | AI | ✅ AI + Me |
-| **44** | `getProcessCredentials()` | Real/Effective UID & GID from `status` | AI | ✅ AI + Me |
-| **45** | `scanCgroups()` | Isolation paths (Docker/Kubernetes/LXC) | AI | ✅ AI + Me |
-| **46** | `scanInstalledPackages()` | `/var/lib/dpkg/status` software inventory | Me | ✅ AI + Me |
+| **43** | `getProcessEnvironment()`| Null-byte separated `/proc/[pid]/environ` | AI | ✅ AI + Me |
+| **44** | `getProcessCredentials()`| Real/Effective UID & GID from `status` | AI | ✅ AI + Me |
+| **45** | **Container Isolation** 🔥| Isolation paths (Docker/Kubernetes/LXC) via `cgroups` | AI | ✅ AI + Me |
+
+### 🐧 Linux — Filesystem & Packages (`src/linux/artifacts/filesystem/`)
+
+| # | Capability | Data Extracted / Method | Idea | Status / Coder |
+|:---:|:---|:---|:---:|:---:|
+| **46** | `scanInstalledPackages()`| DPKG/RPM software inventory lists | Me | ✅ AI + Me |
 | **47** | `scanScheduledTasks()` | Contents of `/etc/crontab` | Me | ✅ AI + Me |
-| **48** | `scanSystemdUnits()` | Enabled `systemctl` services (`multi-user.target`) | AI | ✅ AI + Me |
+| **48** | `scanSystemdUnits()` | Enabled `systemctl` services | AI | ✅ AI + Me |
 | **49** | `scanMountPoints()` | `/proc/mounts` remote/local drives | Me | ✅ Me |
 | **50** | `scanSSHKeys()` | `~/.ssh/authorized_keys` persistence | Me | ✅ AI + Me |
 
-### 📖 Advanced DFIR Research (Based on "Windows Forensics Analyst Field Guide 2023")
+### 📖 Advanced DFIR Research (Based on "Windows Forensics Analyst Field Guide 2023" & WMI)
 
-*Note: These modules were conceptualized using professional DFIR literature to extract deep-system artifacts beyond standard API calls.*
-
-| # | Capability | Data Extracted / Method | Idea | Status / Coder |
+| # | Capability | Data Extracted / Method (Target Directory) | Idea | Status / Coder |
 |:---:|:---|:---|:---:|:---:|
-| **51** | `scanPrefetchFiles()` | `.pf` files execution evidence & precise timestamps | Book / Me | ✅ AI + Me |
-| **52** | `scanEventLogs()` | High-risk Security IDs (4624, 4625, 7045) via `EvtQuery` | Book / Me | ❌ Pending |
-| **53** | `scanAmcache()` | `AppCompatCache` hidden execution history parsing | Book / Me | ❌ Pending |
-| **54** | `scanRDPSessions()` | `Terminal Server Client` registry traversal | Book / Me | ❌ Pending |
-| **55** | `scanSRUMDatabase()` | `SRUDB.dat` hidden network/resource usage metrics | Book / Me | ❌ Pending |
-| **56** | `scanHardwareWMI()` | CPU, GPU, RAM, Motherboard SMBIOS Serial via WMI COM interfaces | Me | ✅ AI + Me |
+| **51** | `scanPrefetchFiles()` | `.pf` files execution evidence (`src/windows/artifacts/system/`) | Book/Me| ✅ AI + Me |
+| **52** | `scanEventLogs()` | Security IDs 4625 via `EvtQuery` (`src/windows/artifacts/system/`) | Book/Me| ✅ AI + Me |
+| **53** | `scanAmcache()` | `AppCompatCache` execution history (`src/windows/artifacts/registry/`)| Book/Me| ❌ Pending |
+| **54** | `scanRDPSessions()` | `Terminal Server Client` tracking (`src/windows/artifacts/registry/`) | Book/Me| ✅ AI + Me |
+| **55** | `scanSRUMDatabase()` | `SRUDB.dat` hidden metrics (`src/windows/artifacts/network/`) | Book/Me| ❌ Pending |
+| **56** | `scanHardwareWMI()` | Motherboard Serial, CPU, GPU, RAM (`src/windows/artifacts/system/`) | Me | ✅ AI + Me |
 
 ---
 

@@ -150,7 +150,18 @@ namespace ff::models
         std::string state;
     };
 
+    struct RdpSession
+    {
+        std::string targetHost;
+        std::string usernameHint;
+    };
 
+    struct EventLogEntry
+    {
+        std::string eventId;
+        std::string timestamp;
+        std::string details;
+    };
 
 
 
@@ -194,5 +205,9 @@ namespace ff::models
         std::vector<PkgInfo> installedPackages;
         std::vector<CronTask> scheduledTasks;
         std::vector<SystemdUnit> systemdUnits;
+
+        // Remote access and event log artifacts
+        std::vector<RdpSession> rdpSessions;
+        std::vector<EventLogEntry> eventLogs;
     };
 }
