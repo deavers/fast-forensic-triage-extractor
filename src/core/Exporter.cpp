@@ -97,11 +97,11 @@ namespace ff::core
             {"isProxyActive", footprint.anonymity.isProxyActive}, {"isVpnActive", footprint.anonymity.isVpnActive}, {"activeAdapters", footprint.anonymity.activeAdapters}
         };
 
-        // Web & Browser
+        // Web & Browser — use toString() helper instead of raw ternary
         for (const auto& b : footprint.browserHistory) 
         {
             report["artifacts"]["digital_footprint"]["browser_history"].push_back({
-                {"browser", b.browser == models::BrowserType::MozillaFirefox ? "MozillaFirefox" : "Other"},
+                {"browser", std::string(models::toString(b.browser))},
                 {"url", b.url}, {"title", b.title}, {"visitCount", b.visitCount}, {"lastVisitTime", b.lastVisitTime}
             });
         }
