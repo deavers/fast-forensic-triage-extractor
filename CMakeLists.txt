@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CORE_SOURCES
     src/main.cpp
     src/core/Exporter.cpp
-    src/core/ConsolePrinter.cpp
+    src/utils/ConsolePrinter.cpp
 )
 
 if(UNIX AND NOT APPLE)
