@@ -303,6 +303,15 @@ namespace ff::core
             });
         }
 
+        for (const auto& dns : footprint.dnsCache) 
+        {
+            report["artifacts"]["digital_footprint"]["dns_cache"].push_back({
+                {"recordName", dns.recordName},
+                {"recordType", dns.recordType},
+                {"data", dns.data}
+            });
+        }
+
         // Save file to disk
         std::ofstream file(std::string{outputPath});
         if (!file.is_open()) 

@@ -199,6 +199,13 @@ namespace ff::models
         std::string updateUrl;
     };
 
+    struct DnsCacheEntry
+    {
+        std::string recordName;
+        std::string recordType;
+        std::string data;
+    };
+
     // Global structure to hold all forensic artifacts and information
     struct DigitalFootprint
     {
@@ -259,6 +266,10 @@ namespace ff::models
         // Clipboard artifacts (cross-platform)
         std::vector<ClipboardEntry> clipboardData;
 
+        // Browser extension artifacts
         std::vector<BrowserExtensionEntry> browserExtensions;
+
+        // DNS Cache artifacts
+        std::vector<DnsCacheEntry> dnsCache;
     };
 }

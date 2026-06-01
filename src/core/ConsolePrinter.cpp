@@ -246,6 +246,24 @@ namespace ff::utils
                               << " | URL: " << ext.updateUrl << "\n";
                 }
             }
+
+            if (!footprint.dnsCache.empty())
+            {
+                std::cout << "\n[Windows Live DNS Cache (Hidden Web History Triage)]:\n";
+                int count = 0;
+
+                for (const auto& dns : footprint.dnsCache) 
+                {
+                    if (count++ > 15) 
+                    { 
+                        std::cout << "  ... (more DNS records hidden. See JSON.)\n"; 
+                        break; 
+                    }
+                    std::cout << "  -> Domain: " << dns.recordName 
+                              << " | Type: " << dns.recordType 
+                              << " | Resolves To: " << dns.data << "\n";
+                }
+            }
         #else
             // Silencing the unused parameter warning on Linux
             (void)footprint; 
