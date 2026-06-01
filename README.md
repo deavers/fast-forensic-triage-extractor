@@ -2,6 +2,18 @@
 
 > A high-performance, cross-platform (Windows WinAPI / Linux Pseudo-FS) forensic live response triage collection tool. Implemented in pure C++20 with an automated, self-registering plugin architecture and built-in anti-reverse engineering protections.
 
+***
+
+## ❓ What is it and why is it needed?
+
+**FFTE** is a high-performance **Digital Forensics Live Response** tool designed for the rapid collection of digital artifacts from compromised or suspicious systems — without requiring system downtime or the installation of third-party software.
+
+In cybersecurity incident response, **time is the most valuable resource**. If an attacker or malware is present in a system, they can wipe forensic traces (logs, history, cache) at any moment.
+
+FFTE allows forensic investigators and system administrators to execute a single, standalone `.exe` file that instantly captures a **"snapshot"** of the system's state — including volatile memory, network connections, active processes, and persistence mechanisms — saving the results into a structured **JSON report** for immediate analysis.
+
+***
+
 ## 🚀 Architecture Overview
 
 ![FFTE Architecture Map](mindmap.png)
@@ -128,7 +140,22 @@
 | **55** | `scanSRUMDatabase()` | `SRUDB.dat` hidden metrics (`src/windows/artifacts/network/`) | Book/Me| ⏳ Planned (Deep Forensics) |
 | **56** | `scanHardwareWMI()` | Motherboard Serial, CPU, GPU, RAM (`src/windows/artifacts/system/`) | Me | ✅ AI + Me |
 
----
+***
+
+## 📊 How to use the Web Dashboard (FFTE Viewer)
+
+After generating the `forensic_report.json` using the FFTE executable, follow these steps to visualize the data:
+
+1. **Locate the file:** Ensure `viewer.html` and `forensic_report.json` are in the same directory (or just have the JSON file ready).
+2. **Open the Dashboard:** Open `viewer.html` in any modern web browser (Chrome, Brave, Edge).
+3. **Upload Report:** Click the **"Load JSON Report"** button in the dashboard and select your `forensic_report.json` file.
+4. **Analyze:** The dashboard will instantly parse the data locally in your browser memory (RAM), providing an interactive view with:
+   - **Interactive Tables:** Sorting, global search, and filtering (e.g., filter memory anomalies by `RWX` status).
+   - **Architecture Map:** Visual flow of the FFTE execution process.
+   - **Data Exfiltration:** View clipboard contents and network resolution (DNS Cache).
+   - **Export:** Save your analysis to CSV for further deep-dive investigations.
+
+***
 
 ## 🛠️ Build Instructions
 
@@ -151,3 +178,59 @@ mkdir build_linux && cd build_linux
 cmake ..
 cmake --build .
 ```
+
+---
+
+## ▶️ Usage
+
+### 🪟 Windows
+
+After building, run the executable directly — **no installation required**.
+
+```bash
+# From the build directory:
+.\fastforensics.exe
+
+# Or specify a custom output path:
+.\fastforensics.exe --output C:\forensics\report.json
+```
+
+> **Tip:** Run as **Administrator** to enable full artifact collection (registry, event logs, process handles, memory scanning).
+
+```powershell
+# Run elevated via PowerShell:
+Start-Process -FilePath ".\fastforensics.exe" -Verb RunAs
+```
+
+The report will be saved as `forensic_report.json` in the current directory.
+
+---
+
+### 🐧 Linux
+
+```bash
+# Make executable (first time only):
+chmod +x ./fastforensics
+
+# Run as root for full artifact access (/proc, kernel modules, cgroups):
+sudo ./fastforensics
+
+# Or specify a custom output path:
+sudo ./fastforensics --output /tmp/forensic_report.json
+```
+
+> **Note:** Root privileges are required for `/proc/[pid]/mem`, LKM triage, and container isolation detection.
+
+The report will be saved as `forensic_report.json` in the current directory.
+
+---
+
+### 📁 Output
+
+Both platforms produce a unified structured report:
+
+```
+forensic_report.json   ← structured artifact snapshot
+```
+
+Open `viewer.html` in any modern browser and load the JSON file to visualize results interactively.
