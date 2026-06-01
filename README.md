@@ -69,7 +69,7 @@
 | **20** | `scanScheduledTasks()` | `TaskCache\Tree` registry extraction | Me | ✅ AI + Me |
 | **21** | `scanBootExecute()` | Session Manager boot-time execution | Me | ✅ Me |
 | **22** | `scanWinlogonNotify()` | Logon notification stealth DLLs | AI | ✅ AI + Me |
-| **23** | `scanBrowserExtensions()`| Malicious registry browser hooks | Me | ❌ Pending |
+| **23** | `scanBrowserExtensions()`| Malicious registry browser hooks | Me | ✅ AI + Me |
 
 ### 🖥️ Windows — System & Drivers (`src/windows/artifacts/system/`)
 
@@ -78,10 +78,10 @@
 | **24** | `scanFailedDriverLoads()` | EventLog traces of failed rootkit injection | AI | ❌ Pending |
 | **25** | `getWindowsInstallDate()` | Epoch timestamp of OS installation | Me | ✅ Me |
 | **26** | `getWindowsLastShutdown()`| Dirty/Clean shutdown logs | Me | ❌ Pending |
-| **27** | `scanPagefileUsage()` | Size and path of `pagefile.sys` RAM dump | AI | ❌ Pending |
-| **28** | `scanHibernationFile()` | Size and path of `hiberfil.sys` | AI | ❌ Pending |
+| **27** | `scanPagefileUsage()` | Size and path of `pagefile.sys` RAM dump | AI | ✅ AI + Me |
+| **28** | `scanHibernationFile()` | Size and path of `hiberfil.sys` | AI | ✅ AI + Me |
 | **29** | **Authenticode Verify** 🔥| Calls `WinVerifyTrust` to detect unsigned `.sys` Rootkits | AI | ✅ AI + Me |
-| **30** | `scanSwapFileUsage()` | Size and path of `swapfile.sys` | AI | ❌ Pending |
+| **30** | `scanSwapFileUsage()` | Size and path of `swapfile.sys` | AI | ✅ AI + Me |
 
 ### 🌐 Windows — Network Interface (`src/windows/artifacts/network/`)
 
@@ -89,7 +89,7 @@
 |:---:|:---|:---|:---:|:---:|
 | **31** | `getTCPConnections()` | IPv4/IPv6 Active bound sockets | Me | ✅ AI + Me |
 | **32** | `getUDPConnections()` | UDP listening ports | Me | ✅ Me |
-| **33** | `scanDNSCache()` | Local DNS resolution history | Me | ❌ Pending |
+| **33** | `scanDNSCache()` | Local DNS resolution history | Me | ✅ AI + Me |
 | **34** | `getNetworkAdapters()` | Hardware MACs and active DHCP | Me | ✅ Me |
 | **35** | `scanFirewallRules()` | Dump of active allowed/blocked ports | AI | ✅ AI + Me |
 | **36** | `getProxySettings()` | WinINET default gateway overrides | Me | ✅ Me |

@@ -62,261 +62,114 @@ namespace ff::core
         }
     }
 
-    bool Exporter::saveToJson(
-        std::string_view outputPath,
-        const models::DigitalFootprint& footprint
-    )
+    bool Exporter::saveToJson(std::string_view outputPath, const models::DigitalFootprint& footprint)
     {
         nlohmann::json report;
-
-        // Report metadata
         auto now = std::chrono::system_clock::now();
         std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+        std::string timeStr = std::ctime(&now_time);
+        
+        if (!timeStr.empty() && timeStr.back() == '\n') 
+            timeStr.pop_back();
         
         report["metadata"]["tool_name"] = "Fast Forensic Triage Extractor (FFTE)";
         report["metadata"]["version"] = "1.0.0-Epoch1";
-
-        // Safe time formatting, remove newline from ctime
-        std::string timeStr = std::ctime(&now_time);
-        if (!timeStr.empty() && timeStr.back() == '\n') 
-            timeStr.pop_back();
         report["metadata"]["scan_timestamp"] = timeStr;
 
+        // Hardware, OS & Location
+        report["artifacts"]["digital_footprint"]["os_info"] = 
+        {
+            {"name", footprint.osInformation.osName},
+            {"install_date", footprint.osInformation.installDate},
+            {"boot_time", footprint.osInformation.bootTime}
+        };
         report["artifacts"]["digital_footprint"]["hw_info"] = 
         {
-            {"cpuName", footprint.hw_info.cpuName},
-            {"gpuName", footprint.hw_info.gpuName},
-            {"totalRamGB", footprint.hw_info.totalRamGB},
-            {"motherboardSerial", footprint.hw_info.motherboardSerial}
+            {"cpuName", footprint.hw_info.cpuName}, {"gpuName", footprint.hw_info.gpuName},
+            {"totalRamGB", footprint.hw_info.totalRamGB}, {"motherboardSerial", footprint.hw_info.motherboardSerial}
+        };
+        report["artifacts"]["digital_footprint"]["location"] = 
+        {
+            {"latitude", footprint.location.latitude}, {"longitude", footprint.location.longitude}, {"source", footprint.location.source}
+        };
+        report["artifacts"]["digital_footprint"]["anonymity"] = 
+        {
+            {"isProxyActive", footprint.anonymity.isProxyActive}, {"isVpnActive", footprint.anonymity.isVpnActive}, {"activeAdapters", footprint.anonymity.activeAdapters}
         };
 
-        // Processes
-        report["artifacts"]["processes"] = nlohmann::json::array();
-        for (const auto& p : footprint.processes) {
-            report["artifacts"]["processes"].push_back(processTo_json(p));
-        }
-
-        // Persistence entries
-        report["artifacts"]["persistence"] = nlohmann::json::array();
-        for (const auto& e : footprint.persistence) {
-            report["artifacts"]["persistence"].push_back(persistenceTo_json(e));
-        }
-
-        // Services and Drivers
-        report["artifacts"]["services_and_drivers"] = nlohmann::json::array();
-        for (const auto& s : footprint.services) {
-            report["artifacts"]["services_and_drivers"].push_back(serviceTo_json(s));
-        }
-
-        // Digital footprint (USB, Location, VPN)
-        report["artifacts"]["digital_footprint"]["anonymity"]["isProxyActive"] = footprint.anonymity.isProxyActive;
-        report["artifacts"]["digital_footprint"]["anonymity"]["isVpnActive"] = footprint.anonymity.isVpnActive;
-        report["artifacts"]["digital_footprint"]["anonymity"]["activeAdapters"] = footprint.anonymity.activeAdapters;
-        
-        report["artifacts"]["digital_footprint"]["location"]["latitude"] = footprint.location.latitude;
-        report["artifacts"]["digital_footprint"]["location"]["longitude"] = footprint.location.longitude;
-        report["artifacts"]["digital_footprint"]["location"]["source"] = footprint.location.source;
-
-        // USB History
-        report["artifacts"]["digital_footprint"]["usb_history"] = nlohmann::json::array();
-        for (const auto& usb : footprint.usbHistory) 
-        {
-            report["artifacts"]["digital_footprint"]["usb_history"].push_back({
-                {"deviceInstanceId", usb.deviceInstanceId},
-                {"friendlyName", usb.friendlyName}
-            });
-        }
-
-        // User Activity
-        report["artifacts"]["digital_footprint"]["user_activity"] = nlohmann::json::array();
-        for (const auto& ua : footprint.userActivity) 
-        {
-            report["artifacts"]["digital_footprint"]["user_activity"].push_back({
-                {"programPath", ua.programPath},
-                {"runCount", ua.runCount},
-                {"totalActiveMinutes", ua.totalActiveMinutes}
-            });
-        }
-
-        // OS Information
-        report["artifacts"]["digital_footprint"]["os_info"]["name"] = footprint.osInformation.osName;
-        report["artifacts"]["digital_footprint"]["os_info"]["install_date"] = footprint.osInformation.installDate;
-        report["artifacts"]["digital_footprint"]["os_info"]["boot_time"] = footprint.osInformation.bootTime;
-
-        // Browser History
-        report["artifacts"]["digital_footprint"]["browser_history"] = nlohmann::json::array();
+        // Web & Browser
         for (const auto& b : footprint.browserHistory) 
         {
             report["artifacts"]["digital_footprint"]["browser_history"].push_back({
                 {"browser", b.browser == models::BrowserType::MozillaFirefox ? "MozillaFirefox" : "Other"},
-                {"url", b.url},
-                {"title", b.title},
-                {"visitCount", b.visitCount},
-                {"lastVisitTime", b.lastVisitTime}
+                {"url", b.url}, {"title", b.title}, {"visitCount", b.visitCount}, {"lastVisitTime", b.lastVisitTime}
             });
         }
-
-        // Bluetooth History
-        report["artifacts"]["digital_footprint"]["bluetooth_history"] = nlohmann::json::array();
-        for (const auto& b : footprint.bluetoothHistory) 
-        {
-            report["artifacts"]["digital_footprint"]["bluetooth_history"].push_back({
-                {"name", b.name},
-                {"macAddress", b.macAddress}
-            });
-        }
-
-        // Process Environments
-        for (const auto& env : footprint.processEnvironments) 
-        {
-            report["artifacts"]["digital_footprint"]["process_environments"].push_back({
-                {"pid", env.pid},
-                {"envDump", env.envDump}
-            });
-        }
-
-        // Process File Descriptors
-        for (const auto& fd : footprint.processFileDescriptors) 
-        {
-            report["artifacts"]["digital_footprint"]["process_open_files"].push_back({
-                {"pid", fd.pid},
-                {"openFiles", fd.openFiles}
-            });
-        }
-
-        // Process Credentials
-        for (const auto& cred : footprint.processCredentials) 
-        {
-            report["artifacts"]["digital_footprint"]["process_credentials"].push_back({
-                {"pid", cred.pid},
-                {"uid_info", cred.uid_info},
-                {"gid_info", cred.gid_info}
-            });
-        }
-
-        // CGroups (Linux-specific)
-        for (const auto& cg : footprint.processCgroups) 
-        {
-            report["artifacts"]["digital_footprint"]["process_cgroups"].push_back({
-                {"pid", cg.pid},
-                {"containerPath", cg.containerPath},
-                {"isContainerized", cg.isContainerized}
-            });
-        }
-
-        // Prefetch Files
-        for (const auto& pf : footprint.prefetchFiles) 
-        {
-            report["artifacts"]["digital_footprint"]["prefetch_files"].push_back({
-                {"executableName", pf.executableName},
-                {"prefetchFileName", pf.prefetchFileName},
-                {"lastRunTime", pf.lastRunTime}
-            });
-        }
-
-        // Network Connections 
-        for (const auto& conn : footprint.networkConnections) 
-        {
-            report["artifacts"]["digital_footprint"]["network_connections"].push_back({
-                {"protocol", conn.protocol},
-                {"localIp", conn.localIp},
-                {"localPort", conn.localPort},
-                {"remoteIp", conn.remoteIp},
-                {"remotePort", conn.remotePort},
-                {"state", conn.state}
-            });
-        }
-
-        // RDP Sessions
-        for (const auto& rdp : footprint.rdpSessions) 
-        {
-            report["artifacts"]["digital_footprint"]["rdp_sessions"].push_back({
-                {"targetHost", rdp.targetHost},
-                {"usernameHint", rdp.usernameHint}
-            });
-        }
-
-        // Event Logs
-        for (const auto& evt : footprint.eventLogs) 
-        {
-            report["artifacts"]["digital_footprint"]["event_logs"].push_back({
-                {"eventId", evt.eventId},
-                {"timestamp", evt.timestamp},
-                {"details", evt.details}
-            });
-        }
-
-        // Installed Software
-        for (const auto& pkg : footprint.installedPackages) 
-        {
-            report["artifacts"]["digital_footprint"]["installed_packages"].push_back({
-                {"name", pkg.name},
-                {"version", pkg.version}
-            });
-        }
-
-        // Scheduled Tasks
-        for (const auto& cron : footprint.scheduledTasks) 
-        {
-            report["artifacts"]["digital_footprint"]["scheduled_tasks"].push_back({
-                {"filePath", cron.filePath},
-                {"taskLine", cron.taskLine}
-            });
-        }
-
-        // Systemd Units
-        for (const auto& unit : footprint.systemdUnits) 
-        {
-            report["artifacts"]["digital_footprint"]["systemd_units"].push_back({
-                {"name", unit.name},
-                {"state", unit.state}
-            });
-        }
-
-        // Injected Memory Artifacts
-        for (const auto& mem : footprint.injectedMemory) 
-        {
-            report["artifacts"]["digital_footprint"]["injected_memory"].push_back({
-                {"pid", mem.pid},
-                {"processName", mem.processName},
-                {"memoryAddress", mem.memoryAddress},
-                {"protection", mem.protection}
-            });
-        }
-
-        // Clipboard Data
-        for (const auto& clip : footprint.clipboardData) 
-        {
-            report["artifacts"]["digital_footprint"]["clipboard_triage"].push_back({
-                {"format", clip.format},
-                {"sizeBytes", clip.sizeBytes},
-                {"content", clip.content}
-            });
-        }
-
         for (const auto& ext : footprint.browserExtensions) 
         {
             report["artifacts"]["digital_footprint"]["browser_extensions"].push_back({
-                {"browser", ext.browser},
-                {"extensionId", ext.extensionId},
-                {"updateUrl", ext.updateUrl}
+                {"browser", ext.browser}, {"extensionId", ext.extensionId}, {"updateUrl", ext.updateUrl}
             });
         }
-
         for (const auto& dns : footprint.dnsCache) 
         {
             report["artifacts"]["digital_footprint"]["dns_cache"].push_back({
-                {"recordName", dns.recordName},
-                {"recordType", dns.recordType},
-                {"data", dns.data}
+                {"recordName", dns.recordName}, {"recordType", dns.recordType}, {"data", dns.data}
             });
         }
 
-        // Save file to disk
-        std::ofstream file(std::string{outputPath});
-        if (!file.is_open())
-            return false;
+        // Network & System Files
+        for (const auto& conn : footprint.networkConnections) 
+        {
+            report["artifacts"]["digital_footprint"]["network_connections"].push_back({
+                {"protocol", conn.protocol}, {"localIp", conn.localIp}, {"localPort", conn.localPort},
+                {"remoteIp", conn.remoteIp}, {"remotePort", conn.remotePort}, {"state", conn.state}
+            });
+        }
+        for (const auto& sf : footprint.systemFiles) 
+        {
+            report["artifacts"]["digital_footprint"]["system_files"].push_back({
+                {"fileName", sf.fileName}, {"sizeMB", sf.sizeMB}, {"notes", sf.notes}
+            });
+        }
 
+        // Processes & Memory
+        for (const auto& p : footprint.processes) report["artifacts"]["processes"].push_back(processTo_json(p));
+        for (const auto& mem : footprint.injectedMemory) 
+        {
+            report["artifacts"]["digital_footprint"]["injected_memory"].push_back({
+                {"pid", mem.pid}, {"processName", mem.processName}, {"memoryAddress", mem.memoryAddress}, {"protection", mem.protection}
+            });
+        }
+
+        // Persistence
+        for (const auto& e : footprint.persistence) report["artifacts"]["persistence"].push_back(persistenceTo_json(e));
+        for (const auto& s : footprint.services) report["artifacts"]["services_and_drivers"].push_back(serviceTo_json(s));
+        for (const auto& cron : footprint.scheduledTasks) 
+        {
+            report["artifacts"]["digital_footprint"]["scheduled_tasks"].push_back({
+                {"filePath", cron.filePath}, {"taskLine", cron.taskLine}
+            });
+        }
+
+        // Security Logs & Exfiltration
+        for (const auto& evt : footprint.eventLogs) 
+        {
+            report["artifacts"]["digital_footprint"]["event_logs"].push_back({
+                {"eventId", evt.eventId}, {"timestamp", evt.timestamp}, {"details", evt.details}
+            });
+        }
+        for (const auto& clip : footprint.clipboardData) 
+        {
+            report["artifacts"]["digital_footprint"]["clipboard_triage"].push_back({
+                {"format", clip.format}, {"sizeBytes", clip.sizeBytes}, {"content", clip.content}
+            });
+        }
+
+        // Save
+        std::ofstream file(std::string{outputPath});
+        if (!file.is_open()) 
+            return false;
         file << report.dump(4, ' ', false, nlohmann::json::error_handler_t::replace);
         file.close();
 

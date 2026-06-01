@@ -206,70 +206,62 @@ namespace ff::models
         std::string data;
     };
 
+    struct SystemFileEntry
+    {
+        std::string fileName;
+        std::string sizeMB;
+        std::string notes;
+    };
+
     // Global structure to hold all forensic artifacts and information
     struct DigitalFootprint
     {
+        // HARDWARE, OS & LOCATION
         HardwareInfo hw_info;
         OsInfo osInformation;
         GeoLocation location;
         AnonymityStatus anonymity;
 
-        // Vectors to hold platform-specific artifacts
-        std::vector<UsbHistoryEntry> usbHistory;
-        std::vector<UserActivityEntry> userActivity;
+        // WEB & BROWSER ARTIFACTS
         std::vector<BrowserHistoryEntry> browserHistory;
-        std::vector<BluetoothDeviceEntry> bluetoothHistory;
+        std::vector<BrowserExtensionEntry> browserExtensions;
+        std::vector<DnsCacheEntry> dnsCache;
 
-        // Windows-specific artifacts
-        std::vector<PrefetchEntry> prefetchFiles;
-
-        // Vectors to hold cross-platform artifacts
-        std::vector<std::string> installedSoftware; // Active software and low-level processes
-        std::vector<std::string> hostsLines;        // Cross-platform network socket bindings
-    
-        // Cross-platform dynamic artifacts
-        std::vector<KernelModule> linuxModules;
-        std::vector<SshKeyEntry> sshKeys;
+        // NETWORK & CONNECTIVITY
+        std::vector<NetworkConnEntry> networkConnections;
         std::vector<ArpTableEntry> arpEntries;
         std::vector<FirewallRuleEntry> firewallRules;
+        std::vector<BluetoothDeviceEntry> bluetoothHistory;
+        std::vector<std::string> hostsLines;
 
-        // Process environment and file descriptor artifacts
+        // PROCESSES, MEMORY & SYSTEM FILES
+        std::vector<ProcessInfo> processes;
+        std::vector<InjectedMemoryEntry> injectedMemory;
+        std::vector<SystemFileEntry> systemFiles;
+
+        // PERSISTENCE & EXECUTION
+        std::vector<PersistenceEntry> persistence;
+        std::vector<PrefetchEntry> prefetchFiles;
+        std::vector<CronTask> scheduledTasks;
+        std::vector<ServiceInfo> services;
+        std::vector<UserActivityEntry> userActivity;
+
+        // SECURITY LOGS & EXFILTRATION
+        std::vector<EventLogEntry> eventLogs;
+        std::vector<RdpSession> rdpSessions;
+        std::vector<ClipboardEntry> clipboardData;
+        std::vector<UsbHistoryEntry> usbHistory;
+
+        // LINUX SPECIFIC
+        std::vector<std::string> installedSoftware;
+        std::vector<KernelModule> linuxModules;
+        std::vector<SshKeyEntry> sshKeys;
         std::vector<ProcEnvEntry> processEnvironments;
         std::vector<ProcFdEntry> processFileDescriptors;
-
-        // Process credentials and cgroup artifacts
         std::vector<ProcCredEntry> processCredentials;
         std::vector<ProcCgroupEntry> processCgroups;
-
-        // Linux-specific infrastructure artifacts
         std::vector<PkgInfo> installedPackages;
-        std::vector<CronTask> scheduledTasks;
         std::vector<SystemdUnit> systemdUnits;
-
-        // Remote access and event log artifacts
-        std::vector<RdpSession> rdpSessions;
-        std::vector<EventLogEntry> eventLogs;
-
-        std::vector<NetworkConnEntry> networkConnections;
-        std::vector<ArpTableEntry> arpTable;
-
-        // Memory injection artifacts
-        std::vector<InjectedMemoryEntry> injectedMemory;
-
-        // Persistence artifacts (cross-platform)
-        std::vector<PersistenceEntry> persistence;
-
-        // Legacy artifacts (for backward compatibility and reporting)
-        std::vector<ProcessInfo> processes;
-        std::vector<ServiceInfo> services;
-
-        // Clipboard artifacts (cross-platform)
-        std::vector<ClipboardEntry> clipboardData;
-
-        // Browser extension artifacts
-        std::vector<BrowserExtensionEntry> browserExtensions;
-
-        // DNS Cache artifacts
-        std::vector<DnsCacheEntry> dnsCache;
+        std::vector<ArpTableEntry> arpTable; // Legacy
     };
 }

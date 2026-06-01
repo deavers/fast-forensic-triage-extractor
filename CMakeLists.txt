@@ -55,7 +55,8 @@ elseif(WIN32)
         src/windows/artifacts/network/HostsFileScanner.cpp
         src/windows/artifacts/registry/ScheduledTaskScanner.cpp
         src/windows/artifacts/registry/BrowserExtensionScanner.cpp
-        src/windows/artifacts/network/DnsCacheScanner.cpp)
+        src/windows/artifacts/network/DnsCacheScanner.cpp
+        src/windows/artifacts/system/SystemFilesScanner.cpp)
     target_compile_definitions(fastforensics PRIVATE FF_PLATFORM_WINDOWS)
     
     # System libraries for WinAPI low-level forensic functions for network and signatures

@@ -150,122 +150,86 @@ namespace ff::utils
     void ConsolePrinter::printWindowsSpecifics(const models::DigitalFootprint& footprint)
     {
         #if defined(FF_PLATFORM_WINDOWS)
-            if (!footprint.arpEntries.empty()) 
+            // SYSTEM FILES
+            if (!footprint.systemFiles.empty()) 
             {
-                std::cout << "[Windows Kernel ARP Table (Function 43)]:\n";
-                for (const auto& arp : footprint.arpEntries) 
+                std::cout << "[Windows Hidden System Files (RAM Dumps)]:\n";
+                for (const auto& sf : footprint.systemFiles) 
                 {
-                    std::cout << "  -> IP: " << arp.ipAddress << " \tMAC: " << arp.macAddress << " [" << arp.type << "]\n";
+                    std::cout << "  -> File: " << sf.fileName << " | Size: " << sf.sizeMB << "\n";
                 }
                 std::cout << "\n";
             }
 
-            if (!footprint.firewallRules.empty()) 
-            {
-                std::cout << "[Windows Active Firewall Rules Triage (Function 39)]:\n";
-                for (const auto& rule : footprint.firewallRules) 
-                {
-                    std::cout << "  -> Rule: " << rule.ruleName << "\n";
-                }
-                std::cout << "\n";
-            }
-
-            if (!footprint.networkConnections.empty())
-            {
-                std::cout << "\n[Windows Network Connections Triage (Function 35 & 36)]:\n";
+            // WEB & BROWSER (Grouped History, Extensions, DNS)
+            if (!footprint.browserHistory.empty() || !footprint.browserExtensions.empty() || !footprint.dnsCache.empty()) {
+                std::cout << "[Windows Web & Browser Triage (History, Extensions, DNS)]:\n";
                 
+                int histCount = 0;
+                for (const auto& bh : footprint.browserHistory) 
+                {
+                    if (histCount++ > 5) break;
+                    std::cout << "  -> [History] " << bh.url << " | Last Visit: " << bh.lastVisitTime << "\n";
+                }
+                
+                for (const auto& ext : footprint.browserExtensions) 
+                {
+                    std::cout << "  -> [Extension] " << ext.browser << " | ID: " << ext.extensionId << "\n";
+                }
+
+                int dnsCount = 0;
+                for (const auto& dns : footprint.dnsCache) 
+                {
+                    if (dnsCount++ > 8) { std::cout << "  ... (more DNS records hidden. See JSON.)\n"; break; }
+                    std::cout << "  -> [DNS Cache] " << dns.recordName << " -> " << dns.data << "\n";
+                }
+            }
+
+            // NETWORK
+            if (!footprint.networkConnections.empty()) 
+            {
+                std::cout << "\n[Windows Network Connections Triage]:\n";
                 int count = 0;
                 for (const auto& conn : footprint.networkConnections) 
                 {
-                    if (count++ > 10) { std::cout << "  ... (more connections hidden for console brevity. See JSON.)\n"; break; }
-                    std::cout << "  -> [" << conn.protocol << "] " 
-                              << conn.localIp << ":" << conn.localPort << " --> " 
-                              << conn.remoteIp << ":" << conn.remotePort 
-                              << " | State: " << conn.state << "\n";
+                    if (count++ > 10) 
+                        break;
+
+                    std::cout << "  -> [" << conn.protocol << "] " << conn.localIp << ":" << conn.localPort 
+                              << " --> " << conn.remoteIp << ":" << conn.remotePort << " | State: " << conn.state << "\n";
                 }
             }
 
-            if (!footprint.rdpSessions.empty())
+            // MEMORY ANOMALIES
+            if (!footprint.injectedMemory.empty()) 
             {
-                std::cout << "\n[Windows RDP Lateral Movement Triage (Function 20)]:\n";
-                for (const auto& rdp : footprint.rdpSessions) 
+                std::cout << "\n[Windows Process Memory Anomalies (Injected DLL / Shellcode)]:\n";
+                for (const auto& mem : footprint.injectedMemory)
                 {
-                    std::cout << "  -> Target Host: " << rdp.targetHost << " | Hint: " << rdp.usernameHint << "\n";
+                    std::cout << "  [!] ALERT -> Process: " << mem.processName << " (PID: " << mem.pid 
+                              << ") | Memory at " << mem.memoryAddress << " [" << mem.protection << "]\n";
                 }
             }
 
-            if (!footprint.eventLogs.empty())
+            // EVENT LOGS & CLIPBOARD
+            if (!footprint.eventLogs.empty()) 
             {
-                std::cout << "\n[Windows Event Log Security Triage (Function 03)]:\n";
+                std::cout << "\n[Windows Event Log Security Triage]:\n";
                 for (const auto& evt : footprint.eventLogs) 
                 {
                     std::cout << "  -> Event: " << evt.eventId << " | Time: " << evt.timestamp << " | " << evt.details << "\n";
                 }
             }
 
-            if (!footprint.prefetchFiles.empty())
-            {
-                std::cout << "\n[Windows Prefetch Execution Triage (Function 02)]:\n";
-                for (const auto& pf : footprint.prefetchFiles) 
-                {
-                    std::cout << "  -> Executable: " << pf.executableName 
-                              << " | File: " << pf.prefetchFileName 
-                              << " | Last Run: " << pf.lastRunTime << "\n";
-                }
-            }
-
-            if (!footprint.injectedMemory.empty())
-            {
-                std::cout << "\n[Windows Process Memory Anomalies (Injected DLL / Shellcode)]:\n";
-                for (const auto& mem : footprint.injectedMemory) 
-                {
-                    std::cout << "  [!] ALERT -> Process: " << mem.processName
-                              << " (PID: " << mem.pid << ") | Unbacked Executable Memory at " 
-                              << mem.memoryAddress << " [" << mem.protection << "]\n";
-                }
-            }
-
-            if (!footprint.clipboardData.empty())
+            if (!footprint.clipboardData.empty()) 
             {
                 std::cout << "\n[Windows Live Clipboard Triage (Data Exfiltration Risk)]:\n";
                 for (const auto& clip : footprint.clipboardData) 
                 {
-                    std::cout << "  [!] CLIPPED DATA -> Format: " << clip.format 
-                              << " | Size: " << clip.sizeBytes << "\n"
-                              << "      Content: " << clip.content << "\n";
-                }
-            }
-
-            if (!footprint.browserExtensions.empty())
-            {
-                std::cout << "\n[Windows Browser Extensions Triage (Function 27)]:\n";
-                for (const auto& ext : footprint.browserExtensions) 
-                {
-                    std::cout << "  -> Browser: " << ext.browser 
-                              << " | ID: " << ext.extensionId 
-                              << " | URL: " << ext.updateUrl << "\n";
-                }
-            }
-
-            if (!footprint.dnsCache.empty())
-            {
-                std::cout << "\n[Windows Live DNS Cache (Hidden Web History Triage)]:\n";
-                int count = 0;
-
-                for (const auto& dns : footprint.dnsCache) 
-                {
-                    if (count++ > 15) 
-                    { 
-                        std::cout << "  ... (more DNS records hidden. See JSON.)\n"; 
-                        break; 
-                    }
-                    std::cout << "  -> Domain: " << dns.recordName 
-                              << " | Type: " << dns.recordType 
-                              << " | Resolves To: " << dns.data << "\n";
+                    std::cout << "  [!] CLIPPED DATA -> Format: " << clip.format << " | Size: " << clip.sizeBytes << "\n";
                 }
             }
         #else
-            // Silencing the unused parameter warning on Linux
             (void)footprint; 
         #endif
     }
