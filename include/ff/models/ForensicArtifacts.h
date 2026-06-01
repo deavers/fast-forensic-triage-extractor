@@ -192,7 +192,6 @@ namespace ff::models
         std::string sizeBytes;
     };
 
-
     // Global structure to hold all forensic artifacts and information
     struct DigitalFootprint
     {
