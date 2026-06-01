@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <string_view>
 
 #include "PersistenceEntry.h"
 #include "ProcessInfo.h"
@@ -24,6 +25,18 @@ namespace ff::models
         Edge,
         Other
     };
+
+    // Helper: convert BrowserType enum to string for JSON serialization
+    constexpr std::string_view toString(BrowserType t) noexcept
+    {
+        switch (t)
+        {
+            case BrowserType::MozillaFirefox: return "Firefox";
+            case BrowserType::Chrome:         return "Chrome";
+            case BrowserType::Edge:           return "Edge";
+            default:                          return "Other";
+        }
+    }
 
     struct UsbHistoryEntry
     {
@@ -121,7 +134,7 @@ namespace ff::models
     };
 
     // LINUX
-    // Process environment and file descriptor artifacts 
+    // Process environment and file descriptor artifacts
     struct ProcEnvEntry
     {
         std::string pid;
@@ -262,6 +275,5 @@ namespace ff::models
         std::vector<ProcCgroupEntry> processCgroups;
         std::vector<PkgInfo> installedPackages;
         std::vector<SystemdUnit> systemdUnits;
-        std::vector<ArpTableEntry> arpTable; // Legacy
     };
 }
