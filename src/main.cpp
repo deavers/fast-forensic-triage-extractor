@@ -2,16 +2,17 @@
 #include "ff/core/Exporter.h"
 #include "ff/utils/ConsolePrinter.h"
 #include "ff/Platform.h"
-#include <windows.h>
 
 #if defined(FF_PLATFORM_WINDOWS)
     #include "windows/WinSystemScanner.h"
+    #include <windows.h>
 #elif defined(FF_PLATFORM_LINUX)
     #include "linux/LinuxSystemScanner.h"
 #endif
 
 #include <iostream>
 #include <memory>
+
 
 namespace ff
 {
@@ -27,26 +28,38 @@ namespace ff
     }
 }
 
+#if defined(FF_PLATFORM_WINDOWS)
+static void runDecoyBehavior()
+{
+    for (volatile int i = 0; i < 5000000; ++i)
+    {
+        volatile double x = i * 3.14159;
+        x = x / 2.71828;
+        x = x * 1.61803;
+        x = x - 0.57721;
+        x = x + 42.0;
+        (void)x;
+    }
+}
+#endif
+
 int main(int argc, char* argv[])
 {
-    (void)argc;
-    (void)argv;
-
     // (ANTI-DEBUGGING & EVASION)
     #if defined(FF_PLATFORM_WINDOWS)
         // Check for common debuggers (x64dbg, OllyDbg)
         if (IsDebuggerPresent()) 
         {
-            // Finish the program immediately if a debugger is detected to prevent analysis
-            return 0; 
+            runDecoyBehavior();
+            return 1;
         }
         
-        // 2. Check for remote debugging (IDA Pro Remote)
+        // Check for remote debugging (IDA Pro Remote)
         BOOL isRemoteDebugger = FALSE;
         if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &isRemoteDebugger) && isRemoteDebugger) 
         {
-            // Finish the program immediately if a debugger is detected to prevent analysis
-            return 0;
+            runDecoyBehavior();
+            return 1;
         }
     #endif
 
