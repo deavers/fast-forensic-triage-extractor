@@ -314,10 +314,10 @@ namespace ff::core
 
         // Save file to disk
         std::ofstream file(std::string{outputPath});
-        if (!file.is_open()) 
+        if (!file.is_open())
             return false;
 
-        file << report.dump(4);
+        file << report.dump(4, ' ', false, nlohmann::json::error_handler_t::replace);
         file.close();
 
         return true;
