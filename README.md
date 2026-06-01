@@ -50,12 +50,14 @@
 
 | # | Capability | Data Extracted / Method | Idea | Status / Coder |
 |:---:|:---|:---|:---:|:---:|
-| **11** | `getProcessHash()` | SHA256 hashing of active memory executables | AI | ❌ Pending |
+| **11** | `getProcessHash()` | SHA256 hashing of active memory executables | AI | ✅ AI + Me |
 | **12** | `scanProcessThreads()` | Thread entry base addresses | Me | ❌ Pending |
 | **13** | `getProcessEnvironment()` | Process memory environment blocks | Me | ✅ Me |
 | **14** | `getProcessStartTime()` | Absolute UTC launch timestamps | Me | ✅ AI + Me |
 | **15** | `scanProcessHandles()` | Locked files, mutexes, and registry keys | Me | ❌ Pending |
 | **16** | `getProcessIntegrity()` | Security tokens (Low/Medium/High/System) | Me | ✅ Me |
+| **NEW** | `scanClipboard()` | Extracts live clipboard RAM buffers for data exfiltration analysis | Me | ✅ AI + Me |
+| **NEW** | **MemHunt (RWX Scanner)** 🔥| Scans active process memory to find injected Shellcode / Cobalt Strike | AI | ✅ AI + Me |
 
 ### 🖥️ Windows — Registry & Autorun (`src/windows/artifacts/registry/`)
 
@@ -64,7 +66,7 @@
 | **17** | `scanHKLM_Run()` | Global auto-start executables | Me | ✅ Me |
 | **18** | `scanHKCU_Run()` | User-specific auto-start executables | Me | ✅ Me |
 | **19** | `scanStartupFolder()` | LNK files in Startup directories | Me | ✅ AI + Me |
-| **20** | `scanScheduledTasks()` | COM interface TaskScheduler XML dumps | Me | ❌ Pending |
+| **20** | `scanScheduledTasks()` | `TaskCache\Tree` registry extraction | Me | ✅ AI + Me |
 | **21** | `scanBootExecute()` | Session Manager boot-time execution | Me | ✅ Me |
 | **22** | `scanWinlogonNotify()` | Logon notification stealth DLLs | AI | ✅ AI + Me |
 | **23** | `scanBrowserExtensions()`| Malicious registry browser hooks | Me | ❌ Pending |
@@ -78,7 +80,7 @@
 | **26** | `getWindowsLastShutdown()`| Dirty/Clean shutdown logs | Me | ❌ Pending |
 | **27** | `scanPagefileUsage()` | Size and path of `pagefile.sys` RAM dump | AI | ❌ Pending |
 | **28** | `scanHibernationFile()` | Size and path of `hiberfil.sys` | AI | ❌ Pending |
-| **29** | **Authenticode Verify** 🔥| Calls `WinVerifyTrust` to detect unsigned `.sys` Rootkits | AI | ✅ AI |
+| **29** | **Authenticode Verify** 🔥| Calls `WinVerifyTrust` to detect unsigned `.sys` Rootkits | AI | ✅ AI + Me |
 | **30** | `scanSwapFileUsage()` | Size and path of `swapfile.sys` | AI | ❌ Pending |
 
 ### 🌐 Windows — Network Interface (`src/windows/artifacts/network/`)

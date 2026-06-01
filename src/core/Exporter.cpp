@@ -294,6 +294,15 @@ namespace ff::core
             });
         }
 
+        for (const auto& ext : footprint.browserExtensions) 
+        {
+            report["artifacts"]["digital_footprint"]["browser_extensions"].push_back({
+                {"browser", ext.browser},
+                {"extensionId", ext.extensionId},
+                {"updateUrl", ext.updateUrl}
+            });
+        }
+
         // Save file to disk
         std::ofstream file(std::string{outputPath});
         if (!file.is_open()) 

@@ -217,7 +217,8 @@ namespace ff::utils
             if (!footprint.injectedMemory.empty())
             {
                 std::cout << "\n[Windows Process Memory Anomalies (Injected DLL / Shellcode)]:\n";
-                for (const auto& mem : footprint.injectedMemory) {
+                for (const auto& mem : footprint.injectedMemory) 
+                {
                     std::cout << "  [!] ALERT -> Process: " << mem.processName
                               << " (PID: " << mem.pid << ") | Unbacked Executable Memory at " 
                               << mem.memoryAddress << " [" << mem.protection << "]\n";
@@ -227,10 +228,22 @@ namespace ff::utils
             if (!footprint.clipboardData.empty())
             {
                 std::cout << "\n[Windows Live Clipboard Triage (Data Exfiltration Risk)]:\n";
-                for (const auto& clip : footprint.clipboardData) {
+                for (const auto& clip : footprint.clipboardData) 
+                {
                     std::cout << "  [!] CLIPPED DATA -> Format: " << clip.format 
                               << " | Size: " << clip.sizeBytes << "\n"
                               << "      Content: " << clip.content << "\n";
+                }
+            }
+
+            if (!footprint.browserExtensions.empty())
+            {
+                std::cout << "\n[Windows Browser Extensions Triage (Function 27)]:\n";
+                for (const auto& ext : footprint.browserExtensions) 
+                {
+                    std::cout << "  -> Browser: " << ext.browser 
+                              << " | ID: " << ext.extensionId 
+                              << " | URL: " << ext.updateUrl << "\n";
                 }
             }
         #else

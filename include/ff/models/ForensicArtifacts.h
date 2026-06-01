@@ -192,6 +192,13 @@ namespace ff::models
         std::string sizeBytes;
     };
 
+    struct BrowserExtensionEntry
+    {
+        std::string browser;
+        std::string extensionId;
+        std::string updateUrl;
+    };
+
     // Global structure to hold all forensic artifacts and information
     struct DigitalFootprint
     {
@@ -251,5 +258,7 @@ namespace ff::models
 
         // Clipboard artifacts (cross-platform)
         std::vector<ClipboardEntry> clipboardData;
+
+        std::vector<BrowserExtensionEntry> browserExtensions;
     };
 }
