@@ -3,9 +3,12 @@
 > A high-performance, cross-platform (Windows WinAPI / Linux Pseudo-FS) forensic live response triage collection tool. Implemented in pure C++20 with an automated, self-registering plugin architecture and built-in anti-reverse engineering protections.
 
 ## 🚀 Architecture Overview
+
+![FFTE Architecture Map](mindmap.png)
+
 * **Zero-Dependency Core:** Statically linked C++ runtime (`-static`). Only relies on native OS APIs (`<windows.h>`, `<iphlpapi.h>`, WMI COM) and Pseudo-FS (`/proc`), allowing execution directly from a USB drive on infected machines without any pre-installed libraries.
 * **Autopilot Plugin System:** Modules self-register into the RAM at runtime before `main()` executes via static initialization vectors.
-* **Stealth & Evasion:** Includes XOR string obfuscation and Anti-Debugging Honeypot mechanics to feed fake Decoy data to debuggers (IDA Pro / x64dbg).
+* **Stealth & Evasion:** Includes Anti-Debugging Honeypot mechanics to feed fake Decoy data to debuggers (IDA Pro / x64dbg) or silently terminate.
 * **Const-Correctness & RAII:** Strictly follows modern C++20 resource management principles to prevent memory leaks during forensic data extraction.
 
 ---
@@ -14,18 +17,17 @@
 
 *Note for Reviewers: This table demonstrates full transparency regarding the development process. Original function numbers are preserved to match Git commit logs exactly.*
 * **Idea:** Who architected the forensic logic.
-* **Realization:** Who wrote the actual C++ implementation.
+* **Status / Coder:** Who wrote the actual C++ implementation.
 * 🔥 = *Advanced execution evasion/kernel structures.*
 * 📖 = *Based on "Windows Forensics Analyst Field Guide 2023" methodology.*
 
 ### 🏆 Top 5 Advanced DFIR & Academic Research Capabilities
-*This highlight matrix showcases the most technically complex modules developed in this project, including low-level kernel interactions, memory analysis, and methodologies derived from professional DFIR literature.*
 
 | # | Forensic Module | Technical Implementation & Data Extracted | Idea Source | Status |
 |:---:|:---|:---|:---:|:---:|
 | **56** | **WMI Hardware Telemetry** | Interacts with complex Windows COM interfaces (`wbemuuid`) to extract raw SMBIOS motherboard serials and CPU/GPU data. | Me | ✅ |
 | **52** | **Event Logs Security** 📖 | Uses `EvtQuery` API to parse low-level XML payloads detecting Brute-Force attacks (Event ID 4625). | Book | ✅ |
-| **29** | **Authenticode Verification** 🔥| Calls `WinVerifyTrust` kernel API to detect unsigned `.sys` Rootkits injected into the operating system. | AI | ✅ |
+| **29** | **Authenticode Verification** 🔥| Calls `WinVerifyTrust` kernel API to detect unsigned `.sys` Rootkits injected into the OS. | AI | ✅ |
 | **41** | **Linux Kernel Modules** 🔥| Parses Ring-0 `/proc/modules` to detect hidden Linux Kernel Modules (LKM). | AI | ✅ |
 | **51** | **Prefetch Execution Triage** 📖| Deep filesystem parsing of restricted `.pf` execution artifacts to extract precise historical timestamps. | Book | ✅ |
 
@@ -51,10 +53,10 @@
 | # | Capability | Data Extracted / Method | Idea | Status / Coder |
 |:---:|:---|:---|:---:|:---:|
 | **11** | `getProcessHash()` | SHA256 hashing of active memory executables | AI | ✅ AI + Me |
-| **12** | `scanProcessThreads()` | Thread entry base addresses | Me | ❌ Pending |
+| **12** | `scanProcessThreads()` | Thread entry base addresses | Me | ⏳ Planned (Deep Forensics) |
 | **13** | `getProcessEnvironment()` | Process memory environment blocks | Me | ✅ Me |
 | **14** | `getProcessStartTime()` | Absolute UTC launch timestamps | Me | ✅ AI + Me |
-| **15** | `scanProcessHandles()` | Locked files, mutexes, and registry keys | Me | ❌ Pending |
+| **15** | `scanProcessHandles()` | Locked files, mutexes, and registry keys | Me | ⏳ Planned (Deep Forensics) |
 | **16** | `getProcessIntegrity()` | Security tokens (Low/Medium/High/System) | Me | ✅ Me |
 | **NEW** | `scanClipboard()` | Extracts live clipboard RAM buffers for data exfiltration analysis | Me | ✅ AI + Me |
 | **NEW** | **MemHunt (RWX Scanner)** 🔥| Scans active process memory to find injected Shellcode / Cobalt Strike | AI | ✅ AI + Me |
@@ -75,9 +77,9 @@
 
 | # | Capability | Data Extracted / Method | Idea | Status / Coder |
 |:---:|:---|:---|:---:|:---:|
-| **24** | `scanFailedDriverLoads()` | EventLog traces of failed rootkit injection | AI | ❌ Pending |
+| **24** | `scanFailedDriverLoads()` | EventLog traces of failed rootkit injection | AI | ✅ Covered by #52 |
 | **25** | `getWindowsInstallDate()` | Epoch timestamp of OS installation | Me | ✅ Me |
-| **26** | `getWindowsLastShutdown()`| Dirty/Clean shutdown logs | Me | ❌ Pending |
+| **26** | `getWindowsLastShutdown()`| Dirty/Clean shutdown logs | Me | ✅ Covered by #52 |
 | **27** | `scanPagefileUsage()` | Size and path of `pagefile.sys` RAM dump | AI | ✅ AI + Me |
 | **28** | `scanHibernationFile()` | Size and path of `hiberfil.sys` | AI | ✅ AI + Me |
 | **29** | **Authenticode Verify** 🔥| Calls `WinVerifyTrust` to detect unsigned `.sys` Rootkits | AI | ✅ AI + Me |
@@ -121,9 +123,9 @@
 |:---:|:---|:---|:---:|:---:|
 | **51** | `scanPrefetchFiles()` | `.pf` files execution evidence (`src/windows/artifacts/system/`) | Book/Me| ✅ AI + Me |
 | **52** | `scanEventLogs()` | Security IDs 4625 via `EvtQuery` (`src/windows/artifacts/system/`) | Book/Me| ✅ AI + Me |
-| **53** | `scanAmcache()` | `AppCompatCache` execution history (`src/windows/artifacts/registry/`)| Book/Me| ❌ Pending |
+| **53** | `scanAmcache()` | `AppCompatCache` execution history (`src/windows/artifacts/registry/`)| Book/Me| ⏳ Planned (Deep Forensics) |
 | **54** | `scanRDPSessions()` | `Terminal Server Client` tracking (`src/windows/artifacts/registry/`) | Book/Me| ✅ AI + Me |
-| **55** | `scanSRUMDatabase()` | `SRUDB.dat` hidden metrics (`src/windows/artifacts/network/`) | Book/Me| ❌ Pending |
+| **55** | `scanSRUMDatabase()` | `SRUDB.dat` hidden metrics (`src/windows/artifacts/network/`) | Book/Me| ⏳ Planned (Deep Forensics) |
 | **56** | `scanHardwareWMI()` | Motherboard Serial, CPU, GPU, RAM (`src/windows/artifacts/system/`) | Me | ✅ AI + Me |
 
 ---

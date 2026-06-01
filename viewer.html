@@ -110,36 +110,6 @@
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
         @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
-    
-        /* 🗺️ Architecture Tree / Mind Map */
-        .tree { display: flex; justify-content: center; margin-top: 10px; overflow-x: auto; padding-bottom: 20px; }
-        .tree ul { padding-top: 20px; position: relative; transition: all 0.5s; display: flex; justify-content: center; padding-left: 0; margin: 0; }
-        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 10px 0 10px; transition: all 0.5s; }
-        
-        /* Lines of connection */
-        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid var(--cyan); width: 50%; height: 20px; }
-        .tree li::after { right: auto; left: 50%; border-left: 2px solid var(--cyan); }
-        .tree li:only-child::after, .tree li:only-child::before { display: none; }
-        .tree li:only-child { padding-top: 0; }
-        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-        .tree li:last-child::before { border-right: 2px solid var(--cyan); border-radius: 0 6px 0 0; }
-        .tree li:first-child::after { border-radius: 6px 0 0 0; }
-        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid var(--cyan); width: 0; height: 20px; margin-left: -1px; }
-        
-        /* Design of node cards */
-        .tree li div.node { 
-            border: 1px solid rgba(0, 240, 255, 0.3); padding: 15px 20px; text-decoration: none; 
-            color: var(--text); display: inline-block; border-radius: 8px; transition: all 0.3s; 
-            background: var(--card-bg); box-shadow: 0 4px 15px rgba(0,0,0,0.4); min-width: 160px;
-            backdrop-filter: blur(10px); cursor: default;
-        }
-        .tree li div.node:hover { background: rgba(0, 240, 255, 0.1); border-color: var(--cyan); box-shadow: 0 0 20px var(--cyan-glow); transform: translateY(-3px); }
-        
-        /* Specific node styles */
-        .node.core { border-color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
-        .node.security { border-color: var(--red); box-shadow: 0 0 15px rgba(255,0,60,0.2); }
-        .node.win { border-color: #00a4ef; box-shadow: 0 0 15px rgba(0,164,239,0.2); }
-        .node.lin { border-color: #fca326; box-shadow: 0 0 15px rgba(252,163,38,0.2); }
     </style>
 </head>
 <body>
@@ -182,7 +152,6 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-btn" onclick="switchTab('tab-arch')">🗺️ Architecture Map</button>
             <button class="tab-btn active" onclick="switchTab('tab-memhunt')">MemHunt Alerts</button>
             <button class="tab-btn" onclick="switchTab('tab-procs')">Processes & Hashes</button>
             <button class="tab-btn" onclick="switchTab('tab-autoruns')">Persistence</button>
@@ -198,83 +167,6 @@
                 <option value="RX">🟡 RX (Suspicious Only)</option>
             </select>
             <button class="btn-export" onclick="exportToCSV()">💾 Export to CSV</button>
-        </div>
-
-        <div id="tab-arch" class="glass tab-content">
-            <h3 style="text-align: center; margin-bottom: 10px;">FFTE Execution Flow & Architecture</h3>
-            
-            <div class="tree">
-                <ul>
-                    <li>
-                        <div class="node core">
-                            <b style="font-size: 16px; color: #fff;">▶ FFTE Core Engine</b><br>
-                            <span style="font-size: 12px; color: var(--text-muted);">main.cpp (Zero-Dependency)</span>
-                        </div>
-                        <ul>
-                            <li>
-                                <div class="node security">
-                                    <b style="font-size: 15px; color: var(--red);">🛡️ Security Layer</b><br>
-                                    <span style="font-size: 12px; color: var(--text-muted);">Anti-Debugging & Evasion</span>
-                                </div>
-                                <ul>
-                                    <li>
-                                        <div class="node win">
-                                            <b style="font-size: 16px; color: #00a4ef;">🪟 WINDOWS (WinAPI)</b><br>
-                                            <span style="font-size: 11px; color: var(--text-muted);">ISystemScanner Interface</span>
-                                        </div>
-                                        <ul>
-                                            <li>
-                                                <div class="node">
-                                                    <b style="color: #fff; font-size: 14px;">📁 System / Memory</b><br>
-                                                    <span style="font-size: 11px; color: var(--text-muted);">MemHunt, WMI, Prefetch</span>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="node">
-                                                    <b style="color: #fff; font-size: 14px;">📁 Registry</b><br>
-                                                    <span style="font-size: 11px; color: var(--text-muted);">Autoruns, Tasks, USB</span>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="node">
-                                                    <b style="color: #fff; font-size: 14px;">📁 Network</b><br>
-                                                    <span style="font-size: 11px; color: var(--text-muted);">TCP/UDP, DNS, Hosts</span>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <div class="node lin">
-                                            <b style="font-size: 16px; color: #fca326;">🐧 LINUX (Pseudo-FS)</b><br>
-                                            <span style="font-size: 11px; color: var(--text-muted);">ISystemScanner Interface</span>
-                                        </div>
-                                        <ul>
-                                            <li>
-                                                <div class="node">
-                                                    <b style="color: #fff; font-size: 14px;">📁 Process</b><br>
-                                                    <span style="font-size: 11px; color: var(--text-muted);">/proc, FDs, cgroups</span>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="node">
-                                                    <b style="color: #fff; font-size: 14px;">📁 Filesystem</b><br>
-                                                    <span style="font-size: 11px; color: var(--text-muted);">SSH, Systemd, Cron</span>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="node">
-                                                    <b style="color: #fff; font-size: 14px;">📁 Kernel</b><br>
-                                                    <span style="font-size: 11px; color: var(--text-muted);">LKM Triage</span>
-                                                </div>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
         </div>
 
         <div id="tab-memhunt" class="glass tab-content active">
@@ -364,8 +256,7 @@
         }
 
         // Switch tabs
-        function switchTab(tabId) 
-        {
+        function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
@@ -395,9 +286,7 @@
                 let valA = a.children[colIndex].innerText.trim();
                 let valB = b.children[colIndex].innerText.trim();
 
-                if (type === 'num') 
-                {
-                    // Getting only digits for numeric comparison, ignoring any non-numeric characters
+                if (type === 'num') {
                     valA = parseInt(valA.replace(/\D/g, '')) || 0;
                     valB = parseInt(valB.replace(/\D/g, '')) || 0;
                     return dir === 'asc' ? valA - valB : valB - valA;
@@ -427,17 +316,15 @@
             let rows = activeTab.querySelectorAll("tbody tr");
             
             rows.forEach(row => {
-                if (row.children.length === 1) return; // Пропуск строки-заглушки (Empty state)
+                if (row.children.length === 1) return; 
                 
                 let textMatch = row.innerText.toLowerCase().includes(input);
                 let memMatch = true;
                 
-                // Дополнительная логика только для MemHunt
                 if (isMemHunt && memFilter !== "ALL") {
                     let protection = row.children[3].innerText;
                     memMatch = protection.includes(memFilter);
                 }
-
                 row.style.display = (textMatch && memMatch) ? "" : "none";
             });
         }
@@ -450,7 +337,7 @@
             let rows = activeTab.querySelectorAll("tr");
             
             for (let i = 0; i < rows.length; i++) {
-                if (rows[i].style.display === "none") continue; // Не экспортируем отфильтрованное
+                if (rows[i].style.display === "none") continue; 
                 let row = [], cols = rows[i].querySelectorAll("td, th");
                 for (let j = 0; j < cols.length; j++) 
                     row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
@@ -482,16 +369,12 @@
         });
 
         // Smart IP Resolution for Network Tab
-        function resolveIP(ip, dnsMap) 
-        {
+        function resolveIP(ip, dnsMap) {
             if (ip === "0.0.0.0" || ip === "::" || ip === "*") return "<span style='color:var(--text-muted);'>Localhost / Unbound</span>";
             if (ip.startsWith("127.")) return "Loopback";
             if (ip.startsWith("10.") || ip.startsWith("192.168.") || ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./)) return "LAN / Internal Routing";
             if (ip === "255.255.255.255") return "Broadcast";
-            
-            // If IP in DNS cache, show the resolved hostname with a badge
             if (dnsMap[ip]) return `<span style="color:var(--cyan); font-weight:bold;">${dnsMap[ip]}</span> (DNS Cache)`;
-            
             return "Unknown (External Server)";
         }
 
@@ -530,7 +413,7 @@
                 </tr>
             `}).join('') : `<tr><td colspan="4" style="text-align:center; color:var(--green);">No memory anomalies detected.</td></tr>`;
 
-            // 2. Processes (Поменял местами Path и Hash для тебя)
+            // 2. Processes
             const procData = arts.processes || [];
             document.getElementById('alert-proc').innerText = procData.length;
             
@@ -556,7 +439,7 @@
                 </tr>
             `).join('');
 
-            // 4. Network Connections & DNS Mapping
+            // 4. Network Connections
             const dnsMap = {};
             if(fp.dns_cache) fp.dns_cache.forEach(d => dnsMap[d.data] = d.recordName);
 
@@ -586,7 +469,7 @@
                 </tr>
             `).join('') : `<tr><td colspan="3" style="text-align:center;">No sensitive data found in clipboard.</td></tr>`;
             
-            // Filter MemHunt
+            // Show MemHunt filter by default since it's the active tab
             document.getElementById('memhuntFilter').style.display = 'block';
         }
     </script>
