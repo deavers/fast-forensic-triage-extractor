@@ -2,6 +2,7 @@
 #include "ff/core/Exporter.h"
 #include "ff/utils/ConsolePrinter.h"
 #include "ff/Platform.h"
+#include <windows.h>
 
 #if defined(FF_PLATFORM_WINDOWS)
     #include "windows/WinSystemScanner.h"
@@ -30,6 +31,24 @@ int main(int argc, char* argv[])
 {
     (void)argc;
     (void)argv;
+
+    // (ANTI-DEBUGGING & EVASION)
+    #if defined(FF_PLATFORM_WINDOWS)
+        // Check for common debuggers (x64dbg, OllyDbg)
+        if (IsDebuggerPresent()) 
+        {
+            // Finish the program immediately if a debugger is detected to prevent analysis
+            return 0; 
+        }
+        
+        // 2. Check for remote debugging (IDA Pro Remote)
+        BOOL isRemoteDebugger = FALSE;
+        if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &isRemoteDebugger) && isRemoteDebugger) 
+        {
+            // Finish the program immediately if a debugger is detected to prevent analysis
+            return 0;
+        }
+    #endif
 
     std::cout << "=== Fast Forensic Triage Extractor (FFTE) [Init] ===\n";
     
