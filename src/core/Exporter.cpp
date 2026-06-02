@@ -166,6 +166,56 @@ namespace ff::core
             });
         }
 
+        // LINUX SPECIFIC
+        for (const auto& mod : footprint.linuxModules) 
+        {
+            report["artifacts"]["digital_footprint"]["linux_modules"].push_back({
+                {"name", mod.name}, {"size", mod.size}, {"state", mod.state}
+            });
+        }
+        for (const auto& key : footprint.sshKeys) 
+        {
+            report["artifacts"]["digital_footprint"]["ssh_keys"].push_back({
+                {"path", key.path}, {"keyContent", key.keyContent}
+            });
+        }
+        for (const auto& fd : footprint.processFileDescriptors) 
+        {
+            report["artifacts"]["digital_footprint"]["process_open_files"].push_back({
+                {"pid", fd.pid}, {"openFiles", fd.openFiles}
+            });
+        }
+        for (const auto& env : footprint.processEnvironments) 
+        {
+            report["artifacts"]["digital_footprint"]["process_environments"].push_back({
+                {"pid", env.pid}, {"environment", env.envDump} // ИСПРАВЛЕНО: envDump
+            });
+        }
+        for (const auto& cred : footprint.processCredentials) 
+        {
+            report["artifacts"]["digital_footprint"]["process_credentials"].push_back({
+                {"pid", cred.pid}, {"uid_info", cred.uid_info}, {"gid_info", cred.gid_info}
+            });
+        }
+        for (const auto& cg : footprint.processCgroups) 
+        {
+            report["artifacts"]["digital_footprint"]["process_cgroups"].push_back({
+                {"pid", cg.pid}, {"cgroup_paths", cg.containerPath}, {"isContainerized", cg.isContainerized} // ИСПРАВЛЕНО: containerPath
+            });
+        }
+        for (const auto& pkg : footprint.installedPackages) 
+        {
+            report["artifacts"]["digital_footprint"]["installed_packages"].push_back({
+                {"name", pkg.name}, {"version", pkg.version} // ИСПРАВЛЕНО: удален architecture
+            });
+        }
+        for (const auto& unit : footprint.systemdUnits) 
+        {
+            report["artifacts"]["digital_footprint"]["systemd_units"].push_back({
+                {"name", unit.name}, {"state", unit.state}
+            });
+        }
+
         // Save
         std::ofstream file(std::string{outputPath});
         if (!file.is_open()) 
