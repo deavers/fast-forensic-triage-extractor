@@ -32,7 +32,9 @@ elseif(WIN32)
     )
     
     # Strictly compile ONLY core and Windows specific artifacts (No Linux files mixed here!)
-    add_executable(fastforensics ${CORE_SOURCES} ${WIN_SOURCES})
+    add_executable(fastforensics ${CORE_SOURCES} ${WIN_SOURCES}
+        src/windows/artifacts/network/ArpScanner.cpp
+        src/windows/artifacts/network/FirewallScanner.cpp)
     target_compile_definitions(fastforensics PRIVATE FF_PLATFORM_WINDOWS)
     
     # System libraries for WinAPI low-level forensic functions for network, events, and signatures

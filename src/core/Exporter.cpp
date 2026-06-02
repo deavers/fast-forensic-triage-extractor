@@ -196,6 +196,28 @@ namespace ff::core
         }
 
         // ----------------------------------------------------
+        // --- BLUETOOTH, HOSTS & USER ACTIVITY ---
+        // ----------------------------------------------------
+        for (const auto& bt : footprint.bluetoothHistory) 
+        {
+            report["artifacts"]["digital_footprint"]["bluetooth_history"].push_back({
+                {"name", bt.name}, {"macAddress", bt.macAddress}
+            });
+        }
+        
+        for (const auto& hostLine : footprint.hostsLines) 
+        {
+            report["artifacts"]["digital_footprint"]["hosts_lines"].push_back(hostLine);
+        }
+        
+        for (const auto& ua : footprint.userActivity) 
+        {
+            report["artifacts"]["digital_footprint"]["user_activity"].push_back({
+                {"programPath", ua.programPath}, {"runCount", ua.runCount}, {"totalActiveMinutes", ua.totalActiveMinutes}
+            });
+        }
+
+        // ----------------------------------------------------
         // --- LINUX SPECIFIC ARTIFACTS ---
         // ----------------------------------------------------
         for (const auto& mod : footprint.linuxModules) 

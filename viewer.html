@@ -598,7 +598,7 @@ function getSectionData(id) {
     arp:          () => df.arp_entries || [],
     firewall:     () => df.firewall_rules || [],
     bluetooth:    () => df.bluetooth_history || [],
-    hosts:        () => df.system_files || [], // fallback if custom hosts array isn't populated
+    hosts:        () => df.hosts_lines || [],
     persistence:  () => arts.persistence || [],
     services:     () => arts.services_and_drivers || [],
     tasks:        () => df.scheduled_tasks || [],
