@@ -12,7 +12,7 @@
 
 #include <iostream>
 #include <memory>
-
+#include <string>
 
 namespace ff
 {
@@ -78,10 +78,19 @@ int main()
     // Autopilot collection of the digital footprint
     auto footprint = scanner->scanDigitalFootprint();
 
+    // Determine output file name based on platform
+    #if defined(FF_PLATFORM_WINDOWS)
+        std::string outputFileName = "forensics_report_windows.json";
+    #elif defined(FF_PLATFORM_LINUX)
+        std::string outputFileName = "forensics_report_linux.json";
+    #else
+        std::string outputFileName = "forensics_report_unknown.json";
+    #endif
+
     // Save to JSON
     std::cout << "[*] Serializing consolidated forensics JSON log...\n";
-    if (ff::core::Exporter::saveToJson("forensic_report.json", footprint)) 
-        std::cout << "[SUCCESS] Forensic artifact session saved to: forensic_report.json\n\n";
+    if (ff::core::Exporter::saveToJson(outputFileName, footprint)) 
+        std::cout << "[SUCCESS] Forensic artifact session saved to: " << outputFileName << "\n\n";
     else 
         std::cerr << "[ERROR] Failed to write forensic report to disk.\n\n";
     

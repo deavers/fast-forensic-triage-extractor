@@ -14,7 +14,29 @@ FFTE allows forensic investigators and system administrators to execute a single
 
 ***
 
-## 🚀 Architecture Overview
+## 🚀 Architecture Overview & Data Flow
+
+Unlike many forensic scripts that rely on third-party parsers, FFTE interacts directly with the lowest levels of the operating system. Below is the data-flow architecture demonstrating how the triage core extracts artifacts:
+
+```text
+FFTE (Fast Forensic Triage Extractor)
+  │
+  ├── [WINDOWS NATIVE CORE] (WinAPI / COM)
+  │     │
+  │     ├── Registry API (Advapi32)  → HKLM/HKCU      → UserAssist (ROT13 decoded), Autorun, USB, Bluetooth, RDP
+  │     ├── Network API (iphlpapi)   → RAM            → TCP/UDP sockets, ARP Table, DNS Cache, Active Adapters
+  │     ├── Process API (psapi)      → RAM            → Process Trees, Injected Memory (MemHunt RWX Scanner)
+  │     ├── COM & WMI (wbemuuid)     → DCOM Broker    → Firewall Rules (INetFwPolicy2), SMBIOS Hardware Serials
+  │     ├── Crypto (WinVerifyTrust)  → PKI Chain      → Authenticode Driver Signature Validation
+  │     └── File I/O                 → NTFS Disk      → Prefetch (.pf), Hosts file, Browser SQLite DBs
+  │
+  └── [LINUX NATIVE CORE] (Pseudo-FS)
+        │
+        ├── Kernel Memory            → /proc/modules  → LKM (Linux Kernel Modules) Rootkit detection
+        ├── Process Triage           → /proc/[pid]/   → Open FDs, Env Variables, Cgroups (Docker isolation)
+        ├── System Credentials       → /proc/status   → UID/GID mapping (Privilege escalation tracking)
+        ├── Network Interfaces       → /proc/net/dev  → VPN/TAP/TUN virtual adapter detection
+        └── File I/O                 → ext4/btrfs     → SSH Keys, Crontab, DPKG/RPM Packages, Systemd Services
 
 ![FFTE Architecture Map](mindmap.png)
 
@@ -70,8 +92,8 @@ FFTE allows forensic investigators and system administrators to execute a single
 | **14** | `getProcessStartTime()` | Absolute UTC launch timestamps | Me | ✅ AI + Me |
 | **15** | `scanProcessHandles()` | Locked files, mutexes, and registry keys | Me | ⏳ Planned (Deep Forensics) |
 | **16** | `getProcessIntegrity()` | Security tokens (Low/Medium/High/System) | Me | ✅ Me |
-| **NEW** | `scanClipboard()` | Extracts live clipboard RAM buffers for data exfiltration analysis | Me | ✅ AI + Me |
-| **NEW** | **MemHunt (RWX Scanner)** 🔥| Scans active process memory to find injected Shellcode / Cobalt Strike | AI | ✅ AI + Me |
+| **57** | `scanClipboard()` | Extracts live clipboard RAM buffers for data exfiltration analysis | Me | ✅ AI + Me |
+| **58** | **MemHunt (RWX Scanner)** 🔥| Scans active process memory to find injected Shellcode / Cobalt Strike | AI | ✅ AI + Me |
 
 ### 🖥️ Windows — Registry & Autorun (`src/windows/artifacts/registry/`)
 
@@ -144,11 +166,11 @@ FFTE allows forensic investigators and system administrators to execute a single
 
 ## 📊 How to use the Web Dashboard (FFTE Viewer)
 
-After generating the `forensic_report.json` using the FFTE executable, follow these steps to visualize the data:
+After generating the report using the FFTE executable, follow these steps to visualize the data:
 
-1. **Locate the file:** Ensure `viewer.html` and `forensic_report.json` are in the same directory (or just have the JSON file ready).
+1. **Locate the file:** Ensure `viewer.html` and your generated report (`forensics_report_windows.json` or `forensics_report_linux.json`) are in the same directory.
 2. **Open the Dashboard:** Open `viewer.html` in any modern web browser (Chrome, Brave, Edge).
-3. **Upload Report:** Click the **"Load JSON Report"** button in the dashboard and select your `forensic_report.json` file.
+3. **Upload Report:** Click the **"Load JSON Report"** button in the dashboard and select your `.json` file.
 4. **Analyze:** The dashboard will instantly parse the data locally in your browser memory (RAM), providing an interactive view with:
    - **Interactive Tables:** Sorting, global search, and filtering (e.g., filter memory anomalies by `RWX` status).
    - **Architecture Map:** Visual flow of the FFTE execution process.
@@ -159,24 +181,38 @@ After generating the `forensic_report.json` using the FFTE executable, follow th
 
 ## 🛠️ Build Instructions
 
-This project uses CMake and requires a compiler with C++20 support (MSVC `/std:c++20` or GCC `-std=c++20`).
+This project uses modern CMake and requires a compiler with C++20 support (MSVC `/std:c++20` or GCC `-std=c++20`).
 
-**Windows (MinGW/GCC or MSVC):**
-
+**For Windows (Using MinGW-w64 / GCC):**
 ```bash
-mkdir build && cd build
-cmake ..
-cmake --build . --config Release
+# 1. Generate build files (specify MinGW if using MSYS2)
+cmake -S . -B build -G "MinGW Makefiles"
+
+# 2. Compile the project
+cmake --build build --config Release
 ```
 
 ---
 
-**Linux (WSL / Debian):**
+**For Windows (Using MSVC / Visual Studio):**
+```bash
+# 1. Generate build files
+cmake -S . -B build
+
+# 2. Compile the project
+cmake --build build --config Release
+```
+
+---
+
+**Linux (WSL / Debian / Ubuntu):**
 
 ```bash
-mkdir build_linux && cd build_linux
-cmake ..
-cmake --build .
+# 1. Generate build files
+cmake -S . -B build_linux
+
+# 2. Compile the project
+cmake --build build_linux
 ```
 
 ---
@@ -192,7 +228,7 @@ After building, run the executable directly — **no installation required**.
 .\fastforensics.exe
 
 # Or specify a custom output path:
-.\fastforensics.exe --output C:\forensics\report.json
+.\fastforensics.exe --output C:\forensics\forensics_report_windows.json
 ```
 
 > **Tip:** Run as **Administrator** to enable full artifact collection (registry, event logs, process handles, memory scanning).
@@ -202,7 +238,7 @@ After building, run the executable directly — **no installation required**.
 Start-Process -FilePath ".\fastforensics.exe" -Verb RunAs
 ```
 
-The report will be saved as `forensic_report.json` in the current directory.
+The report will be saved as forensics_report_windows.json in the current directory.
 
 ---
 
@@ -216,21 +252,41 @@ chmod +x ./fastforensics
 sudo ./fastforensics
 
 # Or specify a custom output path:
-sudo ./fastforensics --output /tmp/forensic_report.json
+sudo ./fastforensics --output /tmp/forensics_report_linux.json
 ```
 
 > **Note:** Root privileges are required for `/proc/[pid]/mem`, LKM triage, and container isolation detection.
 
-The report will be saved as `forensic_report.json` in the current directory.
+The report will be saved as forensics_report_linux.json in the current directory.
 
 ---
 
 ### 📁 Output
 
-Both platforms produce a unified structured report:
+The tool produces a unified structured JSON report depending on the compiled platform:
 
-```
-forensic_report.json   ← structured artifact snapshot
-```
+* `forensics_report_windows.json` (When executed on Windows)
+* `forensics_report_linux.json` (When executed on Linux/WSL)
 
-Open `viewer.html` in any modern browser and load the JSON file to visualize results interactively.
+Open `viewer.html` in any modern browser and load the generated JSON file to visualize results interactively.
+
+***
+
+## 🧠 Architecture Philosophy & Developer Reflection
+
+As part of the project requirements, here is a brief reflection on the design process, challenges faced, and future improvements.
+
+### 1. Design Approach & Rationale
+My primary goal was to create a **Zero-Dependency** triage tool. In real-world digital forensics, installing third-party libraries (like Python runtimes or C++ redistributables) on a compromised machine destroys volatile evidence. Thus, I chose to strictly use standard C++20 and native OS APIs (`<windows.h>`, `/proc` pseudo-filesystem) combined with static linking. 
+Architecturally, I implemented a **Self-Registering Plugin Pattern** (Autopilot Factory). Instead of writing a massive, unmaintainable `switch-case` in the core engine, each forensic artifact scanner (e.g., `ArpScanner`, `LkmScanner`) registers itself into the memory at compile-time using C++ macros. This allows the tool to be infinitely scalable—adding a new scanner simply means dropping a new `.cpp` file into the folder without ever modifying the core logic.
+
+### 2. Interesting Problems & Struggles
+The most challenging part of the development was dealing with cross-platform idiosyncrasies and strict compiler warnings:
+* **The ROT13 & UTF-8 Struggle:** When parsing the Windows `UserAssist` registry key to track user activity, I discovered Microsoft obfuscates program paths using ROT13. However, dealing with wide characters (`wchar_t`) containing Cyrillic or special characters caused the `nlohmann::json` parser to silently crash and abort the array generation. I had to manually implement a robust Wide-to-UTF8 conversion bridge.
+* **WSL Network Isolation:** While writing the Linux VPN detector, I encountered a fascinating issue. The Linux scanner perfectly parses `/proc/net/dev`, but when running inside WSL (Windows Subsystem for Linux), the Linux kernel sits behind a Hyper-V NAT. It physically cannot see the VPN TAP adapters running on the Windows host. This was a great lesson in how virtualization layers affect forensic data collection.
+* **Strict CMake Rules:** Configuring CMake to separate Windows (`WinAPI`) and Linux (`/proc`) targets cleanly, while enforcing `-Werror` (treating all warnings as fatal errors), forced me to write much cleaner, memory-safe C++ code.
+
+### 3. What Could Be Done Better?
+If I had more time, I would improve the tool in two ways:
+1. **Multi-threading:** Currently, the scanners run sequentially. Moving file I/O operations (like deep filesystem Prefetch scanning) to a thread pool (`std::async`) would drastically reduce the triage execution time.
+2. **Raw Database Parsing:** Instead of relying on Windows Registry APIs (which can be hooked or spoofed by rootkits), a more advanced approach would be to parse the raw ESE database files (like `SRUDB.dat` or `Amcache.hve`) directly from the NTFS disk at the hex level.
