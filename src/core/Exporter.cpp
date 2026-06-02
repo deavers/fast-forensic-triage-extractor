@@ -97,11 +97,11 @@ namespace ff::core
             {"isProxyActive", footprint.anonymity.isProxyActive}, {"isVpnActive", footprint.anonymity.isVpnActive}, {"activeAdapters", footprint.anonymity.activeAdapters}
         };
 
-        // Web & Browser — use toString() helper instead of raw ternary
+        // Web & Browser
         for (const auto& b : footprint.browserHistory) 
         {
             report["artifacts"]["digital_footprint"]["browser_history"].push_back({
-                {"browser", std::string(models::toString(b.browser))},
+                {"browser", b.browser == models::BrowserType::MozillaFirefox ? "MozillaFirefox" : "Other"},
                 {"url", b.url}, {"title", b.title}, {"visitCount", b.visitCount}, {"lastVisitTime", b.lastVisitTime}
             });
         }
@@ -166,7 +166,38 @@ namespace ff::core
             });
         }
 
-        // LINUX SPECIFIC
+        // ----------------------------------------------------
+        // --- MISSING WINDOWS ARTIFACTS ---
+        // ----------------------------------------------------
+        for (const auto& arp : footprint.arpEntries) {
+            report["artifacts"]["digital_footprint"]["arp_entries"].push_back({
+                {"ipAddress", arp.ipAddress}, {"macAddress", arp.macAddress}, {"type", arp.type}
+            });
+        }
+        for (const auto& fw : footprint.firewallRules) {
+            report["artifacts"]["digital_footprint"]["firewall_rules"].push_back({
+                {"ruleName", fw.ruleName}, {"ruleData", fw.ruleData}
+            });
+        }
+        for (const auto& pf : footprint.prefetchFiles) {
+            report["artifacts"]["digital_footprint"]["prefetch_files"].push_back({
+                {"executableName", pf.executableName}, {"prefetchFileName", pf.prefetchFileName}, {"lastRunTime", pf.lastRunTime}
+            });
+        }
+        for (const auto& rdp : footprint.rdpSessions) {
+            report["artifacts"]["digital_footprint"]["rdp_sessions"].push_back({
+                {"targetHost", rdp.targetHost}, {"usernameHint", rdp.usernameHint}
+            });
+        }
+        for (const auto& usb : footprint.usbHistory) {
+            report["artifacts"]["digital_footprint"]["usb_history"].push_back({
+                {"deviceInstanceId", usb.deviceInstanceId}, {"friendlyName", usb.friendlyName}
+            });
+        }
+
+        // ----------------------------------------------------
+        // --- LINUX SPECIFIC ARTIFACTS ---
+        // ----------------------------------------------------
         for (const auto& mod : footprint.linuxModules) 
         {
             report["artifacts"]["digital_footprint"]["linux_modules"].push_back({
@@ -188,7 +219,7 @@ namespace ff::core
         for (const auto& env : footprint.processEnvironments) 
         {
             report["artifacts"]["digital_footprint"]["process_environments"].push_back({
-                {"pid", env.pid}, {"environment", env.envDump} // ИСПРАВЛЕНО: envDump
+                {"pid", env.pid}, {"environment", env.envDump}
             });
         }
         for (const auto& cred : footprint.processCredentials) 
@@ -200,13 +231,13 @@ namespace ff::core
         for (const auto& cg : footprint.processCgroups) 
         {
             report["artifacts"]["digital_footprint"]["process_cgroups"].push_back({
-                {"pid", cg.pid}, {"cgroup_paths", cg.containerPath}, {"isContainerized", cg.isContainerized} // ИСПРАВЛЕНО: containerPath
+                {"pid", cg.pid}, {"cgroup_paths", cg.containerPath}, {"isContainerized", cg.isContainerized}
             });
         }
         for (const auto& pkg : footprint.installedPackages) 
         {
             report["artifacts"]["digital_footprint"]["installed_packages"].push_back({
-                {"name", pkg.name}, {"version", pkg.version} // ИСПРАВЛЕНО: удален architecture
+                {"name", pkg.name}, {"version", pkg.version}
             });
         }
         for (const auto& unit : footprint.systemdUnits) 

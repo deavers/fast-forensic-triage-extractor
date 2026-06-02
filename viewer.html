@@ -52,8 +52,6 @@
   --purple-dim:rgba(168,85,247,.12);
   --cyan:      #06b6d4;
   --cyan-dim:  rgba(6,182,212,.12);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.4);
-  --shadow-md: 0 4px 16px rgba(0,0,0,.5);
 }
 
 [data-theme="light"] {
@@ -80,8 +78,6 @@
   --purple-dim:rgba(147,51,234,.1);
   --cyan:      #0891b2;
   --cyan-dim:  rgba(8,145,178,.1);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
-  --shadow-md: 0 4px 16px rgba(0,0,0,.1);
 }
 
 /* ── RESET ── */
@@ -98,272 +94,117 @@ table{border-collapse:collapse;width:100%}
 
 /* ── LAYOUT ── */
 .app { display:flex; height:100dvh; overflow:hidden; }
-
 .sidebar {
-  width: 220px; flex-shrink:0;
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction:column;
-  overflow-y: auto;
+  width: 220px; flex-shrink:0; background: var(--surface);
+  border-right: 1px solid var(--border); display: flex; flex-direction:column; overflow-y: auto;
 }
-
-.main {
-  flex:1; display:flex; flex-direction:column; overflow:hidden;
-}
+.main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
 
 /* ── TOP BAR ── */
 .topbar {
   height: 52px; display:flex; align-items:center; gap:var(--space-3);
-  padding: 0 var(--space-6);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  flex-shrink:0;
+  padding: 0 var(--space-6); background: var(--surface);
+  border-bottom: 1px solid var(--border); flex-shrink:0;
 }
-
 .logo {
   display:flex; align-items:center; gap:var(--space-2);
   font-family:var(--font-mono); font-weight:700; font-size:var(--text-sm);
-  color:var(--primary); letter-spacing:.02em;
-  white-space:nowrap;
+  color:var(--primary); letter-spacing:.02em; white-space:nowrap;
 }
-
 .topbar-sep { width:1px; height:20px; background:var(--border); }
-
 .load-btn {
   display:flex; align-items:center; gap:var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  background: var(--primary); color:#fff;
+  padding: var(--space-2) var(--space-4); background: var(--primary); color:#fff;
   border-radius: var(--radius-md); font-size:var(--text-sm); font-weight:500;
-  transition: opacity var(--transition);
+  transition: opacity var(--transition); cursor:pointer;
 }
 .load-btn:hover { opacity:.85; }
-
 #fileInput { display:none; }
 
-.scan-meta {
-  margin-left:auto; display:flex; align-items:center; gap:var(--space-4);
-  font-size:var(--text-xs); color:var(--text-muted); font-family:var(--font-mono);
-}
-.scan-meta .badge {
-  padding: 2px var(--space-2); background:var(--green-dim); color:var(--green);
-  border-radius:var(--radius-full); font-size:10px; font-weight:600;
-  letter-spacing:.05em;
-}
-.scan-meta .badge.demo {
-  background:var(--yellow-dim); color:var(--yellow);
-}
-
+.scan-meta { margin-left:auto; display:flex; align-items:center; gap:var(--space-4); font-size:var(--text-xs); color:var(--text-muted); font-family:var(--font-mono); }
+.scan-meta .badge { padding: 2px var(--space-2); background:var(--green-dim); color:var(--green); border-radius:var(--radius-full); font-size:10px; font-weight:600; }
+.scan-meta .badge.demo { background:var(--yellow-dim); color:var(--yellow); }
 .theme-btn {
-  width:32px; height:32px; border-radius:var(--radius-md);
-  display:flex; align-items:center; justify-content:center;
-  color:var(--text-muted); border:1px solid var(--border);
-  transition:color var(--transition), background var(--transition);
+  width:32px; height:32px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center;
+  color:var(--text-muted); border:1px solid var(--border); transition:all var(--transition);
 }
 .theme-btn:hover { color:var(--text); background:var(--surface-3); }
 
 /* ── CONTENT ── */
-.content {
-  flex:1; overflow-y:auto; padding: var(--space-6);
-}
+.content { flex:1; overflow-y:auto; padding: var(--space-6); }
 
 /* ── WELCOME ── */
-.welcome {
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  height:100%; gap:var(--space-4); text-align:center; color:var(--text-muted);
-}
-.welcome-icon { color:var(--text-faint); }
+.welcome { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:var(--space-4); text-align:center; color:var(--text-muted); }
 .welcome h2 { font-size:var(--text-xl); color:var(--text); font-weight:600; }
 .welcome p { font-size:var(--text-sm); max-width:40ch; }
-.welcome .demo-btn {
-  padding: var(--space-2) var(--space-6); border:1px solid var(--border-2);
-  border-radius:var(--radius-md); font-size:var(--text-sm);
-  color:var(--text-muted);
-  transition: all var(--transition);
-}
+.welcome .demo-btn { padding: var(--space-2) var(--space-6); border:1px solid var(--border-2); border-radius:var(--radius-md); font-size:var(--text-sm); color:var(--text-muted); transition: all var(--transition); }
 .welcome .demo-btn:hover { background:var(--surface-3); color:var(--text); }
 
 /* ── SIDEBAR NAV ── */
-.sidebar-header {
-  padding: var(--space-4) var(--space-4) var(--space-2);
-  font-size:var(--text-xs); font-weight:600; letter-spacing:.08em;
-  color:var(--text-faint); text-transform:uppercase;
-}
-.nav-item {
-  display:flex; align-items:center; gap:var(--space-3);
-  padding: var(--space-2) var(--space-4);
-  font-size:var(--text-sm); color:var(--text-muted);
-  cursor:pointer; border-radius:0;
-  transition: color var(--transition), background var(--transition);
-  position:relative;
-  border-left:2px solid transparent;
-}
+.sidebar-header { padding: var(--space-4) var(--space-4) var(--space-2); font-size:var(--text-xs); font-weight:600; letter-spacing:.08em; color:var(--text-faint); text-transform:uppercase; }
+.nav-item { display:flex; align-items:center; gap:var(--space-3); padding: var(--space-2) var(--space-4); font-size:var(--text-sm); color:var(--text-muted); cursor:pointer; border-left:2px solid transparent; transition: all var(--transition); }
 .nav-item:hover { color:var(--text); background:var(--surface-3); }
-.nav-item.active {
-  color:var(--primary); background:var(--primary-dim);
-  border-left-color:var(--primary);
-}
-.nav-item .count {
-  margin-left:auto; font-size:10px; font-family:var(--font-mono);
-  color:var(--text-faint); font-weight:500;
-}
+.nav-item.active { color:var(--primary); background:var(--primary-dim); border-left-color:var(--primary); }
+.nav-item .count { margin-left:auto; font-size:10px; font-family:var(--font-mono); color:var(--text-faint); font-weight:500; }
 .nav-item.active .count { color:var(--primary); }
-.nav-group-label {
-  padding: var(--space-4) var(--space-4) var(--space-1);
-  font-size:10px; font-weight:700; letter-spacing:.1em;
-  color:var(--text-faint); text-transform:uppercase;
-}
+.nav-group-label { padding: var(--space-4) var(--space-4) var(--space-1); font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--text-faint); text-transform:uppercase; }
 
 /* ── DASHBOARD ── */
-.kpi-grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(180px,100%), 1fr));
-  gap:var(--space-3); margin-bottom:var(--space-6);
-}
-.kpi-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--radius-lg); padding:var(--space-4);
-  display:flex; flex-direction:column; gap:var(--space-1);
-}
-.kpi-card .kpi-label {
-  font-size:var(--text-xs); color:var(--text-muted); font-weight:500;
-}
-.kpi-card .kpi-value {
-  font-size:var(--text-xl); font-weight:700;
-  font-family:var(--font-mono); color:var(--text);
-  line-height:1;
-}
-.kpi-card .kpi-sub {
-  font-size:var(--text-xs); color:var(--text-faint); font-family:var(--font-mono);
-}
-.kpi-card.threat { border-color:var(--red); background:var(--red-dim); }
-.kpi-card.threat .kpi-value { color:var(--red); }
-.kpi-card.warn  { border-color:var(--yellow); background:var(--yellow-dim); }
-.kpi-card.warn  .kpi-value  { color:var(--yellow); }
-.kpi-card.ok    { border-color:var(--green); background:var(--green-dim); }
-.kpi-card.ok    .kpi-value  { color:var(--green); }
+.kpi-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(min(180px,100%), 1fr)); gap:var(--space-3); margin-bottom:var(--space-6); }
+.kpi-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:var(--space-4); display:flex; flex-direction:column; gap:var(--space-1); }
+.kpi-card .kpi-label { font-size:var(--text-xs); color:var(--text-muted); font-weight:500; }
+.kpi-card .kpi-value { font-size:var(--text-xl); font-weight:700; font-family:var(--font-mono); color:var(--text); line-height:1; }
+.kpi-card .kpi-sub { font-size:var(--text-xs); color:var(--text-faint); font-family:var(--font-mono); }
+.kpi-card.threat { border-color:var(--red); background:var(--red-dim); } .kpi-card.threat .kpi-value { color:var(--red); }
+.kpi-card.warn  { border-color:var(--yellow); background:var(--yellow-dim); } .kpi-card.warn .kpi-value { color:var(--yellow); }
 
-.info-grid {
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(min(300px,100%),1fr));
-  gap:var(--space-3); margin-bottom:var(--space-6);
-}
-.info-card {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--radius-lg); padding:var(--space-4);
-}
-.info-card h3 {
-  font-size:var(--text-xs); font-weight:600; letter-spacing:.07em;
-  text-transform:uppercase; color:var(--text-muted); margin-bottom:var(--space-3);
-  display:flex; align-items:center; gap:var(--space-2);
-}
-.info-row {
-  display:flex; justify-content:space-between; align-items:baseline;
-  padding: var(--space-1) 0; border-bottom:1px solid var(--border);
-  font-size:var(--text-sm); gap:var(--space-4);
-}
+.info-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(300px,100%),1fr)); gap:var(--space-3); margin-bottom:var(--space-6); }
+.info-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:var(--space-4); }
+.info-card h3 { font-size:var(--text-xs); font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:var(--text-muted); margin-bottom:var(--space-3); display:flex; align-items:center; gap:var(--space-2); }
+.info-row { display:flex; justify-content:space-between; align-items:baseline; padding: var(--space-1) 0; border-bottom:1px solid var(--border); font-size:var(--text-sm); gap:var(--space-4); }
 .info-row:last-child { border-bottom:none; }
 .info-row .k { color:var(--text-muted); white-space:nowrap; flex-shrink:0; }
 .info-row .v { color:var(--text); font-family:var(--font-mono); font-size:var(--text-xs); text-align:right; word-break:break-all; }
 
-/* ── SECTION PAGE ── */
-.section-header {
-  display:flex; align-items:center; gap:var(--space-3);
-  margin-bottom:var(--space-4); flex-wrap:wrap;
-}
-.section-title {
-  font-size:var(--text-lg); font-weight:700; color:var(--text);
-}
-.section-count {
-  font-family:var(--font-mono); font-size:var(--text-xs);
-  padding:2px var(--space-2); background:var(--surface-3);
-  border-radius:var(--radius-full); color:var(--text-muted);
-}
+/* ── TABLE & BLOCKS ── */
+.section-header { display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-4); flex-wrap:wrap; }
+.section-title { font-size:var(--text-lg); font-weight:700; color:var(--text); }
+.section-count { font-family:var(--font-mono); font-size:var(--text-xs); padding:2px var(--space-2); background:var(--surface-3); border-radius:var(--radius-full); color:var(--text-muted); }
+.search-box { margin-left:auto; display:flex; align-items:center; gap:var(--space-2); background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-md); padding: var(--space-1) var(--space-3); }
+.search-box input { background:none; border:none; outline:none; font-size:var(--text-sm); color:var(--text); width:200px; }
 
-.search-box {
-  margin-left:auto;
-  display:flex; align-items:center; gap:var(--space-2);
-  background:var(--surface-2); border:1px solid var(--border);
-  border-radius:var(--radius-md); padding: var(--space-1) var(--space-3);
-}
-.search-box input {
-  background:none; border:none; outline:none;
-  font-size:var(--text-sm); color:var(--text); width:200px;
-}
-.search-box input::placeholder { color:var(--text-faint); }
-
-/* ── TABLE ── */
-.table-wrap {
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:var(--radius-lg); overflow:hidden;
-}
-.table-scroll {
-  overflow-x:auto; overflow-y:auto;
-  max-height: calc(100dvh - 220px);
-}
-.ffte-table {
-  width:100%; font-size:var(--text-xs);
-}
-.ffte-table thead { position:sticky; top:0; z-index:20; }
-.ffte-table thead th {
-  background:var(--surface-2);
-  padding: var(--space-3) var(--space-4);
-  text-align:left; font-size:10px; font-weight:700;
-  letter-spacing:.07em; text-transform:uppercase; color:var(--text-muted);
-  border-bottom:1px solid var(--border-2); white-space:nowrap;
-  user-select:none;
-}
-.ffte-table thead th.sortable { cursor:pointer; }
-.ffte-table thead th.sortable:hover { color:var(--text); }
-.ffte-table tbody tr {
-  border-bottom:1px solid var(--border);
-  transition:background var(--transition);
-}
-.ffte-table tbody tr:last-child { border-bottom:none; }
+.table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
+.table-scroll { overflow-x:auto; overflow-y:auto; max-height: calc(100dvh - 220px); }
+.ffte-table { width:100%; font-size:var(--text-xs); }
+.ffte-table thead th { position:sticky; top:0; background:var(--surface-2); padding: var(--space-3) var(--space-4); text-align:left; font-size:10px; font-weight:700; color:var(--text-muted); border-bottom:1px solid var(--border-2); white-space:nowrap; z-index:20; }
+.ffte-table tbody tr { border-bottom:1px solid var(--border); transition:background var(--transition); }
 .ffte-table tbody tr:hover { background:var(--surface-3); }
-.ffte-table td {
-  padding: var(--space-2) var(--space-4);
-  font-family:var(--font-mono); color:var(--text); vertical-align:middle;
-  word-break:break-all; max-width:320px;
-}
+.ffte-table td { padding: var(--space-2) var(--space-4); font-family:var(--font-mono); color:var(--text); vertical-align:middle; word-break:break-all; max-width:400px; }
 .ffte-table td.nowrap { white-space:nowrap; }
 
-/* ── BADGES / PILLS ── */
-.pill {
-  display:inline-flex; align-items:center;
-  padding:2px var(--space-2); border-radius:var(--radius-full);
-  font-size:10px; font-weight:600; letter-spacing:.04em; white-space:nowrap;
+/* ── CODE BOX FOR LINUX STRINGS ── */
+.code-box {
+  max-height: 120px; overflow-y: auto;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-muted); white-space: pre-wrap;
+  word-break: break-all; padding: var(--space-2);
+  background: var(--surface-2); border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
-.pill.green  { background:var(--green-dim);  color:var(--green); }
-.pill.red    { background:var(--red-dim);    color:var(--red); }
+
+.pill { display:inline-flex; align-items:center; padding:2px var(--space-2); border-radius:var(--radius-full); font-size:10px; font-weight:600; white-space:nowrap; }
+.pill.green { background:var(--green-dim); color:var(--green); }
+.pill.red { background:var(--red-dim); color:var(--red); }
 .pill.yellow { background:var(--yellow-dim); color:var(--yellow); }
 .pill.orange { background:var(--orange-dim); color:var(--orange); }
-.pill.blue   { background:var(--primary-dim);color:var(--primary); }
-.pill.purple { background:var(--purple-dim); color:var(--purple); }
-.pill.cyan   { background:var(--cyan-dim);   color:var(--cyan); }
-.pill.gray   { background:var(--surface-3);  color:var(--text-muted); }
-
-/* ── ALERT ROWS ── */
-.ffte-table tr.row-threat td { background:var(--red-dim) !important; }
-.ffte-table tr.row-warn td  { background:var(--yellow-dim) !important; }
-
-/* ── EMPTY STATE ── */
-.empty { text-align:center; padding:var(--space-12) var(--space-4); color:var(--text-faint); }
-.empty p { font-size:var(--text-sm); margin-top:var(--space-2); }
-
-/* ── EXPORT BAR ── */
-.export-bar {
-  display:flex; align-items:center; gap:var(--space-2);
-  padding:var(--space-3) var(--space-4);
-  background:var(--surface-2); border-top:1px solid var(--border);
-}
-.export-btn {
-  display:flex; align-items:center; gap:var(--space-2);
-  padding: var(--space-1) var(--space-3); font-size:var(--text-xs);
-  border:1px solid var(--border-2); border-radius:var(--radius-md);
-  color:var(--text-muted); transition:all var(--transition);
-}
+.pill.blue { background:var(--primary-dim); color:var(--primary); }
+.pill.cyan { background:var(--cyan-dim); color:var(--cyan); }
+.pill.gray { background:var(--surface-3); color:var(--text-muted); }
+.empty { text-align:center; padding:var(--space-12) var(--space-4); color:var(--text-faint); font-weight: 600; }
+.export-bar { display:flex; align-items:center; gap:var(--space-2); padding:var(--space-3) var(--space-4); background:var(--surface-2); border-top:1px solid var(--border); }
+.export-btn { display:flex; align-items:center; gap:var(--space-2); padding: var(--space-1) var(--space-3); font-size:var(--text-xs); border:1px solid var(--border-2); border-radius:var(--radius-md); color:var(--text-muted); cursor:pointer; }
 .export-btn:hover { color:var(--text); background:var(--surface-3); }
 
-/* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width:6px; height:6px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:var(--border-2); border-radius:99px; }
@@ -373,268 +214,162 @@ table{border-collapse:collapse;width:100%}
 <body>
 
 <div class="app">
-  <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar" style="display:none">
     <div class="sidebar-header">FFTE Viewer</div>
 
     <div class="nav-group-label">Overview</div>
     <div class="nav-item active" data-section="dashboard" onclick="showSection('dashboard',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       Dashboard
     </div>
 
-    <div class="nav-group-label">Processes &amp; Memory</div>
+    <div class="nav-group-label">Processes & Memory</div>
     <div class="nav-item" data-section="processes" onclick="showSection('processes',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-      Processes <span class="count" id="cnt-processes">—</span>
+      Processes <span class="count" id="cnt-processes">0</span>
     </div>
     <div class="nav-item" data-section="memory" onclick="showSection('memory',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      Injected Memory <span class="count" id="cnt-memory">—</span>
+      Injected Memory <span class="count" id="cnt-memory">0</span>
     </div>
     <div class="nav-item" data-section="clipboard" onclick="showSection('clipboard',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-      Clipboard <span class="count" id="cnt-clipboard">—</span>
+      Clipboard <span class="count" id="cnt-clipboard">0</span>
     </div>
 
     <div class="nav-group-label">Network</div>
     <div class="nav-item" data-section="network" onclick="showSection('network',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.56 2.9A7 7 0 0 1 19 9v1"/><path d="m6.5 7 5.5 5.5"/><circle cx="20" cy="4" r="2"/><circle cx="4" cy="20" r="2"/><path d="M15.5 17 10 11.5"/><path d="M15.44 21.1A7 7 0 0 1 5 15v-1"/></svg>
-      Connections <span class="count" id="cnt-network">—</span>
+      Connections <span class="count" id="cnt-network">0</span>
     </div>
     <div class="nav-item" data-section="dns" onclick="showSection('dns',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      DNS Cache <span class="count" id="cnt-dns">—</span>
+      DNS Cache <span class="count" id="cnt-dns">0</span>
     </div>
     <div class="nav-item" data-section="arp" onclick="showSection('arp',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-      ARP Table <span class="count" id="cnt-arp">—</span>
+      ARP Table <span class="count" id="cnt-arp">0</span>
     </div>
     <div class="nav-item" data-section="firewall" onclick="showSection('firewall',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      Firewall Rules <span class="count" id="cnt-firewall">—</span>
+      Firewall Rules <span class="count" id="cnt-firewall">0</span>
     </div>
 
-    <div class="nav-group-label">Persistence</div>
+    <div class="nav-group-label">Persistence & OS</div>
     <div class="nav-item" data-section="persistence" onclick="showSection('persistence',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>
-      Autorun / Registry <span class="count" id="cnt-persistence">—</span>
+      Autorun / Registry <span class="count" id="cnt-persistence">0</span>
+    </div>
+    <div class="nav-item" data-section="tasks" onclick="showSection('tasks',this)">
+      Scheduled Tasks <span class="count" id="cnt-tasks">0</span>
     </div>
     <div class="nav-item" data-section="services" onclick="showSection('services',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2H2v10h10V2z"/><path d="M22 12h-10v10h10V12z"/><path d="M12 12H2v10h10V12z"/><path d="M22 2h-10v10h10V2z"/></svg>
-      Services &amp; Drivers <span class="count" id="cnt-services">—</span>
+      Services & Drivers <span class="count" id="cnt-services">0</span>
+    </div>
+    <div class="nav-item" data-section="systemfiles" onclick="showSection('systemfiles',this)">
+      System Files <span class="count" id="cnt-systemfiles">0</span>
     </div>
     <div class="nav-item" data-section="prefetch" onclick="showSection('prefetch',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18"/><path d="M3 12h18"/><path d="M3 21h18"/></svg>
-      Prefetch Files <span class="count" id="cnt-prefetch">—</span>
+      Prefetch Files <span class="count" id="cnt-prefetch">0</span>
     </div>
 
-    <div class="nav-group-label">Browser &amp; Web</div>
+    <div class="nav-group-label">Browser & Web</div>
     <div class="nav-item" data-section="browser" onclick="showSection('browser',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      Browser History <span class="count" id="cnt-browser">—</span>
+      Browser History <span class="count" id="cnt-browser">0</span>
     </div>
     <div class="nav-item" data-section="extensions" onclick="showSection('extensions',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-      Browser Extensions <span class="count" id="cnt-extensions">—</span>
+      Browser Extensions <span class="count" id="cnt-extensions">0</span>
     </div>
 
     <div class="nav-group-label">Security Logs</div>
     <div class="nav-item" data-section="eventlogs" onclick="showSection('eventlogs',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      Event Logs <span class="count" id="cnt-eventlogs">—</span>
+      Event Logs <span class="count" id="cnt-eventlogs">0</span>
     </div>
     <div class="nav-item" data-section="rdp" onclick="showSection('rdp',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-      RDP Sessions <span class="count" id="cnt-rdp">—</span>
+      RDP Sessions <span class="count" id="cnt-rdp">0</span>
     </div>
     <div class="nav-item" data-section="usb" onclick="showSection('usb',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v12M12 14l-3 3M12 14l3 3"/><circle cx="12" cy="19" r="2"/></svg>
-      USB History <span class="count" id="cnt-usb">—</span>
+      USB History <span class="count" id="cnt-usb">0</span>
     </div>
 
-    <div class="nav-group-label">Linux</div>
+    <div class="nav-group-label">Linux Specific</div>
     <div class="nav-item" data-section="lkm" onclick="showSection('lkm',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
-      Kernel Modules <span class="count" id="cnt-lkm">—</span>
+      Kernel Modules <span class="count" id="cnt-lkm">0</span>
+    </div>
+    <div class="nav-item" data-section="procfds" onclick="showSection('procfds',this)">
+      Open Files (FDs) <span class="count" id="cnt-procfds">0</span>
+    </div>
+    <div class="nav-item" data-section="procenvs" onclick="showSection('procenvs',this)">
+      Environments <span class="count" id="cnt-procenvs">0</span>
+    </div>
+    <div class="nav-item" data-section="proccreds" onclick="showSection('proccreds',this)">
+      Credentials <span class="count" id="cnt-proccreds">0</span>
+    </div>
+    <div class="nav-item" data-section="proccgroups" onclick="showSection('proccgroups',this)">
+      Control Groups <span class="count" id="cnt-proccgroups">0</span>
+    </div>
+    <div class="nav-item" data-section="systemd" onclick="showSection('systemd',this)">
+      Systemd Units <span class="count" id="cnt-systemd">0</span>
     </div>
     <div class="nav-item" data-section="ssh" onclick="showSection('ssh',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="11" width="20" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      SSH Keys <span class="count" id="cnt-ssh">—</span>
+      SSH Keys <span class="count" id="cnt-ssh">0</span>
     </div>
     <div class="nav-item" data-section="packages" onclick="showSection('packages',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-      Packages <span class="count" id="cnt-packages">—</span>
+      Packages <span class="count" id="cnt-packages">0</span>
     </div>
   </nav>
 
-  <!-- MAIN -->
   <div class="main">
     <header class="topbar">
-      <!-- SVG Logo -->
-      <div class="logo">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-label="FFTE">
-          <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z" stroke="var(--primary)" stroke-width="1.5" fill="var(--primary-dim)"/>
-          <path d="M9 12l2 2 4-4" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        FFTE
-      </div>
+      <div class="logo">FFTE</div>
       <div class="topbar-sep"></div>
-      <label class="load-btn" for="fileInput">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Load JSON Report
-      </label>
+      <label class="load-btn" for="fileInput">Load JSON Report</label>
       <input type="file" id="fileInput" accept=".json">
       <div class="scan-meta" id="scanMeta" style="display:none">
         <span id="scanTime"></span>
         <span class="badge" id="modeBadge">FULL SCAN</span>
       </div>
       <div style="margin-left:auto"></div>
-      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
+      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">◑</button>
     </header>
 
     <div class="content" id="content">
-      <!-- Welcome -->
       <div class="welcome" id="welcomeScreen">
-        <svg class="welcome-icon" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-          <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z"/>
-        </svg>
         <h2>Fast Forensic Triage Extractor</h2>
         <p>Load a <code>forensic_report.json</code> file generated by FFTE to begin analysis.</p>
-        <button class="demo-btn" onclick="loadDemoData()">Load Demo Data</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-/* ───────────────────────── STATE ───────────────────────── */
-let G = null;   // parsed forensic report
-let CURRENT_SECTION = 'dashboard';
+let G = null;
 
-/* ───────────────────────── THEME ───────────────────────── */
 (function(){
   const root = document.documentElement;
   const btn  = document.querySelector('[data-theme-toggle]');
-  let theme = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
-  root.setAttribute('data-theme', theme);
-  function updateIcon(){
-    btn.innerHTML = theme === 'dark'
-      ? '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-      : '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-  }
-  updateIcon();
+  let theme = 'dark';
   btn.addEventListener('click',()=>{
     theme = theme==='dark'?'light':'dark';
     root.setAttribute('data-theme',theme);
-    updateIcon();
   });
 })();
 
-/* ───────────────────────── FILE LOAD ───────────────────── */
 document.getElementById('fileInput').addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
+    let parsedData = null;
     try {
-      G = JSON.parse(ev.target.result);
-      initViewer();
+      parsedData = JSON.parse(ev.target.result);
     } catch {
-      alert('Invalid JSON file.');
+      alert('Invalid JSON file. Please ensure the file is not corrupted.');
+      return;
+    }
+    G = parsedData;
+    try {
+      initViewer();
+    } catch (err) {
+      console.error(err);
+      alert('Error rendering dashboard components.');
     }
   };
   reader.readAsText(file);
+  e.target.value = ''; // Reset input to allow reloading the exact same file
 });
 
-/* ───────────────────────── DEMO DATA ───────────────────── */
-function loadDemoData() {
-  G = {
-    metadata: {
-      tool_name: "Fast Forensic Triage Extractor (FFTE)",
-      version: "1.0.0-Epoch1",
-      scan_timestamp: new Date().toUTCString(),
-      mode: "DEMO"
-    },
-    artifacts: {
-      digital_footprint: {
-        os_info: { name: "Windows 11 Pro 23H2", install_date: "2024-01-15", boot_time: "2026-06-01 08:12:33" },
-        hw_info: { cpuName: "Intel Core i9-13900K", gpuName: "NVIDIA RTX 4090", totalRamGB: "64 GB", motherboardSerial: "DEMO-SMBIOS-0001" },
-        location: { latitude: 50.0755, longitude: 14.4378, source: "BSSID Triangulation" },
-        anonymity: { isProxyActive: false, isVpnActive: true, activeAdapters: "NordVPN Adapter" },
-        network_connections: [
-          { protocol:"TCP", localIp:"192.168.1.50", localPort:"52341", remoteIp:"185.60.216.35", remotePort:"443", state:"ESTABLISHED" },
-          { protocol:"TCP", localIp:"192.168.1.50", localPort:"52555", remoteIp:"31.13.84.51", remotePort:"443", state:"ESTABLISHED" },
-          { protocol:"UDP", localIp:"0.0.0.0", localPort:"5353", remoteIp:"*", remotePort:"*", state:"LISTENING" },
-          { protocol:"TCP", localIp:"127.0.0.1", localPort:"27017", remoteIp:"*", remotePort:"*", state:"LISTENING" },
-          { protocol:"TCP", localIp:"192.168.1.50", localPort:"53200", remoteIp:"104.21.14.101", remotePort:"80", state:"CLOSE_WAIT" },
-        ],
-        dns_cache: [
-          { recordName:"google.com", recordType:"A", data:"142.250.80.46" },
-          { recordName:"github.com", recordType:"A", data:"140.82.121.4" },
-          { recordName:"api.nordvpn.com", recordType:"A", data:"185.60.216.35" },
-          { recordName:"malware-c2.xyz", recordType:"A", data:"10.0.0.99" },
-        ],
-        arp_entries: [
-          { ipAddress:"192.168.1.1",   macAddress:"A4:91:B1:00:01:FF", type:"Dynamic" },
-          { ipAddress:"192.168.1.100", macAddress:"BC:EA:FA:11:22:33", type:"Dynamic" },
-        ],
-        firewall_rules: [
-          { ruleName:"Allow SSH", ruleData:"Direction=Inbound Protocol=TCP Port=22" },
-          { ruleName:"Block Telnet", ruleData:"Direction=Inbound Protocol=TCP Port=23 Action=Block" },
-        ],
-        browser_history: [
-          { browser:"Chrome",  url:"https://github.com/deavers",       title:"deavers · GitHub",      visitCount:12, lastVisitTime:"2026-06-01 18:45" },
-          { browser:"Firefox", url:"https://attack.mitre.org/techniques/T1055/", title:"Process Injection - MITRE", visitCount:3, lastVisitTime:"2026-06-01 14:20" },
-          { browser:"Chrome",  url:"https://learn.microsoft.com/en-us/sysinternals/", title:"Sysinternals Suite", visitCount:7, lastVisitTime:"2026-05-31 22:10" },
-          { browser:"Edge",    url:"https://www.virustotal.com/gui/",   title:"VirusTotal",            visitCount:2, lastVisitTime:"2026-05-30 11:05" },
-        ],
-        browser_extensions: [
-          { browser:"Chrome",  extensionId:"cjpalhdlnbpafiamejdnhcphjbkeiagm", updateUrl:"clients2.google.com" },
-          { browser:"Chrome",  extensionId:"nkbihfbeogaeaoehlefnkodbefgpgknn", updateUrl:"update.metamask.io" },
-          { browser:"Firefox", extensionId:"uBlock0@raymondhill.net",           updateUrl:"addons.mozilla.org" },
-        ],
-        scheduled_tasks: [
-          { filePath:"/etc/cron.d/syscheck", taskLine:"*/5 * * * * root /usr/sbin/syscheck.sh" },
-        ],
-        event_logs: [
-          { eventId:"4625", timestamp:"2026-06-01 03:14:55", details:"Brute-force attempt from 192.168.100.42 — 47 failed logons" },
-          { eventId:"4625", timestamp:"2026-06-01 03:15:01", details:"Logon failure — Account: Administrator" },
-          { eventId:"4688", timestamp:"2026-06-01 08:12:40", details:"New process: C:\\Windows\\System32\\cmd.exe (Parent: explorer.exe)" },
-        ],
-        clipboard_triage: [
-          { format:"CF_TEXT", sizeBytes:"128", content:"eyJhbGciOiJIUzI1NiJ9.demo.token" },
-        ],
-        system_files: [
-          { fileName:"pagefile.sys", sizeMB:"8192 MB", notes:"Active RAM swap file" },
-          { fileName:"hiberfil.sys", sizeMB:"32768 MB", notes:"Hibernation image — full RAM dump" },
-        ],
-        injected_memory: [
-          { pid:"1337", processName:"explorer.exe", memoryAddress:"0x7FF800A20000", protection:"RWX" },
-        ],
-      },
-      processes: [
-        { pid:4,    ppid:0,    name:"System",       exePath:null,                                    memoryKB:151552, isElevated:true,  isSignatureValid:true,  sha256Hash:"" },
-        { pid:772,  ppid:4,    name:"lsass.exe",    exePath:"C:\\Windows\\System32\\lsass.exe",      memoryKB:16384,  isElevated:true,  isSignatureValid:true,  sha256Hash:"a1b2c3d4" },
-        { pid:1337, ppid:1234, name:"explorer.exe", exePath:"C:\\Windows\\explorer.exe",             memoryKB:98304,  isElevated:false, isSignatureValid:false, sha256Hash:"deadbeef" },
-        { pid:2468, ppid:1337, name:"powershell.exe",exePath:"C:\\Windows\\System32\\powershell.exe",memoryKB:45056,  isElevated:true,  isSignatureValid:true,  sha256Hash:"cafebabe" },
-      ],
-      persistence: [
-        { type:"RegistryRun", name:"WindowsUpdateHelper", trigger:"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", imagePath:"C:\\Users\\user\\AppData\\Roaming\\wuhelper.exe" },
-        { type:"ScheduledTask", name:"GoogleUpdateTaskMachine", trigger:"At logon", imagePath:"C:\\Program Files\\Google\\Update\\GoogleUpdate.exe" },
-      ],
-      services_and_drivers: [
-        { name:"WinDefend",    displayName:"Windows Defender Antivirus Service", imagePath:"C:\\ProgramData\\Microsoft\\Windows Defender\\MsMpEng.exe", startType:"Automatic", serviceType:"Win32 Service" },
-        { name:"SuspiciousDrv",displayName:"System Driver Helper",               imagePath:"C:\\Windows\\System32\\drivers\\sdrv.sys",                  startType:"Boot",      serviceType:"Kernel Driver" },
-      ],
-    }
-  };
-  initViewer();
-}
-
-/* ───────────────────────── INIT ───────────────────────── */
 function initViewer() {
   document.getElementById('welcomeScreen').style.display = 'none';
   document.getElementById('sidebar').style.display = 'flex';
@@ -642,14 +377,11 @@ function initViewer() {
   const meta  = G.metadata || {};
   const df    = G.artifacts?.digital_footprint || {};
   const art   = G.artifacts || {};
-  const isDemo = meta.mode === 'DEMO';
 
   document.getElementById('scanMeta').style.display  = 'flex';
   document.getElementById('scanTime').textContent    = meta.scan_timestamp || '';
-  document.getElementById('modeBadge').textContent   = isDemo ? 'DEMO MODE' : 'FULL SCAN';
-  document.getElementById('modeBadge').className     = 'badge' + (isDemo ? ' demo' : '');
+  document.getElementById('modeBadge').textContent   = 'FULL SCAN';
 
-  // Update counts
   const counts = {
     processes:   (art.processes || []).length,
     memory:      (df.injected_memory || []).length,
@@ -659,6 +391,8 @@ function initViewer() {
     arp:         (df.arp_entries || []).length,
     firewall:    (df.firewall_rules || []).length,
     persistence: (art.persistence || []).length,
+    tasks:       (df.scheduled_tasks || []).length,
+    systemfiles: (df.system_files || []).length,
     services:    (art.services_and_drivers || []).length,
     prefetch:    (df.prefetch_files || []).length,
     browser:     (df.browser_history || []).length,
@@ -669,18 +403,22 @@ function initViewer() {
     lkm:         (df.linux_modules || []).length,
     ssh:         (df.ssh_keys || []).length,
     packages:    (df.installed_packages || []).length,
+    procfds:     (df.process_open_files || []).length,
+    procenvs:    (df.process_environments || []).length,
+    proccreds:   (df.process_credentials || []).length,
+    proccgroups: (df.process_cgroups || []).length,
+    systemd:     (df.systemd_units || []).length
   };
+  
   for (const [k,v] of Object.entries(counts)) {
     const el = document.getElementById('cnt-'+k);
-    if (el) el.textContent = v || '—';
+    if (el) el.textContent = v; // Убрали || '—', теперь всегда показывает цифру (даже 0)
   }
 
   showSection('dashboard', document.querySelector('[data-section="dashboard"]'));
 }
 
-/* ───────────────────────── NAV ───────────────────────── */
 function showSection(name, el) {
-  CURRENT_SECTION = name;
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (el) el.classList.add('active');
   if (!G) return;
@@ -699,6 +437,8 @@ function showSection(name, el) {
     arp:         () => renderARP(df.arp_entries || []),
     firewall:    () => renderFirewall(df.firewall_rules || []),
     persistence: () => renderPersistence(art.persistence || []),
+    tasks:       () => renderScheduledTasks(df.scheduled_tasks || []),
+    systemfiles: () => renderSystemFiles(df.system_files || []),
     services:    () => renderServices(art.services_and_drivers || []),
     prefetch:    () => renderPrefetch(df.prefetch_files || []),
     browser:     () => renderBrowser(df.browser_history || []),
@@ -709,22 +449,23 @@ function showSection(name, el) {
     lkm:         () => renderLKM(df.linux_modules || []),
     ssh:         () => renderSSH(df.ssh_keys || []),
     packages:    () => renderPackages(df.installed_packages || []),
+    procfds:     () => renderProcessFDs(df.process_open_files || []),
+    procenvs:    () => renderProcessEnvs(df.process_environments || []),
+    proccreds:   () => renderProcessCreds(df.process_credentials || []),
+    proccgroups: () => renderProcessCgroups(df.process_cgroups || []),
+    systemd:     () => renderSystemd(df.systemd_units || [])
   };
 
   content.innerHTML = (renderers[name] || (() => '<div class="empty">Section not found</div>'))();
 }
 
-/* ═══════════════════════ DASHBOARD ════════════════════════ */
 function renderDashboard(df, art) {
   const procs    = art.processes || [];
   const memory   = df.injected_memory || [];
   const events   = df.event_logs || [];
   const netConns = df.network_connections || [];
-
   const threatLevel = memory.length > 0 ? 'threat' : events.length > 0 ? 'warn' : 'ok';
   const threatLabel = memory.length > 0 ? '⚠ HIGH RISK' : events.length > 0 ? 'MEDIUM' : 'CLEAN';
-
-  const established = netConns.filter(c => c.state === 'ESTABLISHED').length;
 
   return `
 <div class="kpi-grid">
@@ -736,83 +477,32 @@ function renderDashboard(df, art) {
   <div class="kpi-card">
     <div class="kpi-label">Active Processes</div>
     <div class="kpi-value">${procs.length}</div>
-    <div class="kpi-sub">${procs.filter(p=>p.isElevated).length} elevated</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-label">Network Connections</div>
     <div class="kpi-value">${netConns.length}</div>
-    <div class="kpi-sub">${established} established</div>
-  </div>
-  <div class="kpi-card ${events.length > 0 ? 'warn' : ''}">
-    <div class="kpi-label">Security Events</div>
-    <div class="kpi-value">${events.length}</div>
-    <div class="kpi-sub">${events.filter(e=>e.eventId==='4625').length} failed logons</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-label">Persistence Entries</div>
-    <div class="kpi-value">${(art.persistence||[]).length}</div>
-    <div class="kpi-sub">${(art.services_and_drivers||[]).filter(s=>s.serviceType?.includes('Kernel')).length} kernel drivers</div>
-  </div>
-  <div class="kpi-card ${df.anonymity?.isVpnActive ? 'warn' : ''}">
-    <div class="kpi-label">Anonymity</div>
-    <div class="kpi-value">${df.anonymity?.isVpnActive ? 'VPN ON' : df.anonymity?.isProxyActive ? 'PROXY' : 'NONE'}</div>
-    <div class="kpi-sub">${df.anonymity?.activeAdapters || '—'}</div>
   </div>
 </div>
-
 <div class="info-grid">
   <div class="info-card">
-    <h3>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-      System Identity
-    </h3>
+    <h3>System Identity</h3>
     <div class="info-row"><span class="k">OS</span><span class="v">${df.os_info?.name || '—'}</span></div>
-    <div class="info-row"><span class="k">Install Date</span><span class="v">${df.os_info?.install_date || '—'}</span></div>
     <div class="info-row"><span class="k">Boot Time</span><span class="v">${df.os_info?.boot_time || '—'}</span></div>
     <div class="info-row"><span class="k">CPU</span><span class="v">${df.hw_info?.cpuName || '—'}</span></div>
-    <div class="info-row"><span class="k">GPU</span><span class="v">${df.hw_info?.gpuName || '—'}</span></div>
-    <div class="info-row"><span class="k">RAM</span><span class="v">${df.hw_info?.totalRamGB || '—'}</span></div>
-    <div class="info-row"><span class="k">MB Serial (SMBIOS)</span><span class="v">${df.hw_info?.motherboardSerial || '—'}</span></div>
   </div>
-
   <div class="info-card">
-    <h3>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      Location &amp; Anonymity
-    </h3>
-    <div class="info-row"><span class="k">Latitude</span><span class="v">${df.location?.latitude ?? '—'}</span></div>
-    <div class="info-row"><span class="k">Longitude</span><span class="v">${df.location?.longitude ?? '—'}</span></div>
+    <h3>Location &amp; Anonymity</h3>
     <div class="info-row"><span class="k">Source</span><span class="v">${df.location?.source || '—'}</span></div>
     <div class="info-row"><span class="k">VPN Active</span><span class="v">${df.anonymity?.isVpnActive ? pill('YES','red') : pill('NO','green')}</span></div>
-    <div class="info-row"><span class="k">Proxy Active</span><span class="v">${df.anonymity?.isProxyActive ? pill('YES','red') : pill('NO','green')}</span></div>
-    <div class="info-row"><span class="k">Adapters</span><span class="v">${df.anonymity?.activeAdapters || '—'}</span></div>
   </div>
-
-  ${memory.length > 0 ? `
-  <div class="info-card" style="border-color:var(--red)">
-    <h3 style="color:var(--red)">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      Memory Injection Alerts
-    </h3>
-    ${memory.map(m => `
-    <div class="info-row">
-      <span class="k">${m.processName} (${m.pid})</span>
-      <span class="v">${pill(m.protection,'red')} @ ${m.memoryAddress}</span>
-    </div>`).join('')}
-  </div>` : ''}
 </div>`;
 }
 
-/* ═══════════════════════ HELPERS ════════════════════════ */
-function pill(text, color) {
-  return `<span class="pill ${color}">${esc(String(text))}</span>`;
-}
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function pill(text, color) { return `<span class="pill ${color}">${esc(String(text))}</span>`; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function makeTable(headers, rows, sectionId) {
-  if (!rows.length) return `<div class="empty"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg><p>No data collected for this artifact.</p></div>`;
+  if (!rows.length) return `<div class="empty"><p>0 records found for this artifact.</p></div>`;
   return `
 <div class="table-wrap">
   <div class="table-scroll">
@@ -820,13 +510,6 @@ function makeTable(headers, rows, sectionId) {
       <thead><tr>${headers.map(h=>`<th class="sortable">${h}</th>`).join('')}</tr></thead>
       <tbody id="tbody-${sectionId}">${rows.join('')}</tbody>
     </table>
-  </div>
-  <div class="export-bar">
-    <span style="font-size:var(--text-xs);color:var(--text-faint)">${rows.length} records</span>
-    <button class="export-btn" onclick="exportCSV('${sectionId}')">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Export CSV
-    </button>
   </div>
 </div>`;
 }
@@ -836,233 +519,109 @@ function sectionWrap(title, icon, count, tableHtml, searchId) {
 <div class="section-header">
   <div class="section-title">${icon} ${title}</div>
   <span class="section-count">${count}</span>
-  ${searchId ? `<div class="search-box" style="margin-left:auto">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input type="text" placeholder="Search…" oninput="filterTable('${searchId}',this.value)" />
-  </div>` : ''}
 </div>
 ${tableHtml}`;
 }
 
-function filterTable(tbodyId, q) {
-  const tbody = document.getElementById('tbody-'+tbodyId);
-  if (!tbody) return;
-  const low = q.toLowerCase();
-  for (const tr of tbody.rows) {
-    tr.style.display = tr.textContent.toLowerCase().includes(low) ? '' : 'none';
-  }
-}
-
-function exportCSV(tbodyId) {
-  const tbody = document.getElementById('tbody-'+tbodyId);
-  if (!tbody) return;
-  const rows = [...tbody.rows].filter(r=>r.style.display!=='none');
-  const lines = rows.map(r => [...r.cells].map(c=>'"'+c.textContent.replace(/"/g,'""')+'"').join(','));
-  const blob = new Blob([lines.join('\n')], {type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `ffte_${tbodyId}_${Date.now()}.csv`;
-  a.click();
-}
-
-/* ═══════════════════════ SECTION RENDERERS ═══════════════ */
-
 function renderProcesses(data) {
-  const rows = data.map(p => {
-    const threat = !p.isSignatureValid || p.isElevated;
-    return `<tr class="${!p.isSignatureValid ? 'row-threat' : p.isElevated ? 'row-warn' : ''}">
-      <td class="nowrap">${p.pid}</td>
-      <td class="nowrap">${p.ppid}</td>
-      <td><b>${esc(p.name)}</b></td>
-      <td>${p.isElevated ? pill('Elevated','red') : pill('Normal','green')}</td>
-      <td>${p.isSignatureValid ? pill('Signed','green') : pill('UNSIGNED','red')}</td>
-      <td>${esc(p.exePath || '—')}</td>
-      <td class="nowrap" style="font-size:10px">${p.sha256Hash ? esc(p.sha256Hash.substring(0,16))+'…' : '—'}</td>
-      <td>${p.memoryKB ? (p.memoryKB/1024).toFixed(1)+' MB' : '—'}</td>
-    </tr>`;
-  });
-  return sectionWrap('Processes', '⚙', data.length,
-    makeTable(['PID','PPID','Name','Privilege','Signature','Executable Path','SHA-256','Memory'], rows, 'processes'), 'processes');
+  const rows = data.map(p => `<tr><td>${p.pid}</td><td>${p.ppid}</td><td><b>${esc(p.name)}</b></td><td>${esc(p.exePath || '—')}</td></tr>`);
+  return sectionWrap('Processes', '⚙', data.length, makeTable(['PID','PPID','Name','Path'], rows, 'processes'), 'processes');
 }
-
 function renderMemory(data) {
-  const rows = data.map(m => `<tr class="row-threat">
-    <td class="nowrap">${esc(m.pid)}</td>
-    <td><b>${esc(m.processName)}</b></td>
-    <td style="font-family:var(--font-mono)">${esc(m.memoryAddress)}</td>
-    <td>${pill(m.protection,'red')}</td>
-  </tr>`);
-  return sectionWrap('Injected Memory / Shellcode', '🔴', data.length,
-    makeTable(['PID','Process Name','Memory Address','Protection'], rows, 'memory'), 'memory');
+  const rows = data.map(m => `<tr><td>${esc(m.pid)}</td><td><b>${esc(m.processName)}</b></td><td>${esc(m.memoryAddress)}</td><td>${pill(m.protection,'red')}</td></tr>`);
+  return sectionWrap('Injected Memory', '🔴', data.length, makeTable(['PID','Process','Address','Protection'], rows, 'memory'), 'memory');
 }
-
 function renderClipboard(data) {
-  const rows = data.map(c => `<tr>
-    <td>${pill(c.format,'cyan')}</td>
-    <td>${esc(c.sizeBytes)} bytes</td>
-    <td style="max-width:400px;overflow:hidden;text-overflow:ellipsis">${esc(c.content)}</td>
-  </tr>`);
-  return sectionWrap('Clipboard Triage (Exfiltration Risk)', '📋', data.length,
-    makeTable(['Format','Size','Extracted Content'], rows, 'clipboard'), null);
+  const rows = data.map(c => `<tr><td>${pill(c.format,'cyan')}</td><td>${esc(c.sizeBytes)}</td><td>${esc(c.content)}</td></tr>`);
+  return sectionWrap('Clipboard Triage', '📋', data.length, makeTable(['Format','Size','Content'], rows, 'clipboard'), null);
 }
-
 function renderNetwork(data) {
-  const rows = data.map(c => {
-    const cls = c.state==='ESTABLISHED'?'row-warn':'';
-    return `<tr class="${cls}">
-      <td>${pill(c.protocol, c.protocol==='TCP'?'blue':'cyan')}</td>
-      <td class="nowrap">${esc(c.localIp)}:${esc(c.localPort)}</td>
-      <td class="nowrap">${esc(c.remoteIp)}:${esc(c.remotePort)}</td>
-      <td>${pill(c.state, c.state==='ESTABLISHED'?'yellow':c.state==='LISTENING'?'blue':'gray')}</td>
-    </tr>`;
-  });
-  return sectionWrap('Network Connections', '🌐', data.length,
-    makeTable(['Protocol','Local Endpoint','Remote Endpoint','State'], rows, 'network'), 'network');
+  const rows = data.map(c => `<tr><td>${pill(c.protocol,'blue')}</td><td>${esc(c.localIp)}:${esc(c.localPort)}</td><td>${esc(c.remoteIp)}:${esc(c.remotePort)}</td><td>${esc(c.state)}</td></tr>`);
+  return sectionWrap('Network Connections', '🌐', data.length, makeTable(['Protocol','Local','Remote','State'], rows, 'network'), 'network');
 }
-
 function renderDNS(data) {
-  const rows = data.map(d => `<tr>
-    <td><b>${esc(d.recordName)}</b></td>
-    <td>${pill(d.recordType,'blue')}</td>
-    <td style="font-family:var(--font-mono)">${esc(d.data)}</td>
-  </tr>`);
-  return sectionWrap('DNS Cache', '🔍', data.length,
-    makeTable(['Record Name','Type','Resolved IP / Data'], rows, 'dns'), 'dns');
+  const rows = data.map(d => `<tr><td><b>${esc(d.recordName)}</b></td><td>${esc(d.data)}</td></tr>`);
+  return sectionWrap('DNS Cache', '🔍', data.length, makeTable(['Record','Data'], rows, 'dns'), 'dns');
 }
-
 function renderARP(data) {
-  const rows = data.map(a => `<tr>
-    <td class="nowrap">${esc(a.ipAddress)}</td>
-    <td style="font-family:var(--font-mono)">${esc(a.macAddress)}</td>
-    <td>${pill(a.type, a.type==='Dynamic'?'blue':'green')}</td>
-  </tr>`);
-  return sectionWrap('ARP Table', '🔗', data.length,
-    makeTable(['IP Address','MAC Address','Type'], rows, 'arp'), 'arp');
+  const rows = data.map(a => `<tr><td>${esc(a.ipAddress)}</td><td>${esc(a.macAddress)}</td><td>${esc(a.type)}</td></tr>`);
+  return sectionWrap('ARP Table', '🔗', data.length, makeTable(['IP','MAC','Type'], rows, 'arp'), 'arp');
 }
-
 function renderFirewall(data) {
-  const rows = data.map(f => `<tr>
-    <td><b>${esc(f.ruleName)}</b></td>
-    <td>${esc(f.ruleData)}</td>
-  </tr>`);
-  return sectionWrap('Firewall Rules', '🛡', data.length,
-    makeTable(['Rule Name','Rule Data'], rows, 'firewall'), 'firewall');
+  const rows = data.map(f => `<tr><td><b>${esc(f.ruleName)}</b></td><td>${esc(f.ruleData)}</td></tr>`);
+  return sectionWrap('Firewall Rules', '🛡', data.length, makeTable(['Name','Data'], rows, 'firewall'), 'firewall');
 }
-
 function renderPersistence(data) {
-  const rows = data.map(p => `<tr class="row-warn">
-    <td>${pill(p.type, p.type==='RegistryRun'?'orange':'yellow')}</td>
-    <td>${esc(p.trigger)}</td>
-    <td><b>${esc(p.name)}</b></td>
-    <td>${esc(p.imagePath)}</td>
-  </tr>`);
-  return sectionWrap('Autorun / Registry Persistence', '⚠', data.length,
-    makeTable(['Type','Trigger / Key Location','Name','Image Path'], rows, 'persistence'), 'persistence');
+  const rows = data.map(p => `<tr><td>${pill(p.type,'orange')}</td><td>${esc(p.trigger)}</td><td><b>${esc(p.name)}</b></td><td>${esc(p.imagePath)}</td></tr>`);
+  return sectionWrap('Persistence', '⚠', data.length, makeTable(['Type','Trigger','Name','Path'], rows, 'persistence'), 'persistence');
 }
-
+function renderScheduledTasks(data) {
+  const rows = data.map(t => `<tr><td><b>${esc(t.filePath)}</b></td><td>${esc(t.taskLine)}</td></tr>`);
+  return sectionWrap('Tasks', '⏱', data.length, makeTable(['File/Key', 'Details'], rows, 'tasks'), 'tasks');
+}
+function renderSystemFiles(data) {
+  const rows = data.map(s => `<tr><td><b>${esc(s.fileName)}</b></td><td>${esc(s.sizeMB)}</td><td>${esc(s.notes)}</td></tr>`);
+  return sectionWrap('System Files', '🗄', data.length, makeTable(['Name', 'Size', 'Notes'], rows, 'sys'), 'systemfiles');
+}
 function renderServices(data) {
-  const rows = data.map(s => {
-    const isDriver = s.serviceType?.includes('Kernel');
-    return `<tr class="${isDriver ? 'row-threat' : ''}">
-      <td><b>${esc(s.name)}</b></td>
-      <td>${esc(s.displayName)}</td>
-      <td>${esc(s.imagePath)}</td>
-      <td>${pill(s.startType, s.startType==='Automatic'?'yellow':s.startType==='Boot'?'red':'gray')}</td>
-      <td>${pill(s.serviceType, isDriver ? 'red' : 'blue')}</td>
-    </tr>`;
-  });
-  return sectionWrap('Services &amp; Drivers', '⚙', data.length,
-    makeTable(['Service Name','Display Name','Image Path','Start Type','Type'], rows, 'services'), 'services');
+  const rows = data.map(s => `<tr><td><b>${esc(s.name)}</b></td><td>${esc(s.displayName)}</td><td>${esc(s.imagePath)}</td></tr>`);
+  return sectionWrap('Services & Drivers', '⚙', data.length, makeTable(['Name','Display Name','Path'], rows, 'svc'), 'services');
 }
-
 function renderPrefetch(data) {
-  const rows = data.map(p => `<tr>
-    <td><b>${esc(p.executableName)}</b></td>
-    <td>${esc(p.prefetchFileName)}</td>
-    <td class="nowrap">${esc(p.lastRunTime)}</td>
-  </tr>`);
-  return sectionWrap('Prefetch Execution Evidence', '📄', data.length,
-    makeTable(['Executable','Prefetch File','Last Run Time'], rows, 'prefetch'), 'prefetch');
+  const rows = data.map(p => `<tr><td><b>${esc(p.executableName)}</b></td><td>${esc(p.prefetchFileName)}</td><td>${esc(p.lastRunTime)}</td></tr>`);
+  return sectionWrap('Prefetch', '📄', data.length, makeTable(['Exe','File','Run Time'], rows, 'prefetch'), 'prefetch');
 }
-
 function renderBrowser(data) {
-  const rows = data.map(b => {
-    const browserColor = {Chrome:'blue',Firefox:'orange',Edge:'cyan'}[b.browser] || 'gray';
-    return `<tr>
-      <td>${pill(b.browser, browserColor)}</td>
-      <td style="max-width:300px"><a href="${esc(b.url)}" target="_blank" rel="noopener" style="color:var(--primary);text-decoration:none">${esc(b.title || b.url)}</a></td>
-      <td class="nowrap">${b.visitCount || 1}×</td>
-      <td class="nowrap">${esc(b.lastVisitTime)}</td>
-    </tr>`;
-  });
-  return sectionWrap('Browser History', '🌍', data.length,
-    makeTable(['Browser','Page Title / URL','Visits','Last Visit'], rows, 'browser'), 'browser');
+  const rows = data.map(b => `<tr><td>${pill(b.browser,'blue')}</td><td><a href="${esc(b.url)}">${esc(b.title||b.url)}</a></td><td>${esc(b.lastVisitTime)}</td></tr>`);
+  return sectionWrap('Browser History', '🌍', data.length, makeTable(['Browser','URL','Time'], rows, 'browser'), 'browser');
 }
-
 function renderExtensions(data) {
-  const rows = data.map(e => `<tr>
-    <td>${pill(e.browser,'blue')}</td>
-    <td style="font-family:var(--font-mono)">${esc(e.extensionId)}</td>
-    <td>${esc(e.updateUrl)}</td>
-  </tr>`);
-  return sectionWrap('Browser Extensions', '🧩', data.length,
-    makeTable(['Browser','Extension ID','Update URL'], rows, 'extensions'), 'extensions');
+  const rows = data.map(e => `<tr><td>${esc(e.browser)}</td><td>${esc(e.extensionId)}</td><td>${esc(e.updateUrl)}</td></tr>`);
+  return sectionWrap('Browser Extensions', '🧩', data.length, makeTable(['Browser','ID','Update URL'], rows, 'ext'), 'extensions');
 }
-
 function renderEventLogs(data) {
-  const rows = data.map(e => `<tr class="${e.eventId==='4625'?'row-threat':'row-warn'}">
-    <td>${pill(e.eventId, e.eventId==='4625'?'red':'orange')}</td>
-    <td class="nowrap">${esc(e.timestamp)}</td>
-    <td>${esc(e.details)}</td>
-  </tr>`);
-  return sectionWrap('Security Event Logs', '📋', data.length,
-    makeTable(['Event ID','Timestamp','Details'], rows, 'eventlogs'), 'eventlogs');
+  const rows = data.map(e => `<tr><td>${pill(e.eventId,'red')}</td><td>${esc(e.timestamp)}</td><td>${esc(e.details)}</td></tr>`);
+  return sectionWrap('Event Logs', '📋', data.length, makeTable(['ID','Time','Details'], rows, 'logs'), 'eventlogs');
 }
-
 function renderRDP(data) {
-  const rows = data.map(r => `<tr class="row-warn">
-    <td><b>${esc(r.targetHost)}</b></td>
-    <td>${esc(r.usernameHint)}</td>
-  </tr>`);
-  return sectionWrap('RDP Sessions', '🖥', data.length,
-    makeTable(['Target Host','Username Hint'], rows, 'rdp'), 'rdp');
+  const rows = data.map(r => `<tr><td><b>${esc(r.targetHost)}</b></td><td>${esc(r.usernameHint)}</td></tr>`);
+  return sectionWrap('RDP', '🖥', data.length, makeTable(['Host','User'], rows, 'rdp'), 'rdp');
 }
-
 function renderUSB(data) {
-  const rows = data.map(u => `<tr>
-    <td style="font-family:var(--font-mono);font-size:var(--text-xs)">${esc(u.deviceInstanceId)}</td>
-    <td>${esc(u.friendlyName)}</td>
-  </tr>`);
-  return sectionWrap('USB Device History', '🔌', data.length,
-    makeTable(['Device Instance ID','Friendly Name'], rows, 'usb'), 'usb');
+  const rows = data.map(u => `<tr><td>${esc(u.deviceInstanceId)}</td><td>${esc(u.friendlyName)}</td></tr>`);
+  return sectionWrap('USB', '🔌', data.length, makeTable(['ID','Name'], rows, 'usb'), 'usb');
 }
-
 function renderLKM(data) {
-  const rows = data.map(m => `<tr>
-    <td><b>${esc(m.name)}</b></td>
-    <td>${esc(m.size)} bytes</td>
-    <td>${pill(m.state, m.state==='Live'?'green':m.state==='Loading'?'yellow':'gray')}</td>
-  </tr>`);
-  return sectionWrap('Linux Kernel Modules (LKM)', '🐧', data.length,
-    makeTable(['Module Name','Size','State'], rows, 'lkm'), 'lkm');
+  const rows = data.map(m => `<tr><td><b>${esc(m.name)}</b></td><td>${esc(m.size)} bytes</td><td>${pill(m.state,'gray')}</td></tr>`);
+  return sectionWrap('Linux LKM', '🐧', data.length, makeTable(['Module','Size','State'], rows, 'lkm'), 'lkm');
 }
-
+function renderProcessFDs(data) {
+  const rows = data.map(d => `<tr><td class="nowrap"><b>${esc(d.pid)}</b></td><td style="width:100%"><div class="code-box">${esc((d.openFiles||'').replace(/;/g, ';\n'))}</div></td></tr>`);
+  return sectionWrap('Linux FDs', '📁', data.length, makeTable(['PID', 'Open Files'], rows, 'procfds'), 'procfds');
+}
+function renderProcessEnvs(data) {
+  const rows = data.map(d => `<tr><td class="nowrap"><b>${esc(d.pid)}</b></td><td style="width:100%"><div class="code-box">${esc((d.environment||d.envDump||'').replace(/\\0/g, '\n').replace(/ /g, '\n'))}</div></td></tr>`);
+  return sectionWrap('Linux Envs', '🌱', data.length, makeTable(['PID', 'Environments'], rows, 'procenvs'), 'procenvs');
+}
+function renderProcessCreds(data) {
+  const rows = data.map(d => `<tr><td class="nowrap"><b>${esc(d.pid)}</b></td><td><div class="code-box">${esc(d.uid_info)}</div></td><td><div class="code-box">${esc(d.gid_info)}</div></td></tr>`);
+  return sectionWrap('Linux Creds', '👤', data.length, makeTable(['PID', 'UID', 'GID'], rows, 'proccreds'), 'proccreds');
+}
+function renderProcessCgroups(data) {
+  const rows = data.map(d => `<tr><td class="nowrap"><b>${esc(d.pid)}</b></td><td style="width:100%"><div class="code-box">${esc(d.cgroup_paths||d.containerPath||'—')}</div></td></tr>`);
+  return sectionWrap('Control Groups', '📦', data.length, makeTable(['PID', 'CGroup Paths'], rows, 'proccgroups'), 'proccgroups');
+}
+function renderSystemd(data) {
+  const rows = data.map(d => `<tr><td><b>${esc(d.name)}</b></td><td>${esc(d.state)}</td></tr>`);
+  return sectionWrap('Systemd', '⚙', data.length, makeTable(['Unit Name', 'State'], rows, 'systemd'), 'systemd');
+}
 function renderSSH(data) {
-  const rows = data.map(k => `<tr class="row-warn">
-    <td>${esc(k.path)}</td>
-    <td style="font-size:10px;word-break:break-all">${esc(k.keyContent?.substring(0,80))}…</td>
-  </tr>`);
-  return sectionWrap('SSH Authorized Keys', '🔑', data.length,
-    makeTable(['File Path','Key Preview'], rows, 'ssh'), 'ssh');
+  const rows = data.map(k => `<tr><td>${esc(k.path)}</td><td style="width:100%"><div class="code-box">${esc(k.keyContent)}</div></td></tr>`);
+  return sectionWrap('SSH Keys', '🔑', data.length, makeTable(['Path','Key Content'], rows, 'ssh'), 'ssh');
 }
-
 function renderPackages(data) {
-  const rows = data.map(p => `<tr>
-    <td><b>${esc(p.name)}</b></td>
-    <td>${pill(p.version,'gray')}</td>
-  </tr>`);
-  return sectionWrap('Installed Packages (DPKG/RPM)', '📦', data.length,
-    makeTable(['Package Name','Version'], rows, 'packages'), 'packages');
+  const rows = data.map(p => `<tr><td><b>${esc(p.name)}</b></td><td>${pill(p.version,'gray')}</td></tr>`);
+  return sectionWrap('Packages', '📦', data.length, makeTable(['Package','Version'], rows, 'packages'), 'packages');
 }
 </script>
 </body>
