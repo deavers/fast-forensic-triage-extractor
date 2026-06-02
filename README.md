@@ -37,8 +37,7 @@ FFTE (Fast Forensic Triage Extractor)
         ├── System Credentials       → /proc/status   → UID/GID mapping (Privilege escalation tracking)
         ├── Network Interfaces       → /proc/net/dev  → VPN/TAP/TUN virtual adapter detection
         └── File I/O                 → ext4/btrfs     → SSH Keys, Crontab, DPKG/RPM Packages, Systemd Services
-
----
+```
 
 ![FFTE Architecture Map](mindmap.png)
 
