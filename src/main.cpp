@@ -31,7 +31,7 @@ namespace ff
 #if defined(FF_PLATFORM_WINDOWS)
 static void runDecoyBehavior()
 {
-    for (volatile int i = 0; i < 5000000; ++i)
+    for (int i = 0; i < 5000000; ++i)
     {
         volatile double x = i * 3.14159;
         x = x / 2.71828;
@@ -43,7 +43,7 @@ static void runDecoyBehavior()
 }
 #endif
 
-int main(int argc, char* argv[])
+int main()
 {
     // (ANTI-DEBUGGING & EVASION)
     #if defined(FF_PLATFORM_WINDOWS)
