@@ -38,6 +38,8 @@ FFTE (Fast Forensic Triage Extractor)
         ├── Network Interfaces       → /proc/net/dev  → VPN/TAP/TUN virtual adapter detection
         └── File I/O                 → ext4/btrfs     → SSH Keys, Crontab, DPKG/RPM Packages, Systemd Services
 
+---
+
 ![FFTE Architecture Map](mindmap.png)
 
 * **Zero-Dependency Core:** Statically linked C++ runtime (`-static`). Only relies on native OS APIs (`<windows.h>`, `<iphlpapi.h>`, WMI COM) and Pseudo-FS (`/proc`), allowing execution directly from a USB drive on infected machines without any pre-installed libraries.
