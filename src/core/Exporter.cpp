@@ -167,7 +167,7 @@ namespace ff::core
         }
 
         // ----------------------------------------------------
-        // --- MISSING WINDOWS ARTIFACTS ---
+        // --- WINDOWS ARTIFACTS ---
         // ----------------------------------------------------
         for (const auto& arp : footprint.arpEntries) {
             report["artifacts"]["digital_footprint"]["arp_entries"].push_back({
@@ -209,6 +209,8 @@ namespace ff::core
         {
             report["artifacts"]["digital_footprint"]["hosts_lines"].push_back(hostLine);
         }
+        
+        report["artifacts"]["digital_footprint"]["user_activity"] = nlohmann::json::array();
         
         for (const auto& ua : footprint.userActivity) 
         {

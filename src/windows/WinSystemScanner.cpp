@@ -77,20 +77,6 @@ namespace ff::windows
             RegCloseKey(hProxyKey);
         }
 
-        // Check if VPN processes or adapters are currently running
-        footprint.anonymity.isVpnActive = false;
-        footprint.anonymity.activeAdapters = "None";
-        
-        // Flag if scanner sees active VPN subsystems in memory
-        for (const auto& p : footprint.processes) 
-        {
-            if (p.name == "NordVPN.exe" || p.name == "tailscaled.exe") {
-                footprint.anonymity.isVpnActive = true;
-                footprint.anonymity.activeAdapters = "NordVPN / Tailscale detected in active processes";
-                break;
-            }
-        }
-
         // GPS: SIMULATION BASED ON OSTRAVA COORDINATES
         footprint.location.latitude = 49.8308;
         footprint.location.longitude = 18.1625;
@@ -195,6 +181,34 @@ namespace ff::windows
         for (const auto& subScanner : WinRegistry::getScanners())
         {
             subScanner->scan(footprint);
+        }
+
+        // VPN DETECTION: Check for known VPN services in the registry
+        footprint.anonymity.isVpnActive = false;
+        footprint.anonymity.activeAdapters = "None";
+
+        static const std::vector<std::pair<std::string, std::string>> vpnServiceKeys = {
+            { "nordlynwfp",    "NordVPN (WireGuard)"  },
+            { "nordvpntap",    "NordVPN (OpenVPN TAP)"},
+            { "tapnordvpn",    "NordVPN (TAP)"        },
+            { "tailscale",     "Tailscale"            },
+            { "mullvad",       "Mullvad VPN"          },
+            { "ExpressVpnTap", "ExpressVPN"           },
+            { "wintun",        "WireGuard (wintun)"   },
+            { "ovpn-dco",      "OpenVPN DCO"          },
+        };
+
+        HKEY hVpnKey;
+        for (const auto& [svcName, displayName] : vpnServiceKeys)
+        {
+            std::string regPath = "SYSTEM\\CurrentControlSet\\Services\\" + svcName;
+            if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, regPath.c_str(), 0, KEY_READ, &hVpnKey) == ERROR_SUCCESS)
+            {
+                footprint.anonymity.isVpnActive = true;
+                footprint.anonymity.activeAdapters = displayName + " adapter/service detected";
+                RegCloseKey(hVpnKey);
+                break;
+            }
         }
 
         return footprint;

@@ -649,8 +649,17 @@ document.getElementById('fileInput').addEventListener('change', e => {
 });
 
 /* ═══════════════════════════ INIT VIEWER ═══════════════════════════ */
-function initViewer() {
-  document.getElementById('welcomeScreen').style.display = 'none';
+function initViewer() 
+{
+  // Security: Clear any existing data before loading new file
+  const welcome = document.getElementById('welcomeScreen');
+  if (welcome) 
+  {
+    welcome.style.display = 'none';
+  }
+
+  // Clear previous state
+  sortState = {};
 
   const arts = G.artifacts || {};
   const df = arts.digital_footprint || {};
