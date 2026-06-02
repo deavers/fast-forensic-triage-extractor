@@ -3,625 +3,1308 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FFTE Forensic Viewer</title>
+<title>FFTE — Forensic Report Viewer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── TOKENS ─────────────────────────────────────────────── */
+/* ═══════════════════════════ TOKENS ═══════════════════════════ */
 :root {
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-ui:   'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', monospace;
+  --font-ui:   'Inter', system-ui, sans-serif;
 
-  --text-xs:   clamp(0.7rem,  0.65rem + 0.2vw, 0.8rem);
-  --text-sm:   clamp(0.8rem,  0.75rem + 0.25vw, 0.9rem);
-  --text-base: clamp(0.875rem,0.85rem + 0.15vw, 1rem);
-  --text-lg:   clamp(1rem,    0.95rem + 0.3vw,  1.2rem);
-  --text-xl:   clamp(1.2rem,  1rem    + 0.8vw,  1.6rem);
+  --text-xs:   clamp(0.688rem, 0.66rem + 0.14vw, 0.75rem);
+  --text-sm:   clamp(0.75rem,  0.72rem + 0.15vw, 0.8125rem);
+  --text-base: clamp(0.8125rem,0.78rem + 0.16vw, 0.875rem);
+  --text-lg:   clamp(0.9375rem,0.9rem  + 0.19vw, 1rem);
+  --text-xl:   clamp(1.0625rem,1rem    + 0.31vw, 1.1875rem);
+  --text-2xl:  clamp(1.3125rem,1.2rem  + 0.56vw, 1.5625rem);
 
-  --space-1: .25rem; --space-2: .5rem; --space-3: .75rem;
-  --space-4: 1rem;   --space-6: 1.5rem; --space-8: 2rem;
-  --space-10:2.5rem; --space-12:3rem;
+  --space-1:.25rem; --space-2:.5rem;  --space-3:.75rem;
+  --space-4:1rem;   --space-5:1.25rem;--space-6:1.5rem;
+  --space-8:2rem;   --space-10:2.5rem;--space-12:3rem;
 
-  --radius-sm:.375rem; --radius-md:.5rem; --radius-lg:.75rem;
-  --radius-xl:1rem;    --radius-full:9999px;
+  --radius-sm:.25rem; --radius-md:.375rem; --radius-lg:.5rem;
+  --radius-xl:.75rem; --radius-full:9999px;
 
-  --transition: 160ms cubic-bezier(.16,1,.3,1);
+  --ease: cubic-bezier(.16,1,.3,1);
+  --t: 150ms;
+
+  /* sidebar */
+  --sidebar-w: 228px;
 }
 
+/* ─── DARK THEME ─── */
 [data-theme="dark"] {
-  --bg:        #0d0e10;
-  --surface:   #13151a;
-  --surface-2: #181b22;
-  --surface-3: #1e2230;
-  --border:    rgba(255,255,255,.08);
-  --border-2:  rgba(255,255,255,.12);
-  --text:      #e2e4ea;
-  --text-muted:#8b8fa8;
-  --text-faint:#4a4d62;
-  --primary:   #3b82f6;
-  --primary-dim:rgba(59,130,246,.15);
-  --green:     #22c55e;
-  --green-dim: rgba(34,197,94,.12);
-  --red:       #ef4444;
-  --red-dim:   rgba(239,68,68,.12);
-  --yellow:    #f59e0b;
-  --yellow-dim:rgba(245,158,11,.12);
-  --orange:    #f97316;
-  --orange-dim:rgba(249,115,22,.12);
-  --purple:    #a855f7;
-  --purple-dim:rgba(168,85,247,.12);
-  --cyan:      #06b6d4;
-  --cyan-dim:  rgba(6,182,212,.12);
+  --bg:          #0b0c0f;
+  --surface:     #111318;
+  --surface-2:   #161920;
+  --surface-3:   #1c2028;
+  --surface-4:   #21252f;
+  --border:      rgba(255,255,255,.065);
+  --border-2:    rgba(255,255,255,.11);
+  --text:        #dde0ea;
+  --text-2:      #a8adc2;
+  --text-3:      #5c6080;
+  --text-4:      #363a52;
+
+  --accent:      #3b7eff;
+  --accent-dim:  rgba(59,126,255,.14);
+  --accent-glow: rgba(59,126,255,.08);
+
+  --green:       #2dd17a;  --green-dim:  rgba(45,209,122,.12);
+  --red:         #ff4d4d;  --red-dim:    rgba(255,77,77,.12);
+  --yellow:      #f5c542;  --yellow-dim: rgba(245,197,66,.12);
+  --orange:      #ff8c42;  --orange-dim: rgba(255,140,66,.12);
+  --purple:      #b07eff;  --purple-dim: rgba(176,126,255,.12);
+  --cyan:        #2de0d4;  --cyan-dim:   rgba(45,224,212,.12);
+  --pink:        #ff6eb4;  --pink-dim:   rgba(255,110,180,.12);
+
+  --shadow-card: 0 1px 3px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.25);
+  --shadow-pop:  0 8px 32px rgba(0,0,0,.5);
 }
 
+/* ─── LIGHT THEME ─── */
 [data-theme="light"] {
-  --bg:        #f0f2f5;
-  --surface:   #ffffff;
-  --surface-2: #f8f9fb;
-  --surface-3: #eef0f5;
-  --border:    rgba(0,0,0,.08);
-  --border-2:  rgba(0,0,0,.14);
-  --text:      #1a1d2e;
-  --text-muted:#5a5f7a;
-  --text-faint:#a0a5be;
-  --primary:   #2563eb;
-  --primary-dim:rgba(37,99,235,.1);
-  --green:     #16a34a;
-  --green-dim: rgba(22,163,74,.1);
-  --red:       #dc2626;
-  --red-dim:   rgba(220,38,38,.1);
-  --yellow:    #d97706;
-  --yellow-dim:rgba(217,119,6,.1);
-  --orange:    #ea580c;
-  --orange-dim:rgba(234,88,12,.1);
-  --purple:    #9333ea;
-  --purple-dim:rgba(147,51,234,.1);
-  --cyan:      #0891b2;
-  --cyan-dim:  rgba(8,145,178,.1);
+  --bg:          #eef0f5;
+  --surface:     #ffffff;
+  --surface-2:   #f5f6fa;
+  --surface-3:   #eceef4;
+  --surface-4:   #e4e7ef;
+  --border:      rgba(0,0,0,.07);
+  --border-2:    rgba(0,0,0,.12);
+  --text:        #13151f;
+  --text-2:      #4a4f6a;
+  --text-3:      #8a90aa;
+  --text-4:      #c4c8da;
+
+  --accent:      #2462e8;
+  --accent-dim:  rgba(36,98,232,.1);
+  --accent-glow: rgba(36,98,232,.06);
+
+  --green:       #0fa854;  --green-dim:  rgba(15,168,84,.1);
+  --red:         #e02020;  --red-dim:    rgba(224,32,32,.09);
+  --yellow:      #c8960a;  --yellow-dim: rgba(200,150,10,.1);
+  --orange:      #d96010;  --orange-dim: rgba(217,96,16,.1);
+  --purple:      #7c44d4;  --purple-dim: rgba(124,68,212,.1);
+  --cyan:        #0594a8;  --cyan-dim:   rgba(5,148,168,.1);
+  --pink:        #c43f88;  --pink-dim:   rgba(196,63,136,.1);
+
+  --shadow-card: 0 1px 2px rgba(0,0,0,.06), 0 3px 12px rgba(0,0,0,.07);
+  --shadow-pop:  0 6px 24px rgba(0,0,0,.14);
 }
 
-/* ── RESET ── */
+/* ═══════════════════════════ RESET ═══════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  font-family:var(--font-ui);font-size:var(--text-base);
-  color:var(--text);background:var(--bg);min-height:100dvh;
-  -webkit-font-smoothing:antialiased;
-}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-ui);font-size:var(--text-base);color:var(--text);background:var(--bg);min-height:100dvh;overflow:hidden}
 button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
-input{font:inherit;color:inherit}
+input,select{font:inherit;color:inherit}
 table{border-collapse:collapse;width:100%}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:var(--radius-full)}
+::-webkit-scrollbar-thumb:hover{background:var(--text-3)}
+::selection{background:var(--accent-dim);color:var(--text)}
 
-/* ── LAYOUT ── */
-.app { display:flex; height:100dvh; overflow:hidden; }
-.sidebar {
-  width: 220px; flex-shrink:0; background: var(--surface);
-  border-right: 1px solid var(--border); display: flex; flex-direction:column; overflow-y: auto;
+/* ═══════════════════════════ LAYOUT ═══════════════════════════ */
+.app{display:flex;height:100dvh;overflow:hidden}
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
 }
-.main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.sidebar-inner{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:var(--space-4)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
-/* ── TOP BAR ── */
-.topbar {
-  height: 52px; display:flex; align-items:center; gap:var(--space-3);
-  padding: 0 var(--space-6); background: var(--surface);
-  border-bottom: 1px solid var(--border); flex-shrink:0;
+/* ═══════════════════════════ TOPBAR ═══════════════════════════ */
+.topbar{
+  height:48px;display:flex;align-items:center;gap:var(--space-3);
+  padding:0 var(--space-5);
+  background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;
 }
-.logo {
-  display:flex; align-items:center; gap:var(--space-2);
-  font-family:var(--font-mono); font-weight:700; font-size:var(--text-sm);
-  color:var(--primary); letter-spacing:.02em; white-space:nowrap;
+.logo-mark{
+  display:flex;align-items:center;gap:var(--space-2);flex-shrink:0;
 }
-.topbar-sep { width:1px; height:20px; background:var(--border); }
-.load-btn {
-  display:flex; align-items:center; gap:var(--space-2);
-  padding: var(--space-2) var(--space-4); background: var(--primary); color:#fff;
-  border-radius: var(--radius-md); font-size:var(--text-sm); font-weight:500;
-  transition: opacity var(--transition); cursor:pointer;
+.logo-svg{width:28px;height:28px;flex-shrink:0}
+.logo-text{font-family:var(--font-mono);font-weight:700;font-size:var(--text-sm);letter-spacing:.04em;color:var(--text)}
+.logo-text span{color:var(--accent)}
+.topbar-sep{width:1px;height:18px;background:var(--border-2);flex-shrink:0}
+
+.load-btn{
+  display:flex;align-items:center;gap:var(--space-2);
+  padding:5px var(--space-4);
+  background:var(--accent);color:#fff;
+  border-radius:var(--radius-lg);font-size:var(--text-sm);font-weight:600;
+  transition:opacity var(--t) var(--ease),transform var(--t) var(--ease);
+  cursor:pointer;flex-shrink:0;
 }
-.load-btn:hover { opacity:.85; }
-#fileInput { display:none; }
+.load-btn:hover{opacity:.88;transform:translateY(-1px)}
+.load-btn:active{transform:translateY(0)}
+#fileInput{display:none}
 
-.scan-meta { margin-left:auto; display:flex; align-items:center; gap:var(--space-4); font-size:var(--text-xs); color:var(--text-muted); font-family:var(--font-mono); }
-.scan-meta .badge { padding: 2px var(--space-2); background:var(--green-dim); color:var(--green); border-radius:var(--radius-full); font-size:10px; font-weight:600; }
-.scan-meta .badge.demo { background:var(--yellow-dim); color:var(--yellow); }
-.theme-btn {
-  width:32px; height:32px; border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center;
-  color:var(--text-muted); border:1px solid var(--border); transition:all var(--transition);
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:var(--space-3)}
+.meta-pill{
+  display:flex;align-items:center;gap:var(--space-2);
+  font-size:var(--text-xs);color:var(--text-2);font-family:var(--font-mono);
 }
-.theme-btn:hover { color:var(--text); background:var(--surface-3); }
+.status-dot{width:6px;height:6px;border-radius:var(--radius-full);background:var(--green);flex-shrink:0;animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.scan-time{color:var(--text-3);font-size:var(--text-xs)}
 
-/* ── CONTENT ── */
-.content { flex:1; overflow-y:auto; padding: var(--space-6); }
+.icon-btn{
+  width:30px;height:30px;border-radius:var(--radius-md);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-3);border:1px solid var(--border);
+  transition:all var(--t) var(--ease);flex-shrink:0;
+}
+.icon-btn:hover{color:var(--text);background:var(--surface-3);border-color:var(--border-2)}
+.icon-btn svg{width:14px;height:14px;display:block}
 
-/* ── WELCOME ── */
-.welcome { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:var(--space-4); text-align:center; color:var(--text-muted); }
-.welcome h2 { font-size:var(--text-xl); color:var(--text); font-weight:600; }
-.welcome p { font-size:var(--text-sm); max-width:40ch; }
-.welcome .demo-btn { padding: var(--space-2) var(--space-6); border:1px solid var(--border-2); border-radius:var(--radius-md); font-size:var(--text-sm); color:var(--text-muted); transition: all var(--transition); }
-.welcome .demo-btn:hover { background:var(--surface-3); color:var(--text); }
+/* ═══════════════════════════ SIDEBAR ═══════════════════════════ */
+.sidebar-top{
+  padding:var(--space-3) var(--space-4);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.sidebar-search{
+  display:flex;align-items:center;gap:var(--space-2);
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--radius-md);padding:4px var(--space-3);
+  font-size:var(--text-xs);color:var(--text-3);
+}
+.sidebar-search svg{width:11px;height:11px;flex-shrink:0;color:var(--text-3)}
+.sidebar-search input{
+  background:none;border:none;outline:none;
+  font-size:var(--text-xs);color:var(--text);width:100%;
+}
+.sidebar-search input::placeholder{color:var(--text-3)}
 
-/* ── SIDEBAR NAV ── */
-.sidebar-header { padding: var(--space-4) var(--space-4) var(--space-2); font-size:var(--text-xs); font-weight:600; letter-spacing:.08em; color:var(--text-faint); text-transform:uppercase; }
-.nav-item { display:flex; align-items:center; gap:var(--space-3); padding: var(--space-2) var(--space-4); font-size:var(--text-sm); color:var(--text-muted); cursor:pointer; border-left:2px solid transparent; transition: all var(--transition); }
-.nav-item:hover { color:var(--text); background:var(--surface-3); }
-.nav-item.active { color:var(--primary); background:var(--primary-dim); border-left-color:var(--primary); }
-.nav-item .count { margin-left:auto; font-size:10px; font-family:var(--font-mono); color:var(--text-faint); font-weight:500; }
-.nav-item.active .count { color:var(--primary); }
-.nav-group-label { padding: var(--space-4) var(--space-4) var(--space-1); font-size:10px; font-weight:700; letter-spacing:.1em; color:var(--text-faint); text-transform:uppercase; }
+.nav-group{padding-top:var(--space-3)}
+.nav-group-lbl{
+  padding:0 var(--space-4) var(--space-1);
+  font-size:10px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-4);
+}
+.nav-item{
+  display:flex;align-items:center;gap:var(--space-2);
+  padding:5px var(--space-4);
+  font-size:var(--text-sm);color:var(--text-2);
+  cursor:pointer;border-left:2px solid transparent;
+  transition:all var(--t) var(--ease);user-select:none;
+  white-space:nowrap;overflow:hidden;
+}
+.nav-item:hover{color:var(--text);background:var(--surface-3)}
+.nav-item.active{color:var(--accent);background:var(--accent-dim);border-left-color:var(--accent)}
+.nav-item.active .ni-icon{color:var(--accent)}
+.ni-icon{color:var(--text-3);flex-shrink:0;font-size:12px;width:14px;text-align:center}
+.ni-label{flex:1;overflow:hidden;text-overflow:ellipsis}
+.ni-count{
+  margin-left:auto;flex-shrink:0;
+  font-size:9px;font-family:var(--font-mono);font-weight:600;
+  color:var(--text-3);background:var(--surface-3);
+  padding:1px 5px;border-radius:var(--radius-full);
+  transition:all var(--t) var(--ease);
+}
+.nav-item.active .ni-count{color:var(--accent);background:var(--accent-dim)}
+.nav-item.has-data .ni-count{color:var(--text-2)}
+.nav-item.threat-item .ni-count{color:var(--red);background:var(--red-dim)}
+.nav-item.warn-item  .ni-count{color:var(--yellow);background:var(--yellow-dim)}
 
-/* ── DASHBOARD ── */
-.kpi-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(min(180px,100%), 1fr)); gap:var(--space-3); margin-bottom:var(--space-6); }
-.kpi-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:var(--space-4); display:flex; flex-direction:column; gap:var(--space-1); }
-.kpi-card .kpi-label { font-size:var(--text-xs); color:var(--text-muted); font-weight:500; }
-.kpi-card .kpi-value { font-size:var(--text-xl); font-weight:700; font-family:var(--font-mono); color:var(--text); line-height:1; }
-.kpi-card .kpi-sub { font-size:var(--text-xs); color:var(--text-faint); font-family:var(--font-mono); }
-.kpi-card.threat { border-color:var(--red); background:var(--red-dim); } .kpi-card.threat .kpi-value { color:var(--red); }
-.kpi-card.warn  { border-color:var(--yellow); background:var(--yellow-dim); } .kpi-card.warn .kpi-value { color:var(--yellow); }
+/* ═══════════════════════════ CONTENT ═══════════════════════════ */
+.content{flex:1;overflow-y:auto;padding:var(--space-6);scroll-padding-top:var(--space-4)}
 
-.info-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(300px,100%),1fr)); gap:var(--space-3); margin-bottom:var(--space-6); }
-.info-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:var(--space-4); }
-.info-card h3 { font-size:var(--text-xs); font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:var(--text-muted); margin-bottom:var(--space-3); display:flex; align-items:center; gap:var(--space-2); }
-.info-row { display:flex; justify-content:space-between; align-items:baseline; padding: var(--space-1) 0; border-bottom:1px solid var(--border); font-size:var(--text-sm); gap:var(--space-4); }
-.info-row:last-child { border-bottom:none; }
-.info-row .k { color:var(--text-muted); white-space:nowrap; flex-shrink:0; }
-.info-row .v { color:var(--text); font-family:var(--font-mono); font-size:var(--text-xs); text-align:right; word-break:break-all; }
+/* ═══════════════════════════ WELCOME ═══════════════════════════ */
+.welcome{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;gap:var(--space-5);text-align:center;color:var(--text-2);
+  padding:var(--space-8);
+}
+.welcome-icon{
+  width:72px;height:72px;border-radius:var(--radius-xl);
+  background:var(--surface-2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-3);font-size:32px;
+}
+.welcome h2{font-size:var(--text-2xl);font-weight:700;color:var(--text);letter-spacing:-.01em}
+.welcome p{font-size:var(--text-sm);max-width:38ch;color:var(--text-2);line-height:1.6}
+.welcome code{font-family:var(--font-mono);font-size:.9em;background:var(--surface-3);padding:1px 5px;border-radius:var(--radius-sm)}
+.welcome-actions{display:flex;gap:var(--space-3);flex-wrap:wrap;justify-content:center}
 
-/* ── TABLE & BLOCKS ── */
-.section-header { display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-4); flex-wrap:wrap; }
-.section-title { font-size:var(--text-lg); font-weight:700; color:var(--text); }
-.section-count { font-family:var(--font-mono); font-size:var(--text-xs); padding:2px var(--space-2); background:var(--surface-3); border-radius:var(--radius-full); color:var(--text-muted); }
-.search-box { margin-left:auto; display:flex; align-items:center; gap:var(--space-2); background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-md); padding: var(--space-1) var(--space-3); }
-.search-box input { background:none; border:none; outline:none; font-size:var(--text-sm); color:var(--text); width:200px; }
+/* ═══════════════════════════ KPI GRID ═══════════════════════════ */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(160px,100%),1fr));gap:var(--space-3);margin-bottom:var(--space-5)}
+.kpi{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);
+  padding:var(--space-4) var(--space-4) var(--space-3);
+  display:flex;flex-direction:column;gap:var(--space-1);
+  box-shadow:var(--shadow-card);
+  transition:transform var(--t) var(--ease),box-shadow var(--t) var(--ease);
+}
+.kpi:hover{transform:translateY(-1px);box-shadow:var(--shadow-pop)}
+.kpi-icon{font-size:16px;margin-bottom:var(--space-1);color:var(--text-3)}
+.kpi-val{font-size:var(--text-2xl);font-weight:700;font-family:var(--font-mono);color:var(--text);line-height:1;letter-spacing:-.02em}
+.kpi-label{font-size:var(--text-xs);color:var(--text-2);font-weight:500}
+.kpi-sub{font-size:10px;color:var(--text-3);font-family:var(--font-mono);margin-top:var(--space-1)}
+.kpi.danger{border-color:var(--red);background:var(--red-dim)}
+.kpi.danger .kpi-val,.kpi.danger .kpi-icon{color:var(--red)}
+.kpi.warn{border-color:var(--yellow);background:var(--yellow-dim)}
+.kpi.warn .kpi-val,.kpi.warn .kpi-icon{color:var(--yellow)}
+.kpi.ok{border-color:var(--green);background:var(--green-dim)}
+.kpi.ok .kpi-val,.kpi.ok .kpi-icon{color:var(--green)}
+.kpi.info{border-color:var(--accent);background:var(--accent-dim)}
+.kpi.info .kpi-val,.kpi.info .kpi-icon{color:var(--accent)}
 
-.table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
-.table-scroll { overflow-x:auto; overflow-y:auto; max-height: calc(100dvh - 220px); }
-.ffte-table { width:100%; font-size:var(--text-xs); }
-.ffte-table thead th { position:sticky; top:0; background:var(--surface-2); padding: var(--space-3) var(--space-4); text-align:left; font-size:10px; font-weight:700; color:var(--text-muted); border-bottom:1px solid var(--border-2); white-space:nowrap; z-index:20; }
-.ffte-table tbody tr { border-bottom:1px solid var(--border); transition:background var(--transition); }
-.ffte-table tbody tr:hover { background:var(--surface-3); }
-.ffte-table td { padding: var(--space-2) var(--space-4); font-family:var(--font-mono); color:var(--text); vertical-align:middle; word-break:break-all; max-width:400px; }
-.ffte-table td.nowrap { white-space:nowrap; }
+/* ═══════════════════════════ INFO CARDS ═══════════════════════════ */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:var(--space-3);margin-bottom:var(--space-5)}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);
+  padding:var(--space-4);box-shadow:var(--shadow-card);
+}
+.card-title{
+  font-size:var(--text-xs);font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-3);
+  margin-bottom:var(--space-3);padding-bottom:var(--space-2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:var(--space-2);
+}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-4);padding:4px 0;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.row-k{font-size:var(--text-xs);color:var(--text-2);white-space:nowrap;flex-shrink:0;padding-top:1px}
+.row-v{font-size:var(--text-xs);font-family:var(--font-mono);color:var(--text);text-align:right;word-break:break-all;flex:1;min-width:0}
 
-/* ── CODE BOX FOR LINUX STRINGS ── */
-.code-box {
-  max-height: 120px; overflow-y: auto;
-  font-family: var(--font-mono); font-size: 11px;
-  color: var(--text-muted); white-space: pre-wrap;
-  word-break: break-all; padding: var(--space-2);
-  background: var(--surface-2); border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+/* ═══════════════════════════ SECTION ═══════════════════════════ */
+.section-bar{
+  display:flex;align-items:center;gap:var(--space-3);
+  margin-bottom:var(--space-4);flex-wrap:wrap;
+}
+.section-title{font-size:var(--text-xl);font-weight:700;color:var(--text);letter-spacing:-.01em}
+.section-badge{
+  font-family:var(--font-mono);font-size:10px;font-weight:700;
+  padding:2px 7px;background:var(--surface-3);border-radius:var(--radius-full);color:var(--text-2);
+}
+.filter-row{display:flex;align-items:center;gap:var(--space-2);margin-left:auto;flex-wrap:wrap}
+.search-input{
+  display:flex;align-items:center;gap:var(--space-2);
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:5px var(--space-3);
+  transition:border-color var(--t) var(--ease);
+}
+.search-input:focus-within{border-color:var(--border-2)}
+.search-input svg{width:12px;height:12px;color:var(--text-3);flex-shrink:0}
+.search-input input{background:none;border:none;outline:none;font-size:var(--text-sm);color:var(--text);width:180px}
+.search-input input::placeholder{color:var(--text-3)}
+.export-btn{
+  display:flex;align-items:center;gap:var(--space-2);
+  padding:5px var(--space-3);font-size:var(--text-xs);font-weight:500;
+  border:1px solid var(--border);border-radius:var(--radius-lg);color:var(--text-2);
+  transition:all var(--t) var(--ease);
+}
+.export-btn:hover{color:var(--text);background:var(--surface-3);border-color:var(--border-2)}
+.export-btn svg{width:12px;height:12px}
+
+/* ═══════════════════════════ TABLE ═══════════════════════════ */
+.tbl-wrap{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);
+  overflow:hidden;box-shadow:var(--shadow-card);
+}
+.tbl-scroll{overflow:auto;max-height:calc(100dvh - 210px)}
+.ffte-tbl{font-size:var(--text-xs);min-width:100%}
+.ffte-tbl thead th{
+  position:sticky;top:0;z-index:10;
+  background:var(--surface-2);padding:var(--space-3) var(--space-4);
+  font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text-2);text-align:left;white-space:nowrap;
+  border-bottom:1px solid var(--border-2);cursor:pointer;
+  user-select:none;transition:color var(--t) var(--ease);
+}
+.ffte-tbl thead th:hover{color:var(--text)}
+.ffte-tbl thead th .sort-icon{margin-left:4px;opacity:.4;font-size:9px}
+.ffte-tbl thead th.sorted .sort-icon{opacity:1;color:var(--accent)}
+.ffte-tbl tbody tr{border-bottom:1px solid var(--border);transition:background var(--t) var(--ease)}
+.ffte-tbl tbody tr:last-child{border-bottom:none}
+.ffte-tbl tbody tr:hover{background:var(--surface-3)}
+.ffte-tbl td{
+  padding:var(--space-2) var(--space-4);
+  font-family:var(--font-mono);color:var(--text);
+  vertical-align:middle;max-width:380px;word-break:break-all;
+}
+.ffte-tbl td.col-nowrap{white-space:nowrap;max-width:none}
+.ffte-tbl td.col-dim{color:var(--text-2)}
+.ffte-tbl td.col-faint{color:var(--text-3)}
+.ffte-tbl .no-data{text-align:center;padding:var(--space-12) var(--space-6);color:var(--text-3);font-family:var(--font-ui)}
+.tbl-footer{
+  padding:var(--space-2) var(--space-4);background:var(--surface-2);
+  border-top:1px solid var(--border);font-size:var(--text-xs);
+  color:var(--text-3);display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--font-mono);
 }
 
-.pill { display:inline-flex; align-items:center; padding:2px var(--space-2); border-radius:var(--radius-full); font-size:10px; font-weight:600; white-space:nowrap; }
-.pill.green { background:var(--green-dim); color:var(--green); }
-.pill.red { background:var(--red-dim); color:var(--red); }
-.pill.yellow { background:var(--yellow-dim); color:var(--yellow); }
-.pill.orange { background:var(--orange-dim); color:var(--orange); }
-.pill.blue { background:var(--primary-dim); color:var(--primary); }
-.pill.cyan { background:var(--cyan-dim); color:var(--cyan); }
-.pill.gray { background:var(--surface-3); color:var(--text-muted); }
-.empty { text-align:center; padding:var(--space-12) var(--space-4); color:var(--text-faint); font-weight: 600; }
-.export-bar { display:flex; align-items:center; gap:var(--space-2); padding:var(--space-3) var(--space-4); background:var(--surface-2); border-top:1px solid var(--border); }
-.export-btn { display:flex; align-items:center; gap:var(--space-2); padding: var(--space-1) var(--space-3); font-size:var(--text-xs); border:1px solid var(--border-2); border-radius:var(--radius-md); color:var(--text-muted); cursor:pointer; }
-.export-btn:hover { color:var(--text); background:var(--surface-3); }
+/* code block for multi-line content */
+.code-block{
+  font-family:var(--font-mono);font-size:10px;
+  color:var(--text-2);white-space:pre-wrap;word-break:break-all;
+  padding:var(--space-2) var(--space-3);max-height:100px;overflow-y:auto;
+  background:var(--surface-2);border-radius:var(--radius-md);
+  border:1px solid var(--border);line-height:1.5;
+}
+.code-block::-webkit-scrollbar{width:3px}
 
-::-webkit-scrollbar { width:6px; height:6px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:var(--border-2); border-radius:99px; }
-::-webkit-scrollbar-thumb:hover { background:var(--text-faint); }
+/* ═══════════════════════════ PILLS ═══════════════════════════ */
+.pill{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:1px 7px;border-radius:var(--radius-full);
+  font-size:10px;font-weight:700;white-space:nowrap;font-family:var(--font-ui);
+}
+.pill.green  {background:var(--green-dim);  color:var(--green)}
+.pill.red    {background:var(--red-dim);    color:var(--red)}
+.pill.yellow {background:var(--yellow-dim); color:var(--yellow)}
+.pill.orange {background:var(--orange-dim); color:var(--orange)}
+.pill.blue   {background:var(--accent-dim); color:var(--accent)}
+.pill.cyan   {background:var(--cyan-dim);   color:var(--cyan)}
+.pill.purple {background:var(--purple-dim); color:var(--purple)}
+.pill.pink   {background:var(--pink-dim);   color:var(--pink)}
+.pill.gray   {background:var(--surface-3);  color:var(--text-2)}
+
+/* ═══════════════════════════ ALERT BANNER ═══════════════════════════ */
+.alert-banner{
+  display:flex;align-items:center;gap:var(--space-3);
+  padding:var(--space-3) var(--space-4);border-radius:var(--radius-xl);
+  font-size:var(--text-sm);font-weight:500;margin-bottom:var(--space-4);
+  border:1px solid;
+}
+.alert-banner.danger{background:var(--red-dim);color:var(--red);border-color:rgba(255,77,77,.3)}
+.alert-banner.warn{background:var(--yellow-dim);color:var(--yellow);border-color:rgba(245,197,66,.3)}
+.alert-banner.ok{background:var(--green-dim);color:var(--green);border-color:rgba(45,209,122,.3)}
+.alert-banner-icon{font-size:18px;flex-shrink:0}
+.alert-banner-text strong{display:block;margin-bottom:2px}
+.alert-banner-text span{font-size:var(--text-xs);font-weight:400;opacity:.8}
+
+/* ═══════════════════════════ MISC ═══════════════════════════ */
+.mt-4{margin-top:var(--space-4)}
+.mb-4{margin-bottom:var(--space-4)}
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:var(--space-10) var(--space-6);gap:var(--space-2);
+  color:var(--text-3);font-size:var(--text-sm);text-align:center;
+}
+.empty-state-icon{font-size:32px;margin-bottom:var(--space-2)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* no data placeholders inside table vs section */
+.section-empty{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-xl);box-shadow:var(--shadow-card);
+}
+
+/* ═══════════════════════════ RESPONSIVE ═══════════════════════════ */
+@media(max-width:680px){
+  :root{--sidebar-w:0px}
+  .sidebar{position:fixed;left:-240px;top:0;bottom:0;z-index:100;width:240px;transition:left .25s var(--ease)}
+  .sidebar.open{left:0}
+  .content{padding:var(--space-4) var(--space-3)}
+}
 </style>
 </head>
 <body>
-
 <div class="app">
-  <nav class="sidebar" id="sidebar" style="display:none">
-    <div class="sidebar-header">FFTE Viewer</div>
 
-    <div class="nav-group-label">Overview</div>
-    <div class="nav-item active" data-section="dashboard" onclick="showSection('dashboard',this)">
-      Dashboard
+  <nav class="sidebar" id="sidebar" aria-label="Navigation">
+    <div class="sidebar-top">
+      <div class="sidebar-search">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="4.5"/><path d="m11 11 2.5 2.5"/></svg>
+        <input type="text" id="navSearch" placeholder="Filter sections…" autocomplete="off" aria-label="Filter navigation">
+      </div>
     </div>
-
-    <div class="nav-group-label">Processes & Memory</div>
-    <div class="nav-item" data-section="processes" onclick="showSection('processes',this)">
-      Processes <span class="count" id="cnt-processes">0</span>
-    </div>
-    <div class="nav-item" data-section="memory" onclick="showSection('memory',this)">
-      Injected Memory <span class="count" id="cnt-memory">0</span>
-    </div>
-    <div class="nav-item" data-section="clipboard" onclick="showSection('clipboard',this)">
-      Clipboard <span class="count" id="cnt-clipboard">0</span>
-    </div>
-
-    <div class="nav-group-label">Network</div>
-    <div class="nav-item" data-section="network" onclick="showSection('network',this)">
-      Connections <span class="count" id="cnt-network">0</span>
-    </div>
-    <div class="nav-item" data-section="dns" onclick="showSection('dns',this)">
-      DNS Cache <span class="count" id="cnt-dns">0</span>
-    </div>
-    <div class="nav-item" data-section="arp" onclick="showSection('arp',this)">
-      ARP Table <span class="count" id="cnt-arp">0</span>
-    </div>
-    <div class="nav-item" data-section="firewall" onclick="showSection('firewall',this)">
-      Firewall Rules <span class="count" id="cnt-firewall">0</span>
-    </div>
-
-    <div class="nav-group-label">Persistence & OS</div>
-    <div class="nav-item" data-section="persistence" onclick="showSection('persistence',this)">
-      Autorun / Registry <span class="count" id="cnt-persistence">0</span>
-    </div>
-    <div class="nav-item" data-section="tasks" onclick="showSection('tasks',this)">
-      Scheduled Tasks <span class="count" id="cnt-tasks">0</span>
-    </div>
-    <div class="nav-item" data-section="services" onclick="showSection('services',this)">
-      Services & Drivers <span class="count" id="cnt-services">0</span>
-    </div>
-    <div class="nav-item" data-section="systemfiles" onclick="showSection('systemfiles',this)">
-      System Files <span class="count" id="cnt-systemfiles">0</span>
-    </div>
-    <div class="nav-item" data-section="prefetch" onclick="showSection('prefetch',this)">
-      Prefetch Files <span class="count" id="cnt-prefetch">0</span>
-    </div>
-
-    <div class="nav-group-label">Browser & Web</div>
-    <div class="nav-item" data-section="browser" onclick="showSection('browser',this)">
-      Browser History <span class="count" id="cnt-browser">0</span>
-    </div>
-    <div class="nav-item" data-section="extensions" onclick="showSection('extensions',this)">
-      Browser Extensions <span class="count" id="cnt-extensions">0</span>
-    </div>
-
-    <div class="nav-group-label">Security Logs</div>
-    <div class="nav-item" data-section="eventlogs" onclick="showSection('eventlogs',this)">
-      Event Logs <span class="count" id="cnt-eventlogs">0</span>
-    </div>
-    <div class="nav-item" data-section="rdp" onclick="showSection('rdp',this)">
-      RDP Sessions <span class="count" id="cnt-rdp">0</span>
-    </div>
-    <div class="nav-item" data-section="usb" onclick="showSection('usb',this)">
-      USB History <span class="count" id="cnt-usb">0</span>
-    </div>
-
-    <div class="nav-group-label">Linux Specific</div>
-    <div class="nav-item" data-section="lkm" onclick="showSection('lkm',this)">
-      Kernel Modules <span class="count" id="cnt-lkm">0</span>
-    </div>
-    <div class="nav-item" data-section="procfds" onclick="showSection('procfds',this)">
-      Open Files (FDs) <span class="count" id="cnt-procfds">0</span>
-    </div>
-    <div class="nav-item" data-section="procenvs" onclick="showSection('procenvs',this)">
-      Environments <span class="count" id="cnt-procenvs">0</span>
-    </div>
-    <div class="nav-item" data-section="proccreds" onclick="showSection('proccreds',this)">
-      Credentials <span class="count" id="cnt-proccreds">0</span>
-    </div>
-    <div class="nav-item" data-section="proccgroups" onclick="showSection('proccgroups',this)">
-      Control Groups <span class="count" id="cnt-proccgroups">0</span>
-    </div>
-    <div class="nav-item" data-section="systemd" onclick="showSection('systemd',this)">
-      Systemd Units <span class="count" id="cnt-systemd">0</span>
-    </div>
-    <div class="nav-item" data-section="ssh" onclick="showSection('ssh',this)">
-      SSH Keys <span class="count" id="cnt-ssh">0</span>
-    </div>
-    <div class="nav-item" data-section="packages" onclick="showSection('packages',this)">
-      Packages <span class="count" id="cnt-packages">0</span>
-    </div>
+    <div class="sidebar-inner" id="sidebarInner">
+      </div>
   </nav>
 
   <div class="main">
+
     <header class="topbar">
-      <div class="logo">FFTE</div>
-      <div class="topbar-sep"></div>
-      <label class="load-btn" for="fileInput">Load JSON Report</label>
-      <input type="file" id="fileInput" accept=".json">
-      <div class="scan-meta" id="scanMeta" style="display:none">
-        <span id="scanTime"></span>
-        <span class="badge" id="modeBadge">FULL SCAN</span>
+      <div class="logo-mark">
+        <svg class="logo-svg" viewBox="0 0 28 28" fill="none" aria-label="FFTE">
+          <rect width="28" height="28" rx="6" fill="var(--accent-dim)"/>
+          <path d="M7 8h14M7 14h10M7 20h12" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="21" cy="20" r="3.5" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <path d="m23 22 1.5 1.5" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-text">FF<span>TE</span></span>
       </div>
-      <div style="margin-left:auto"></div>
-      <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">◑</button>
+      <div class="topbar-sep"></div>
+      <label class="load-btn" for="fileInput">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 2v9M4 8l4 4 4-4"/><path d="M2 13h12"/></svg>
+        Load Report
+      </label>
+      <input type="file" id="fileInput" accept=".json" aria-label="Load forensic JSON report">
+
+      <div class="topbar-right">
+        <div class="meta-pill" id="scanMeta" style="display:none">
+          <div class="status-dot"></div>
+          <span id="scanHost" style="color:var(--text)"></span>
+          <span class="scan-time" id="scanTime"></span>
+        </div>
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">
+          <svg id="themeIcon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/><circle cx="8" cy="8" r="3"/></svg>
+        </button>
+      </div>
     </header>
 
     <div class="content" id="content">
       <div class="welcome" id="welcomeScreen">
-        <h2>Fast Forensic Triage Extractor</h2>
-        <p>Load a <code>forensic_report.json</code> file generated by FFTE to begin analysis.</p>
+        <div class="welcome-icon">🛡️</div>
+        <h2>FFTE Forensic Viewer</h2>
+        <p>Load a <code>forensic_report.json</code> generated by the FFTE tool to begin analysis. All data is processed locally — nothing leaves your browser.</p>
+        <div class="welcome-actions">
+          <label class="load-btn" for="fileInput" style="font-size:var(--text-sm)">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 2v9M4 8l4 4 4-4"/><path d="M2 13h12"/></svg>
+            Load forensic_report.json
+          </label>
+        </div>
       </div>
     </div>
+
   </div>
 </div>
 
 <script>
-let G = null;
+'use strict';
 
-(function(){
+/* ═══════════════════════════ GLOBALS ═══════════════════════════ */
+let G = null;          // full parsed json
+let currentSection = null;
+let sortState = {};    // {sectionId: {col, dir}}
+
+/* ═══════════════════════════ THEME ═══════════════════════════ */
+(function () {
   const root = document.documentElement;
-  const btn  = document.querySelector('[data-theme-toggle]');
-  let theme = 'dark';
-  btn.addEventListener('click',()=>{
-    theme = theme==='dark'?'light':'dark';
-    root.setAttribute('data-theme',theme);
-  });
+  const btn  = document.getElementById('themeToggle');
+  const icon = document.getElementById('themeIcon');
+  let   dark = true;
+
+  const moonSVG = `<path d="M12 3a6.364 6.364 0 0 0 9 9 9 9 0 1 1-9-9z" fill="currentColor" stroke="none"/>`;
+  const sunSVG  = `<path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41"/><circle cx="8" cy="8" r="3"/>`;
+
+  function apply() {
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    icon.innerHTML = dark ? moonSVG : sunSVG;
+    btn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+  apply();
+  btn.addEventListener('click', () => { dark = !dark; apply(); });
 })();
 
+/* ═══════════════════════════ HELPERS ═══════════════════════════ */
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+function pill(text, color) {
+  return `<span class="pill ${color}">${esc(String(text))}</span>`;
+}
+function na(v) {
+  if (v === null || v === undefined || v === '') return `<span style="color:var(--text-3)">—</span>`;
+  return esc(String(v));
+}
+function bool(v) {
+  return v ? pill('YES', 'red') : pill('NO', 'green');
+}
+function boolInv(v) {
+  return v ? pill('YES', 'green') : pill('NO', 'red');
+}
+function codeBlock(text, maxLines) {
+  if (!text) return `<span style="color:var(--text-3)">—</span>`;
+  const lines = String(text).replace(/\\0/g, '\n').replace(/; /g, '\n').trim().split('\n').filter(Boolean);
+  const show = maxLines ? lines.slice(0, maxLines) : lines;
+  const overflow = maxLines && lines.length > maxLines ? `\n… +${lines.length - maxLines} more` : '';
+  return `<div class="code-block">${esc(show.join('\n') + overflow)}</div>`;
+}
+function netState(s) {
+  const map = {ESTABLISHED:'green',LISTEN:'blue',TIME_WAIT:'yellow',CLOSE_WAIT:'orange',SYN_SENT:'cyan',CLOSE:'gray'};
+  return pill(s || '?', map[s] || 'gray');
+}
+function signatureStatus(valid) {
+  return valid ? pill('✓ SIGNED', 'green') : pill('⚠ UNSIGNED', 'red');
+}
+function protectionBadge(p) {
+  if (!p) return na(p);
+  const high = ['RWX','PAGE_EXECUTE_READWRITE','PAGE_EXECUTE_READ','EXECUTE'];
+  const isHigh = high.some(h => p.toUpperCase().includes(h));
+  return pill(p, isHigh ? 'red' : 'orange');
+}
+
+/* ═══════════════════════════ NAV CONFIG ═══════════════════════════ */
+const NAV = [
+  { group: 'Overview',          items: [
+    { id:'dashboard',   label:'Dashboard',           icon:'⊞' },
+  ]},
+  { group: 'Processes & Memory', items: [
+    { id:'processes',   label:'Processes',           icon:'⚙' },
+    { id:'memory',      label:'Injected Memory',     icon:'⚠', threat:true },
+    { id:'clipboard',   label:'Clipboard Data',      icon:'📋' },
+  ]},
+  { group: 'Network',           items: [
+    { id:'network',     label:'Connections',         icon:'⇆' },
+    { id:'dns',         label:'DNS Cache',           icon:'🔍' },
+    { id:'arp',         label:'ARP Table',           icon:'🔗' },
+    { id:'firewall',    label:'Firewall Rules',      icon:'🛡' },
+    { id:'bluetooth',   label:'Bluetooth Devices',   icon:'📶' },
+    { id:'hosts',       label:'Hosts File',          icon:'🌐' },
+  ]},
+  { group: 'Persistence & OS',  items: [
+    { id:'persistence', label:'Autorun / Registry',  icon:'🔁', threat:true },
+    { id:'services',    label:'Services & Drivers',  icon:'⚙' },
+    { id:'tasks',       label:'Cron / Sched Tasks',  icon:'⏱' },
+    { id:'systemfiles', label:'System Files',        icon:'🗄' },
+    { id:'prefetch',    label:'Prefetch Files',      icon:'📄' },
+    { id:'useractivity',label:'User Activity',       icon:'📊' },
+  ]},
+  { group: 'Browser & Web',     items: [
+    { id:'browser',     label:'Browser History',     icon:'🌍' },
+    { id:'extensions',  label:'Browser Extensions',  icon:'🧩' },
+  ]},
+  { group: 'Security Logs',     items: [
+    { id:'eventlogs',   label:'Event Logs',          icon:'⚡', threat:true },
+    { id:'rdp',         label:'RDP Sessions',        icon:'🖥' },
+    { id:'usb',         label:'USB History',         icon:'🔌' },
+  ]},
+  { group: 'Linux Specific',    items: [
+    { id:'lkm',         label:'Kernel Modules',      icon:'🐧', threat:true },
+    { id:'procfds',     label:'Open Files (FDs)',    icon:'📁' },
+    { id:'procenvs',    label:'Environments',        icon:'🌱' },
+    { id:'proccreds',   label:'Process Creds',       icon:'👤' },
+    { id:'proccgroups', label:'Control Groups',      icon:'📦' },
+    { id:'systemd',     label:'Systemd Units',       icon:'⚙' },
+    { id:'ssh',         label:'SSH Keys',            icon:'🔑' },
+    { id:'packages',    label:'Packages',            icon:'📦' },
+  ]},
+];
+
+/* ─── ПОДГОНКА ПУТЕЙ ДАННЫХ ПОД СТРУКТУРУ C++ EXPORTER ─── */
+function getSectionData(id) {
+  if (!G || !G.artifacts) return [];
+  const arts = G.artifacts || {};
+  const df = arts.digital_footprint || {};
+
+  const map = {
+    processes:    () => arts.processes || [],
+    memory:       () => df.injected_memory || [],
+    clipboard:    () => df.clipboard_triage || [],
+    network:      () => df.network_connections || [],
+    dns:          () => df.dns_cache || [],
+    arp:          () => df.arp_entries || [],
+    firewall:     () => df.firewall_rules || [],
+    bluetooth:    () => df.bluetooth_history || [],
+    hosts:        () => df.system_files || [], // fallback if custom hosts array isn't populated
+    persistence:  () => arts.persistence || [],
+    services:     () => arts.services_and_drivers || [],
+    tasks:        () => df.scheduled_tasks || [],
+    systemfiles:  () => df.system_files || [],
+    prefetch:     () => df.prefetch_files || [],
+    useractivity: () => df.user_activity || [],
+    browser:      () => df.browser_history || [],
+    extensions:   () => df.browser_extensions || [],
+    eventlogs:    () => df.event_logs || [],
+    rdp:          () => df.rdp_sessions || [],
+    usb:          () => df.usb_history || [],
+    // Linux Specific Accessors matching Exporter.cpp
+    lkm:          () => df.linux_modules || [],
+    procfds:      () => df.process_open_files || [],
+    procenvs:     () => df.process_environments || [],
+    proccreds:    () => df.process_credentials || [],
+    proccgroups:  () => df.process_cgroups || [],
+    systemd:      () => df.systemd_units || [],
+    ssh:          () => df.ssh_keys || [],
+    packages:     () => df.installed_packages || [],
+  };
+  return map[id] ? map[id]() : [];
+}
+
+/* ═══════════════════════════ FILE LOAD ═══════════════════════════ */
 document.getElementById('fileInput').addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    let parsedData = null;
-    try {
-      parsedData = JSON.parse(ev.target.result);
-    } catch {
-      alert('Invalid JSON file. Please ensure the file is not corrupted.');
-      return;
+    let parsed = null;
+    try { 
+      parsed = JSON.parse(ev.target.result); 
+    } catch { 
+      alert('Invalid JSON — file may be corrupted.'); 
+      return; 
     }
-    G = parsedData;
-    try {
-      initViewer();
-    } catch (err) {
-      console.error(err);
-      alert('Error rendering dashboard components.');
+    G = parsed;
+    try { 
+      initViewer(); 
+    } catch (err) { 
+      console.error(err); 
+      alert('Error rendering viewer:\n' + err.message); 
     }
   };
   reader.readAsText(file);
-  e.target.value = ''; // Reset input to allow reloading the exact same file
+  e.target.value = ''; // Сброс инпута для бесконечной повторной загрузки
 });
 
+/* ═══════════════════════════ INIT VIEWER ═══════════════════════════ */
 function initViewer() {
   document.getElementById('welcomeScreen').style.display = 'none';
-  document.getElementById('sidebar').style.display = 'flex';
 
-  const meta  = G.metadata || {};
-  const df    = G.artifacts?.digital_footprint || {};
-  const art   = G.artifacts || {};
+  const arts = G.artifacts || {};
+  const df = arts.digital_footprint || {};
 
-  document.getElementById('scanMeta').style.display  = 'flex';
-  document.getElementById('scanTime').textContent    = meta.scan_timestamp || '';
-  document.getElementById('modeBadge').textContent   = 'FULL SCAN';
+  /* topbar meta */
+  document.getElementById('scanMeta').style.display = 'flex';
+  const host = df.os_info?.name || G.metadata?.tool_name || 'Target Machine';
+  document.getElementById('scanHost').textContent = host.slice(0, 30);
+  const ts = G.metadata?.scan_timestamp || 'Just Now';
+  document.getElementById('scanTime').textContent = ts ? '· ' + ts : '';
 
-  const counts = {
-    processes:   (art.processes || []).length,
-    memory:      (df.injected_memory || []).length,
-    clipboard:   (df.clipboard_triage || []).length,
-    network:     (df.network_connections || []).length,
-    dns:         (df.dns_cache || []).length,
-    arp:         (df.arp_entries || []).length,
-    firewall:    (df.firewall_rules || []).length,
-    persistence: (art.persistence || []).length,
-    tasks:       (df.scheduled_tasks || []).length,
-    systemfiles: (df.system_files || []).length,
-    services:    (art.services_and_drivers || []).length,
-    prefetch:    (df.prefetch_files || []).length,
-    browser:     (df.browser_history || []).length,
-    extensions:  (df.browser_extensions || []).length,
-    eventlogs:   (df.event_logs || []).length,
-    rdp:         (df.rdp_sessions || []).length,
-    usb:         (df.usb_history || []).length,
-    lkm:         (df.linux_modules || []).length,
-    ssh:         (df.ssh_keys || []).length,
-    packages:    (df.installed_packages || []).length,
-    procfds:     (df.process_open_files || []).length,
-    procenvs:    (df.process_environments || []).length,
-    proccreds:   (df.process_credentials || []).length,
-    proccgroups: (df.process_cgroups || []).length,
-    systemd:     (df.systemd_units || []).length
-  };
-  
-  for (const [k,v] of Object.entries(counts)) {
-    const el = document.getElementById('cnt-'+k);
-    if (el) el.textContent = v; // Убрали || '—', теперь всегда показывает цифру (даже 0)
+  buildSidebar();
+  showSection('dashboard');
+}
+
+/* ═══════════════════════════ SIDEBAR BUILD ═══════════════════════════ */
+function buildSidebar() {
+  const container = document.getElementById('sidebarInner');
+  container.innerHTML = '';
+
+  for (const group of NAV) {
+    const groupEl = document.createElement('div');
+    groupEl.className = 'nav-group';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'nav-group-lbl';
+    lbl.textContent = group.group;
+    groupEl.appendChild(lbl);
+
+    for (const item of group.items) {
+      const count = item.id === 'dashboard' ? null : getSectionData(item.id).length;
+      const el = document.createElement('div');
+      el.className = 'nav-item';
+      el.dataset.section = item.id;
+      el.dataset.label = (item.label + ' ' + item.id).toLowerCase();
+
+      if (count !== null && count > 0) el.classList.add('has-data');
+      if (item.threat && count > 0) el.classList.add('threat-item');
+
+      el.innerHTML = `
+        <span class="ni-icon">${item.icon}</span>
+        <span class="ni-label">${item.label}</span>
+        ${count !== null ? `<span class="ni-count">${count}</span>` : ''}
+      `;
+      el.addEventListener('click', () => showSection(item.id));
+      groupEl.appendChild(el);
+    }
+    container.appendChild(groupEl);
   }
 
-  showSection('dashboard', document.querySelector('[data-section="dashboard"]'));
+  /* nav filter */
+  document.getElementById('navSearch').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('.nav-item[data-label]').forEach(el => {
+      el.style.display = el.dataset.label.includes(q) ? '' : 'none';
+    });
+    document.querySelectorAll('.nav-group-lbl').forEach(lbl => {
+      const visible = [...lbl.parentElement.querySelectorAll('.nav-item')].some(el => el.style.display !== 'none');
+      lbl.style.display = visible ? '' : 'none';
+    });
+  });
 }
 
-function showSection(name, el) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (el) el.classList.add('active');
-  if (!G) return;
-
-  const df  = G.artifacts?.digital_footprint || {};
-  const art = G.artifacts || {};
+/* ═══════════════════════════ SHOW SECTION ═══════════════════════════ */
+function showSection(id) {
+  currentSection = id;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.section === id));
   const content = document.getElementById('content');
 
-  const renderers = {
-    dashboard:   () => renderDashboard(df, art),
-    processes:   () => renderProcesses(art.processes || []),
-    memory:      () => renderMemory(df.injected_memory || []),
-    clipboard:   () => renderClipboard(df.clipboard_triage || []),
-    network:     () => renderNetwork(df.network_connections || []),
-    dns:         () => renderDNS(df.dns_cache || []),
-    arp:         () => renderARP(df.arp_entries || []),
-    firewall:    () => renderFirewall(df.firewall_rules || []),
-    persistence: () => renderPersistence(art.persistence || []),
-    tasks:       () => renderScheduledTasks(df.scheduled_tasks || []),
-    systemfiles: () => renderSystemFiles(df.system_files || []),
-    services:    () => renderServices(art.services_and_drivers || []),
-    prefetch:    () => renderPrefetch(df.prefetch_files || []),
-    browser:     () => renderBrowser(df.browser_history || []),
-    extensions:  () => renderExtensions(df.browser_extensions || []),
-    eventlogs:   () => renderEventLogs(df.event_logs || []),
-    rdp:         () => renderRDP(df.rdp_sessions || []),
-    usb:         () => renderUSB(df.usb_history || []),
-    lkm:         () => renderLKM(df.linux_modules || []),
-    ssh:         () => renderSSH(df.ssh_keys || []),
-    packages:    () => renderPackages(df.installed_packages || []),
-    procfds:     () => renderProcessFDs(df.process_open_files || []),
-    procenvs:    () => renderProcessEnvs(df.process_environments || []),
-    proccreds:   () => renderProcessCreds(df.process_credentials || []),
-    proccgroups: () => renderProcessCgroups(df.process_cgroups || []),
-    systemd:     () => renderSystemd(df.systemd_units || [])
+  const renders = {
+    dashboard:   renderDashboard,
+    processes:   () => renderProcesses(getSectionData('processes')),
+    memory:      () => renderInjectedMemory(getSectionData('memory')),
+    clipboard:   () => renderClipboard(getSectionData('clipboard')),
+    network:     () => renderNetwork(getSectionData('network')),
+    dns:         () => renderDNS(getSectionData('dns')),
+    arp:         () => renderARP(getSectionData('arp')),
+    firewall:    () => renderFirewall(getSectionData('firewall')),
+    bluetooth:   () => renderBluetooth(getSectionData('bluetooth')),
+    hosts:       () => renderHosts(getSectionData('hosts')),
+    persistence: () => renderPersistence(getSectionData('persistence')),
+    services:    () => renderServices(getSectionData('services')),
+    tasks:       () => renderTasks(getSectionData('tasks')),
+    systemfiles: () => renderSystemFiles(getSectionData('systemfiles')),
+    prefetch:    () => renderPrefetch(getSectionData('prefetch')),
+    useractivity:() => renderUserActivity(getSectionData('useractivity')),
+    browser:     () => renderBrowserHistory(getSectionData('browser')),
+    extensions:  () => renderExtensions(getSectionData('extensions')),
+    eventlogs:   () => renderEventLogs(getSectionData('eventlogs')),
+    rdp:         () => renderRDP(getSectionData('rdp')),
+    usb:         () => renderUSB(getSectionData('usb')),
+    lkm:         () => renderLKM(getSectionData('lkm')),
+    procfds:     () => renderProcFDs(getSectionData('procfds')),
+    procenvs:    () => renderProcEnvs(getSectionData('procenvs')),
+    proccreds:   () => renderProcCreds(getSectionData('proccreds')),
+    proccgroups: () => renderProcCgroups(getSectionData('proccgroups')),
+    systemd:     () => renderSystemd(getSectionData('systemd')),
+    ssh:         () => renderSSH(getSectionData('ssh')),
+    packages:    () => renderPackages(getSectionData('packages')),
   };
 
-  content.innerHTML = (renderers[name] || (() => '<div class="empty">Section not found</div>'))();
+  content.innerHTML = (renders[id] ? renders[id]() : '<div class="empty-state"><div>Section not found</div></div>');
+  content.scrollTop = 0;
+  initSortHandlers();
 }
 
-function renderDashboard(df, art) {
-  const procs    = art.processes || [];
-  const memory   = df.injected_memory || [];
-  const events   = df.event_logs || [];
-  const netConns = df.network_connections || [];
-  const threatLevel = memory.length > 0 ? 'threat' : events.length > 0 ? 'warn' : 'ok';
-  const threatLabel = memory.length > 0 ? '⚠ HIGH RISK' : events.length > 0 ? 'MEDIUM' : 'CLEAN';
-
+/* ═══════════════════════════ TABLE HELPERS ═══════════════════════════ */
+function makeTable(id, cols, rows) {
+  if (!rows.length) {
+    return `<div class="section-empty"><div class="empty-state"><div class="empty-state-icon">📭</div><div>0 records found for this artifact.</div></div></div>`;
+  }
+  const ths = cols.map((c, i) =>
+    `<th data-col="${i}" data-id="${id}">${c} <span class="sort-icon">↕</span></th>`
+  ).join('');
+  const trs = rows.join('');
   return `
-<div class="kpi-grid">
-  <div class="kpi-card ${threatLevel}">
-    <div class="kpi-label">Threat Level</div>
-    <div class="kpi-value">${threatLabel}</div>
-    <div class="kpi-sub">${memory.length} memory anomalies</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-label">Active Processes</div>
-    <div class="kpi-value">${procs.length}</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-label">Network Connections</div>
-    <div class="kpi-value">${netConns.length}</div>
-  </div>
-</div>
-<div class="info-grid">
-  <div class="info-card">
-    <h3>System Identity</h3>
-    <div class="info-row"><span class="k">OS</span><span class="v">${df.os_info?.name || '—'}</span></div>
-    <div class="info-row"><span class="k">Boot Time</span><span class="v">${df.os_info?.boot_time || '—'}</span></div>
-    <div class="info-row"><span class="k">CPU</span><span class="v">${df.hw_info?.cpuName || '—'}</span></div>
-  </div>
-  <div class="info-card">
-    <h3>Location &amp; Anonymity</h3>
-    <div class="info-row"><span class="k">Source</span><span class="v">${df.location?.source || '—'}</span></div>
-    <div class="info-row"><span class="k">VPN Active</span><span class="v">${df.anonymity?.isVpnActive ? pill('YES','red') : pill('NO','green')}</span></div>
-  </div>
-</div>`;
-}
-
-function pill(text, color) { return `<span class="pill ${color}">${esc(String(text))}</span>`; }
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function makeTable(headers, rows, sectionId) {
-  if (!rows.length) return `<div class="empty"><p>0 records found for this artifact.</p></div>`;
-  return `
-<div class="table-wrap">
-  <div class="table-scroll">
-    <table class="ffte-table">
-      <thead><tr>${headers.map(h=>`<th class="sortable">${h}</th>`).join('')}</tr></thead>
-      <tbody id="tbody-${sectionId}">${rows.join('')}</tbody>
+<div class="tbl-wrap">
+  <div class="tbl-scroll">
+    <table class="ffte-tbl" id="tbl-${id}">
+      <thead><tr>${ths}</tr></thead>
+      <tbody id="tbody-${id}">${trs}</tbody>
     </table>
   </div>
+  <div class="tbl-footer">
+    <span id="tbl-count-${id}">${rows.length} record${rows.length !== 1 ? 's' : ''}</span>
+    <button class="export-btn" onclick="exportCSV('${id}')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v9M4 8l4 4 4-4"/><path d="M2 13h12"/></svg>
+      Export CSV
+    </button>
+  </div>
 </div>`;
 }
 
-function sectionWrap(title, icon, count, tableHtml, searchId) {
+function sectionShell(title, icon, count, searchId, inner) {
+  const searchHtml = searchId ? `
+    <div class="filter-row">
+      <div class="search-input">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="4.5"/><path d="m11 11 2.5 2.5"/></svg>
+        <input type="text" placeholder="Search…" oninput="filterTable('${searchId}',this.value)" aria-label="Filter table">
+      </div>
+    </div>` : '';
   return `
-<div class="section-header">
+<div class="section-bar">
   <div class="section-title">${icon} ${title}</div>
-  <span class="section-count">${count}</span>
+  <span class="section-badge">${count}</span>
+  ${searchHtml}
 </div>
-${tableHtml}`;
+${inner}`;
 }
 
+function filterTable(id, q) {
+  const tbody = document.getElementById('tbody-' + id);
+  if (!tbody) return;
+  const term = q.toLowerCase();
+  let vis = 0;
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const match = tr.textContent.toLowerCase().includes(term);
+    tr.style.display = match ? '' : 'none';
+    if (match) vis++;
+  });
+  const c = document.getElementById('tbl-count-' + id);
+  if (c) c.textContent = `${vis} record${vis !== 1 ? 's' : ''}`;
+}
+
+function initSortHandlers() {
+  document.querySelectorAll('.ffte-tbl thead th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = parseInt(th.dataset.col);
+      const id  = th.dataset.id;
+      if (!sortState[id]) sortState[id] = { col: -1, dir: 'asc' };
+      const s = sortState[id];
+      if (s.col === col) s.dir = s.dir === 'asc' ? 'desc' : 'asc';
+      else { s.col = col; s.dir = 'asc'; }
+
+      const tbody = document.getElementById('tbody-' + id);
+      if (!tbody) return;
+      const rows = [...tbody.querySelectorAll('tr')];
+      rows.sort((a, b) => {
+        const ta = a.cells[col]?.textContent.trim() || '';
+        const tb = b.cells[col]?.textContent.trim() || '';
+        const n = parseFloat(ta) - parseFloat(tb);
+        const cmp = isNaN(n) ? ta.localeCompare(tb) : n;
+        return s.dir === 'asc' ? cmp : -cmp;
+      });
+      rows.forEach(r => tbody.appendChild(r));
+
+      document.querySelectorAll(`th[data-id="${id}"]`).forEach((h, i) => {
+        h.classList.toggle('sorted', i === col);
+        const icon = h.querySelector('.sort-icon');
+        if (icon) icon.textContent = i === col ? (s.dir === 'asc' ? '↑' : '↓') : '↕';
+      });
+    });
+  });
+}
+
+/* ═══════════════════════════ CSV EXPORT ═══════════════════════════ */
+function exportCSV(id) {
+  const tbl = document.getElementById('tbl-' + id);
+  if (!tbl) return;
+  const rows = [];
+  const headers = [...tbl.querySelectorAll('thead th')].map(th => `"${th.textContent.replace(/[↕↑↓]/g,'').trim()}"`);
+  rows.push(headers.join(','));
+  tbl.querySelectorAll('tbody tr').forEach(tr => {
+    if (tr.style.display === 'none') return;
+    const cells = [...tr.cells].map(td => `"${td.textContent.replace(/"/g,'""').trim()}"`);
+    rows.push(cells.join(','));
+  });
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ffte_${id}_${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ═══════════════════════════ RENDERERS ═══════════════════════════ */
+
+/* ── DASHBOARD ── */
+function renderDashboard() {
+  const arts     = G.artifacts || {};
+  const df       = arts.digital_footprint || {};
+  
+  const memory   = df.injected_memory || [];
+  const events   = df.event_logs || [];
+  const persist  = arts.persistence || [];
+  const procs    = arts.processes || [];
+  const net      = df.network_connections || [];
+  const lkm      = df.linux_modules || [];
+
+  const threatHigh = memory.length > 0 || lkm.length > 0;
+  const threatMed  = events.length > 0 || persist.length > 0;
+  const threatClass = threatHigh ? 'danger' : threatMed ? 'warn' : 'ok';
+  const threatLabel = threatHigh ? '⚠ HIGH RISK' : threatMed ? '⚡ MEDIUM' : '✓ CLEAN';
+  const threatMsg   = threatHigh
+    ? `${memory.length} memory injection(s) detected`
+    : threatMed
+      ? `${events.length} event(s), ${persist.length} persistence entries`
+      : 'No critical anomalies found';
+
+  const vpn = df.anonymity?.isVpnActive ? '<span class="pill orange">VPN ACTIVE</span>' : '';
+  const proxy = df.anonymity?.isProxyActive ? '<span class="pill yellow">PROXY ACTIVE</span>' : '';
+
+  const alert = `<div class="alert-banner ${threatClass}">
+    <span class="alert-banner-icon">${threatHigh ? '🔴' : threatMed ? '🟡' : '🟢'}</span>
+    <div class="alert-banner-text"><strong>${threatLabel}</strong><span>${threatMsg}</span></div>
+    ${vpn}${proxy}
+  </div>`;
+
+  const kpis = `<div class="kpi-grid">
+    <div class="kpi ${threatClass}">
+      <div class="kpi-icon">${threatHigh ? '⚠' : '🛡'}</div>
+      <div class="kpi-val">${threatLabel}</div>
+      <div class="kpi-label">Threat Level</div>
+      <div class="kpi-sub">${threatMsg}</div>
+    </div>
+    <div class="kpi ${procs.length > 0 ? 'info' : ''}">
+      <div class="kpi-icon">⚙</div>
+      <div class="kpi-val">${procs.length}</div>
+      <div class="kpi-label">Processes</div>
+      <div class="kpi-sub">${procs.filter(p=>p.isElevated).length} elevated</div>
+    </div>
+    <div class="kpi ${net.length > 0 ? 'info' : ''}">
+      <div class="kpi-icon">⇆</div>
+      <div class="kpi-val">${net.length}</div>
+      <div class="kpi-label">Net Connections</div>
+      <div class="kpi-sub">${net.filter(c=>c.state==='ESTABLISHED').length} established</div>
+    </div>
+    <div class="kpi ${memory.length > 0 ? 'danger' : ''}">
+      <div class="kpi-icon">⚡</div>
+      <div class="kpi-val">${memory.length}</div>
+      <div class="kpi-label">Injected Memory</div>
+      <div class="kpi-sub">RWX anomalies</div>
+    </div>
+    <div class="kpi ${persist.length > 0 ? 'warn' : ''}">
+      <div class="kpi-icon">🔁</div>
+      <div class="kpi-val">${persist.length}</div>
+      <div class="kpi-label">Persistence</div>
+      <div class="kpi-sub">Autorun entries</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon">🌍</div>
+      <div class="kpi-val">${(df.browser_history||[]).length}</div>
+      <div class="kpi-label">Browser History</div>
+      <div class="kpi-sub">URLs collected</div>
+    </div>
+  </div>`;
+
+  const os = df.os_info || {};
+  const hw = df.hw_info || {};
+  const loc = df.location || {};
+  const anon = df.anonymity || {};
+
+  const info = `<div class="info-grid">
+    <div class="card">
+      <div class="card-title">🖥 System Identity</div>
+      <div class="row"><span class="row-k">OS</span><span class="row-v">${na(os.name)}</span></div>
+      <div class="row"><span class="row-k">Install Date</span><span class="row-v">${na(os.install_date)}</span></div>
+      <div class="row"><span class="row-k">Boot Time</span><span class="row-v">${na(os.boot_time)}</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">💻 Hardware</div>
+      <div class="row"><span class="row-k">CPU</span><span class="row-v">${na(hw.cpuName)}</span></div>
+      <div class="row"><span class="row-k">GPU</span><span class="row-v">${na(hw.gpuName)}</span></div>
+      <div class="row"><span class="row-k">RAM</span><span class="row-v">${na(hw.totalRamGB)}</span></div>
+      <div class="row"><span class="row-k">Board Serial</span><span class="row-v">${na(hw.motherboardSerial)}</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📍 Location &amp; Anonymity</div>
+      <div class="row"><span class="row-k">Source</span><span class="row-v">${na(loc.source)}</span></div>
+      <div class="row"><span class="row-k">Lat / Lon</span><span class="row-v">${loc.latitude ? loc.latitude + ' / ' + loc.longitude : '—'}</span></div>
+      <div class="row"><span class="row-k">VPN Active</span><span class="row-v">${bool(anon.isVpnActive)}</span></div>
+      <div class="row"><span class="row-k">Proxy Active</span><span class="row-v">${bool(anon.isProxyActive)}</span></div>
+      <div class="row"><span class="row-k">Adapters</span><span class="row-v">${na(anon.activeAdapters)}</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Artifact Counts</div>
+      ${[
+        ['Processes', procs.length],
+        ['Net Connections', net.length],
+        ['DNS Cache', (df.dns_cache||[]).length],
+        ['Browser History', (df.browser_history||[]).length],
+        ['Persistence', persist.length],
+        ['Event Logs', events.length],
+        ['USB Devices', (df.usb_history||[]).length],
+        ['Linux Modules', lkm.length],
+        ['Packages', (df.installed_packages||[]).length],
+      ].map(([k,v]) => `<div class="row"><span class="row-k">${k}</span><span class="row-v">${v}</span></div>`).join('')}
+    </div>
+  </div>`;
+
+  return alert + kpis + info;
+}
+
+/* ── PROCESSES ── */
 function renderProcesses(data) {
-  const rows = data.map(p => `<tr><td>${p.pid}</td><td>${p.ppid}</td><td><b>${esc(p.name)}</b></td><td>${esc(p.exePath || '—')}</td></tr>`);
-  return sectionWrap('Processes', '⚙', data.length, makeTable(['PID','PPID','Name','Path'], rows, 'processes'), 'processes');
+  const rows = data.map(p => `<tr>
+    <td class="col-nowrap" style="font-weight:600">${esc(p.pid)}</td>
+    <td class="col-dim">${esc(p.ppid)}</td>
+    <td style="font-weight:600">${esc(p.name)}</td>
+    <td class="col-dim">${na(p.exePath)}</td>
+    <td class="col-nowrap">${p.memoryKB ? (p.memoryKB/1024).toFixed(1)+' MB' : '—'}</td>
+    <td>${p.isElevated !== undefined ? bool(p.isElevated) : '—'}</td>
+    <td>${p.isSignatureValid !== undefined ? signatureStatus(p.isSignatureValid) : '—'}</td>
+  </tr>`);
+  return sectionShell('Processes', '⚙', data.length, 'processes',
+    makeTable('processes', ['PID','PPID','Name','Exe Path','Memory','Elevated','Signature'], rows));
 }
-function renderMemory(data) {
-  const rows = data.map(m => `<tr><td>${esc(m.pid)}</td><td><b>${esc(m.processName)}</b></td><td>${esc(m.memoryAddress)}</td><td>${pill(m.protection,'red')}</td></tr>`);
-  return sectionWrap('Injected Memory', '🔴', data.length, makeTable(['PID','Process','Address','Protection'], rows, 'memory'), 'memory');
+
+/* ── INJECTED MEMORY ── */
+function renderInjectedMemory(data) {
+  const alert = data.length ? `<div class="alert-banner danger mb-4">
+    <span class="alert-banner-icon">🔴</span>
+    <div class="alert-banner-text"><strong>Memory Injection Detected</strong><span>${data.length} process(es) with suspicious RWX memory regions</span></div>
+  </div>` : '';
+  const rows = data.map(m => `<tr>
+    <td class="col-nowrap" style="font-weight:600">${esc(m.pid)}</td>
+    <td style="font-weight:600">${esc(m.processName)}</td>
+    <td style="font-family:var(--font-mono)">${esc(m.memoryAddress)}</td>
+    <td>${protectionBadge(m.protection)}</td>
+  </tr>`);
+  return alert + sectionShell('Injected Memory (RWX Scanner)', '⚠', data.length, 'memory',
+    makeTable('memory', ['PID','Process Name','Memory Address','Protection'], rows));
 }
+
+/* ── CLIPBOARD ── */
 function renderClipboard(data) {
-  const rows = data.map(c => `<tr><td>${pill(c.format,'cyan')}</td><td>${esc(c.sizeBytes)}</td><td>${esc(c.content)}</td></tr>`);
-  return sectionWrap('Clipboard Triage', '📋', data.length, makeTable(['Format','Size','Content'], rows, 'clipboard'), null);
+  const rows = data.map(c => `<tr>
+    <td class="col-nowrap">${pill(c.format || '?', 'cyan')}</td>
+    <td class="col-dim">${na(c.sizeBytes)}</td>
+    <td>${codeBlock(c.content, 5)}</td>
+  </tr>`);
+  return sectionShell('Clipboard Data', '📋', data.length, null,
+    makeTable('clipboard', ['Format','Size (bytes)','Content'], rows));
 }
+
+/* ── NETWORK ── */
 function renderNetwork(data) {
-  const rows = data.map(c => `<tr><td>${pill(c.protocol,'blue')}</td><td>${esc(c.localIp)}:${esc(c.localPort)}</td><td>${esc(c.remoteIp)}:${esc(c.remotePort)}</td><td>${esc(c.state)}</td></tr>`);
-  return sectionWrap('Network Connections', '🌐', data.length, makeTable(['Protocol','Local','Remote','State'], rows, 'network'), 'network');
+  const rows = data.map(c => `<tr>
+    <td class="col-nowrap">${pill(c.protocol || '?', 'blue')}</td>
+    <td class="col-nowrap">${esc(c.localIp)}:${esc(c.localPort)}</td>
+    <td class="col-nowrap">${esc(c.remoteIp)}:${esc(c.remotePort)}</td>
+    <td>${netState(c.state)}</td>
+  </tr>`);
+  return sectionShell('Network Connections', '⇆', data.length, 'network',
+    makeTable('network', ['Protocol','Local','Remote','State'], rows));
 }
+
+/* ── DNS ── */
 function renderDNS(data) {
-  const rows = data.map(d => `<tr><td><b>${esc(d.recordName)}</b></td><td>${esc(d.data)}</td></tr>`);
-  return sectionWrap('DNS Cache', '🔍', data.length, makeTable(['Record','Data'], rows, 'dns'), 'dns');
+  const rows = data.map(d => `<tr>
+    <td style="font-weight:600">${esc(d.recordName)}</td>
+    <td class="col-dim">${na(d.recordType)}</td>
+    <td>${esc(d.data)}</td>
+  </tr>`);
+  return sectionShell('DNS Cache', '🔍', data.length, 'dns',
+    makeTable('dns', ['Record Name','Type','Data'], rows));
 }
+
+/* ── ARP ── */
 function renderARP(data) {
-  const rows = data.map(a => `<tr><td>${esc(a.ipAddress)}</td><td>${esc(a.macAddress)}</td><td>${esc(a.type)}</td></tr>`);
-  return sectionWrap('ARP Table', '🔗', data.length, makeTable(['IP','MAC','Type'], rows, 'arp'), 'arp');
+  const rows = data.map(a => `<tr>
+    <td>${esc(a.ipAddress)}</td>
+    <td>${esc(a.macAddress)}</td>
+    <td>${pill(a.type || '?', 'gray')}</td>
+  </tr>`);
+  return sectionShell('ARP Table', '🔗', data.length, 'arp',
+    makeTable('arp', ['IP Address','MAC Address','Type'], rows));
 }
+
+/* ── FIREWALL ── */
 function renderFirewall(data) {
-  const rows = data.map(f => `<tr><td><b>${esc(f.ruleName)}</b></td><td>${esc(f.ruleData)}</td></tr>`);
-  return sectionWrap('Firewall Rules', '🛡', data.length, makeTable(['Name','Data'], rows, 'firewall'), 'firewall');
+  const rows = data.map(f => `<tr>
+    <td style="font-weight:600">${esc(f.ruleName)}</td>
+    <td class="col-dim">${esc(f.ruleData)}</td>
+  </tr>`);
+  return sectionShell('Firewall Rules', '🛡', data.length, 'firewall',
+    makeTable('firewall', ['Rule Name','Rule Data'], rows));
 }
+
+/* ── BLUETOOTH ── */
+function renderBluetooth(data) {
+  const rows = data.map(b => `<tr>
+    <td style="font-weight:600">${esc(b.name)}</td>
+    <td>${esc(b.macAddress)}</td>
+  </tr>`);
+  return sectionShell('Bluetooth Devices', '📶', data.length, 'bluetooth',
+    makeTable('bluetooth', ['Device Name','MAC Address'], rows));
+}
+
+/* ── HOSTS ── */
+function renderHosts(data) {
+  const rows = data.map(line => `<tr><td>${esc(line.fileName || line)}</td></tr>`);
+  return sectionShell('Hosts File', '🌐', data.length, null,
+    makeTable('hosts', ['Entry'], rows));
+}
+
+/* ── PERSISTENCE ── */
 function renderPersistence(data) {
-  const rows = data.map(p => `<tr><td>${pill(p.type,'orange')}</td><td>${esc(p.trigger)}</td><td><b>${esc(p.name)}</b></td><td>${esc(p.imagePath)}</td></tr>`);
-  return sectionWrap('Persistence', '⚠', data.length, makeTable(['Type','Trigger','Name','Path'], rows, 'persistence'), 'persistence');
+  const alert = data.length ? `<div class="alert-banner warn mb-4">
+    <span class="alert-banner-icon">🔁</span>
+    <div class="alert-banner-text"><strong>Persistence Entries Found</strong><span>${data.length} autorun/registry entries detected</span></div>
+  </div>` : '';
+  const rows = data.map(p => `<tr>
+    <td class="col-nowrap">${pill(p.type || '?', p.type === 'ScheduledTask' ? 'orange' : 'yellow')}</td>
+    <td style="font-weight:600">${esc(p.name)}</td>
+    <td class="col-dim">${esc(p.trigger)}</td>
+    <td>${esc(p.imagePath)}</td>
+  </tr>`);
+  return alert + sectionShell('Autorun / Registry Persistence', '🔁', data.length, 'persistence',
+    makeTable('persistence', ['Type','Name','Trigger','Image Path'], rows));
 }
-function renderScheduledTasks(data) {
-  const rows = data.map(t => `<tr><td><b>${esc(t.filePath)}</b></td><td>${esc(t.taskLine)}</td></tr>`);
-  return sectionWrap('Tasks', '⏱', data.length, makeTable(['File/Key', 'Details'], rows, 'tasks'), 'tasks');
-}
-function renderSystemFiles(data) {
-  const rows = data.map(s => `<tr><td><b>${esc(s.fileName)}</b></td><td>${esc(s.sizeMB)}</td><td>${esc(s.notes)}</td></tr>`);
-  return sectionWrap('System Files', '🗄', data.length, makeTable(['Name', 'Size', 'Notes'], rows, 'sys'), 'systemfiles');
-}
+
+/* ── SERVICES ── */
 function renderServices(data) {
-  const rows = data.map(s => `<tr><td><b>${esc(s.name)}</b></td><td>${esc(s.displayName)}</td><td>${esc(s.imagePath)}</td></tr>`);
-  return sectionWrap('Services & Drivers', '⚙', data.length, makeTable(['Name','Display Name','Path'], rows, 'svc'), 'services');
+  const rows = data.map(s => `<tr>
+    <td style="font-weight:600">${esc(s.name)}</td>
+    <td class="col-dim">${na(s.displayName)}</td>
+    <td>${na(s.imagePath)}</td>
+  </tr>`);
+  return sectionShell('Services & Drivers', '⚙', data.length, 'services',
+    makeTable('services', ['Name','Display Name','Image Path'], rows));
 }
+
+/* ── TASKS ── */
+function renderTasks(data) {
+  const rows = data.map(t => `<tr>
+    <td style="font-weight:600">${esc(t.filePath)}</td>
+    <td class="col-dim">${esc(t.taskLine)}</td>
+  </tr>`);
+  return sectionShell('Scheduled / Cron Tasks', '⏱', data.length, 'tasks',
+    makeTable('tasks', ['File / Key','Task Line'], rows));
+}
+
+/* ── SYSTEM FILES ── */
+function renderSystemFiles(data) {
+  const rows = data.map(s => `<tr>
+    <td style="font-weight:600">${esc(s.fileName)}</td>
+    <td class="col-dim">${na(s.sizeMB)}</td>
+    <td>${na(s.notes)}</td>
+  </tr>`);
+  return sectionShell('System Files', '🗄', data.length, 'systemfiles',
+    makeTable('systemfiles', ['File Name','Size (MB)','Notes'], rows));
+}
+
+/* ── SYSTEM PREFETCH ── */
 function renderPrefetch(data) {
-  const rows = data.map(p => `<tr><td><b>${esc(p.executableName)}</b></td><td>${esc(p.prefetchFileName)}</td><td>${esc(p.lastRunTime)}</td></tr>`);
-  return sectionWrap('Prefetch', '📄', data.length, makeTable(['Exe','File','Run Time'], rows, 'prefetch'), 'prefetch');
+  const rows = data.map(p => `<tr>
+    <td style="font-weight:600">${esc(p.executableName)}</td>
+    <td class="col-dim">${esc(p.prefetchFileName)}</td>
+    <td class="col-dim">${na(p.lastRunTime)}</td>
+  </tr>`);
+  return sectionShell('Prefetch Files', '📄', data.length, 'prefetch',
+    makeTable('prefetch', ['Executable','Prefetch File','Last Run Time'], rows));
 }
-function renderBrowser(data) {
-  const rows = data.map(b => `<tr><td>${pill(b.browser,'blue')}</td><td><a href="${esc(b.url)}">${esc(b.title||b.url)}</a></td><td>${esc(b.lastVisitTime)}</td></tr>`);
-  return sectionWrap('Browser History', '🌍', data.length, makeTable(['Browser','URL','Time'], rows, 'browser'), 'browser');
+
+/* ── USER ACTIVITY ── */
+function renderUserActivity(data) {
+  const rows = data.map(u => `<tr>
+    <td style="font-weight:600">${esc(u.programPath)}</td>
+    <td class="col-nowrap">${na(u.runCount)}</td>
+    <td class="col-nowrap">${u.totalActiveMinutes ? u.totalActiveMinutes + ' min' : '—'}</td>
+  </tr>`);
+  return sectionShell('User Activity (SRUM)', '📊', data.length, 'useractivity',
+    makeTable('useractivity', ['Program Path','Run Count','Active Time'], rows));
 }
+
+/* ── BROWSER HISTORY ── */
+function renderBrowserHistory(data) {
+  const rows = data.map(b => {
+    const bcolor = {Firefox:'orange',MozillaFirefox:'orange',Chrome:'green',Edge:'blue',Other:'gray'}[b.browser] || 'gray';
+    const urlEsc = esc(b.url || '');
+    const titleEsc = esc(b.title || b.url || '');
+    return `<tr>
+      <td class="col-nowrap">${pill(b.browser || '?', bcolor)}</td>
+      <td style="max-width:320px"><a href="${urlEsc}" target="_blank" rel="noopener noreferrer" title="${urlEsc}">${titleEsc}</a></td>
+      <td class="col-nowrap col-dim">${na(b.visitCount)}</td>
+      <td class="col-nowrap col-dim">${na(b.lastVisitTime)}</td>
+    </tr>`;
+  });
+  return sectionShell('Browser History', '🌍', data.length, 'browser',
+    makeTable('browser', ['Browser','Title / URL','Visits','Last Visit'], rows));
+}
+
+/* ── BROWSER EXTENSIONS ── */
 function renderExtensions(data) {
-  const rows = data.map(e => `<tr><td>${esc(e.browser)}</td><td>${esc(e.extensionId)}</td><td>${esc(e.updateUrl)}</td></tr>`);
-  return sectionWrap('Browser Extensions', '🧩', data.length, makeTable(['Browser','ID','Update URL'], rows, 'ext'), 'extensions');
+  const rows = data.map(e => `<tr>
+    <td class="col-nowrap">${pill(e.browser || '?', 'blue')}</td>
+    <td style="font-weight:600">${esc(e.extensionId)}</td>
+    <td class="col-dim">${na(e.updateUrl)}</td>
+  </tr>`);
+  return sectionShell('Browser Extensions', '🧩', data.length, 'extensions',
+    makeTable('extensions', ['Browser','Extension ID','Update URL'], rows));
 }
+
+/* ── EVENT LOGS ── */
 function renderEventLogs(data) {
-  const rows = data.map(e => `<tr><td>${pill(e.eventId,'red')}</td><td>${esc(e.timestamp)}</td><td>${esc(e.details)}</td></tr>`);
-  return sectionWrap('Event Logs', '📋', data.length, makeTable(['ID','Time','Details'], rows, 'logs'), 'eventlogs');
+  const alert = data.length ? `<div class="alert-banner warn mb-4">
+    <span class="alert-banner-icon">⚡</span>
+    <div class="alert-banner-text"><strong>Security Events Detected</strong><span>Event ID 4625 (failed logon) brute-force detection</span></div>
+  </div>` : '';
+  const rows = data.map(e => `<tr>
+    <td class="col-nowrap">${pill(e.eventId, 'red')}</td>
+    <td class="col-nowrap col-dim">${na(e.timestamp)}</td>
+    <td>${na(e.details)}</td>
+  </tr>`);
+  return alert + sectionShell('Security Event Logs', '⚡', data.length, 'eventlogs',
+    makeTable('eventlogs', ['Event ID','Timestamp','Details'], rows));
 }
+
+/* ── RDP ── */
 function renderRDP(data) {
-  const rows = data.map(r => `<tr><td><b>${esc(r.targetHost)}</b></td><td>${esc(r.usernameHint)}</td></tr>`);
-  return sectionWrap('RDP', '🖥', data.length, makeTable(['Host','User'], rows, 'rdp'), 'rdp');
+  const rows = data.map(r => `<tr>
+    <td style="font-weight:600">${esc(r.targetHost)}</td>
+    <td class="col-dim">${na(r.usernameHint)}</td>
+  </tr>`);
+  return sectionShell('RDP Sessions', '🖥', data.length, 'rdp',
+    makeTable('rdp', ['Target Host','Username Hint'], rows));
 }
+
+/* ── USB ── */
 function renderUSB(data) {
-  const rows = data.map(u => `<tr><td>${esc(u.deviceInstanceId)}</td><td>${esc(u.friendlyName)}</td></tr>`);
-  return sectionWrap('USB', '🔌', data.length, makeTable(['ID','Name'], rows, 'usb'), 'usb');
+  const rows = data.map(u => `<tr>
+    <td class="col-dim" style="word-break:break-all">${esc(u.deviceInstanceId)}</td>
+    <td style="font-weight:600">${na(u.friendlyName)}</td>
+  </tr>`);
+  return sectionShell('USB Device History', '🔌', data.length, 'usb',
+    makeTable('usb', ['Device Instance ID','Friendly Name'], rows));
 }
+
+/* ── LKM ── */
 function renderLKM(data) {
-  const rows = data.map(m => `<tr><td><b>${esc(m.name)}</b></td><td>${esc(m.size)} bytes</td><td>${pill(m.state,'gray')}</td></tr>`);
-  return sectionWrap('Linux LKM', '🐧', data.length, makeTable(['Module','Size','State'], rows, 'lkm'), 'lkm');
+  const alert = data.length ? `<div class="alert-banner danger mb-4">
+    <span class="alert-banner-icon">🐧</span>
+    <div class="alert-banner-text"><strong>Linux Kernel Modules Enumerated</strong><span>Check for unknown/suspicious modules — potential rootkit indicators</span></div>
+  </div>` : '';
+  const rows = data.map(m => `<tr>
+    <td style="font-weight:600">${esc(m.name)}</td>
+    <td class="col-dim">${na(m.size)} bytes</td>
+    <td>${pill(m.state || '—', m.state === 'Live' || m.state === '-' ? 'green' : 'gray')}</td>
+  </tr>`);
+  return alert + sectionShell('Linux Kernel Modules (LKM)', '🐧', data.length, 'lkm',
+    makeTable('lkm', ['Module Name','Size','State'], rows));
 }
-function renderProcessFDs(data) {
-  const rows = data.map(d => `<tr><td class="nowrap"><b>${esc(d.pid)}</b></td><td style="width:100%"><div class="code-box">${esc((d.openFiles||'').replace(/;/g, ';\n'))}</div></td></tr>`);
-  return sectionWrap('Linux FDs', '📁', data.length, makeTable(['PID', 'Open Files'], rows, 'procfds'), 'procfds');
+
+/* ── PROC FDs ── */
+function renderProcFDs(data) {
+  const rows = data.map(d => `<tr>
+    <td class="col-nowrap" style="font-weight:600">${esc(d.pid)}</td>
+    <td>${codeBlock(d.openFiles, 8)}</td>
+  </tr>`);
+  return sectionShell('Open File Descriptors', '📁', data.length, null,
+    makeTable('procfds', ['PID','Open Files'], rows));
 }
-function renderProcessEnvs(data) {
-  const rows = data.map(d => `<tr><td class="nowrap"><b>${esc(d.pid)}</b></td><td style="width:100%"><div class="code-box">${esc((d.environment||d.envDump||'').replace(/\\0/g, '\n').replace(/ /g, '\n'))}</div></td></tr>`);
-  return sectionWrap('Linux Envs', '🌱', data.length, makeTable(['PID', 'Environments'], rows, 'procenvs'), 'procenvs');
+
+/* ── PROC ENVS ── */
+function renderProcEnvs(data) {
+  const rows = data.map(d => `<tr>
+    <td class="col-nowrap" style="font-weight:600">${esc(d.pid)}</td>
+    <td>${codeBlock(d.environment || d.envDump, 6)}</td>
+  </tr>`);
+  return sectionShell('Process Environments', '🌱', data.length, null,
+    makeTable('procenvs', ['PID','Environment'], rows));
 }
-function renderProcessCreds(data) {
-  const rows = data.map(d => `<tr><td class="nowrap"><b>${esc(d.pid)}</b></td><td><div class="code-box">${esc(d.uid_info)}</div></td><td><div class="code-box">${esc(d.gid_info)}</div></td></tr>`);
-  return sectionWrap('Linux Creds', '👤', data.length, makeTable(['PID', 'UID', 'GID'], rows, 'proccreds'), 'proccreds');
+
+/* ── PROC CREDS ── */
+function renderProcCreds(data) {
+  const rows = data.map(d => `<tr>
+    <td class="col-nowrap" style="font-weight:600">${esc(d.pid)}</td>
+    <td>${codeBlock(d.uid_info, 4)}</td>
+    <td>${codeBlock(d.gid_info, 4)}</td>
+  </tr>`);
+  return sectionShell('Process Credentials', '👤', data.length, null,
+    makeTable('proccreds', ['PID','UID Info','GID Info'], rows));
 }
-function renderProcessCgroups(data) {
-  const rows = data.map(d => `<tr><td class="nowrap"><b>${esc(d.pid)}</b></td><td style="width:100%"><div class="code-box">${esc(d.cgroup_paths||d.containerPath||'—')}</div></td></tr>`);
-  return sectionWrap('Control Groups', '📦', data.length, makeTable(['PID', 'CGroup Paths'], rows, 'proccgroups'), 'proccgroups');
+
+/* ── PROC CGROUPS ── */
+function renderProcCgroups(data) {
+  const rows = data.map(d => `<tr>
+    <td class="col-nowrap" style="font-weight:600">${esc(d.pid)}</td>
+    <td>${d.isContainerized ? pill('CONTAINERIZED','cyan') : pill('NATIVE','gray')}</td>
+    <td>${codeBlock(d.cgroup_paths || d.containerPath, 5)}</td>
+  </tr>`);
+  return sectionShell('Control Groups / Containers', '📦', data.length, null,
+    makeTable('proccgroups', ['PID','Status','CGroup Paths'], rows));
 }
+
+/* ── SYSTEMD ── */
 function renderSystemd(data) {
-  const rows = data.map(d => `<tr><td><b>${esc(d.name)}</b></td><td>${esc(d.state)}</td></tr>`);
-  return sectionWrap('Systemd', '⚙', data.length, makeTable(['Unit Name', 'State'], rows, 'systemd'), 'systemd');
+  const rows = data.map(d => `<tr>
+    <td style="font-weight:600">${esc(d.name)}</td>
+    <td>${pill(d.state || '?', d.state === 'enabled' || d.state === 'active' ? 'green' : 'gray')}</td>
+  </tr>`);
+  return sectionShell('Systemd Units', '⚙', data.length, 'systemd',
+    makeTable('systemd', ['Unit Name','State'], rows));
 }
+
+/* ── SSH KEYS ── */
 function renderSSH(data) {
-  const rows = data.map(k => `<tr><td>${esc(k.path)}</td><td style="width:100%"><div class="code-box">${esc(k.keyContent)}</div></td></tr>`);
-  return sectionWrap('SSH Keys', '🔑', data.length, makeTable(['Path','Key Content'], rows, 'ssh'), 'ssh');
+  const rows = data.map(k => `<tr>
+    <td class="col-dim" style="word-break:break-all">${esc(k.path)}</td>
+    <td>${codeBlock(k.keyContent, 6)}</td>
+  </tr>`);
+  return sectionShell('SSH Keys', '🔑', data.length, null,
+    makeTable('ssh', ['File Path','Key Content'], rows));
 }
+
+/* ── PACKAGES ── */
 function renderPackages(data) {
-  const rows = data.map(p => `<tr><td><b>${esc(p.name)}</b></td><td>${pill(p.version,'gray')}</td></tr>`);
-  return sectionWrap('Packages', '📦', data.length, makeTable(['Package','Version'], rows, 'packages'), 'packages');
+  const rows = data.map(p => `<tr>
+    <td style="font-weight:600">${esc(p.name)}</td>
+    <td>${pill(p.version || '?', 'gray')}</td>
+  </tr>`);
+  return sectionShell('Installed Packages', '📦', data.length, 'packages',
+    makeTable('packages', ['Package Name','Version'], rows));
 }
 </script>
 </body>

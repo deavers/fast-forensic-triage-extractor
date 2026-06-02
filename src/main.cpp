@@ -21,7 +21,7 @@ namespace ff
         #if defined(FF_PLATFORM_WINDOWS)
             return std::make_unique<windows::WinSystemScanner>(core::ScanMode::Elevated);
         #elif defined(FF_PLATFORM_LINUX)
-            return std::make_unique<linux::LinuxSystemScanner>(core::ScanMode::Elevated);
+            return std::make_unique<::ff::linux_os::LinuxSystemScanner>(core::ScanMode::Elevated);
         #else
             return nullptr;
         #endif
