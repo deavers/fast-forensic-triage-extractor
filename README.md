@@ -246,6 +246,9 @@ The report will be saved as forensics_report_windows.json in the current directo
 ### 🐧 Linux
 
 ```bash
+# From the build directory:
+cd build_linux
+
 # Make executable (first time only):
 chmod +x ./fastforensics
 
