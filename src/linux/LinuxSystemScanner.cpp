@@ -20,9 +20,9 @@ namespace ff::linux_os
     {
         models::DigitalFootprint footprint;
         
-        footprint.location.latitude = 49.8308;
-        footprint.location.longitude = 18.1625;
-        footprint.location.source = "Linux Pseudo-FS Forensic Triage (VSB-TUO Campus)";
+        footprint.location.latitude = 00.0000;
+        footprint.location.longitude = 00.0000;
+        footprint.location.source = "Linux Demo (No GPS)";
         
         footprint.anonymity.isProxyActive = false;
 

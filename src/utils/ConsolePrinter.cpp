@@ -39,10 +39,10 @@ namespace ff::utils
         std::cout << "  -> OS Install Date:  " << footprint.osInformation.installDate << "\n";
         std::cout << "  -> System Boot Time: " << footprint.osInformation.bootTime << "\n\n";
 
-        std::cout << "[Extracted GPS Location Triage]:\n";
-        std::cout << "  -> Latitude:  " << footprint.location.latitude << "\n";
-        std::cout << "  -> Longitude: " << footprint.location.longitude << "\n";
-        std::cout << "  -> Source:    " << footprint.location.source << "\n\n";
+        // std::cout << "[Extracted GPS Location Triage]:\n";
+        // std::cout << "  -> Latitude:  " << footprint.location.latitude << "\n";
+        // std::cout << "  -> Longitude: " << footprint.location.longitude << "\n";
+        // std::cout << "  -> Source:    " << footprint.location.source << "\n\n";
 
         if (!footprint.installedSoftware.empty()) 
         {

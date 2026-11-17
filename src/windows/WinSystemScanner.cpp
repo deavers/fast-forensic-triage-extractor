@@ -77,10 +77,9 @@ namespace ff::windows
             RegCloseKey(hProxyKey);
         }
 
-        // GPS: SIMULATION BASED ON OSTRAVA COORDINATES
-        footprint.location.latitude = 49.8308;
-        footprint.location.longitude = 18.1625;
-        footprint.location.source = "Forensic Wifi-Triangulation Triage (VSB-TUO Campus)";
+        footprint.location.latitude = 00.0000;
+        footprint.location.longitude = 00.0000;
+        footprint.location.source = "Windows Demo (No GPS)";
 
         // DIGITAL FORENSICS: PARSE USERASSIST (HISTORY + PROGRAM RUNTIME)
         HKEY hUserAssistKey;

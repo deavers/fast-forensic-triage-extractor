@@ -88,10 +88,10 @@ namespace ff::core
             {"cpuName", footprint.hw_info.cpuName}, {"gpuName", footprint.hw_info.gpuName},
             {"totalRamGB", footprint.hw_info.totalRamGB}, {"motherboardSerial", footprint.hw_info.motherboardSerial}
         };
-        report["artifacts"]["digital_footprint"]["location"] = 
-        {
-            {"latitude", footprint.location.latitude}, {"longitude", footprint.location.longitude}, {"source", footprint.location.source}
-        };
+        // report["artifacts"]["digital_footprint"]["location"] = 
+        // {
+        //     {"latitude", footprint.location.latitude}, {"longitude", footprint.location.longitude}, {"source", footprint.location.source}
+        // };
         report["artifacts"]["digital_footprint"]["anonymity"] = 
         {
             {"isProxyActive", footprint.anonymity.isProxyActive}, {"isVpnActive", footprint.anonymity.isVpnActive}, {"activeAdapters", footprint.anonymity.activeAdapters}
