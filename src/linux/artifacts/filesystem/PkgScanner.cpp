@@ -18,8 +18,7 @@ namespace ff::linux_os
             {
                 std::string line;
                 models::PkgInfo currentPkg;
-                int count = 0;
-
+                
                 while (std::getline(dpkgFile, line))
                 {
                     if (line.find("Package: ") == 0) 
@@ -35,9 +34,6 @@ namespace ff::linux_os
                             // Add the completed package info to the footprint
                             footprint.installedPackages.push_back(currentPkg);
                             currentPkg = models::PkgInfo(); // Reset for next package
-
-                            if (count++ > 50) 
-                                break; // Limiting for demo report
                         }
                     }
                 }
