@@ -5,7 +5,6 @@
 
 #if defined(FF_PLATFORM_WINDOWS)
     #include "windows/WinSystemScanner.h"
-    #include <windows.h>
 #elif defined(FF_PLATFORM_LINUX)
     #include "linux/LinuxSystemScanner.h"
 #endif
@@ -28,41 +27,8 @@ namespace ff
     }
 }
 
-#if defined(FF_PLATFORM_WINDOWS)
-static void runDecoyBehavior()
-{
-    for (int i = 0; i < 5000000; ++i)
-    {
-        volatile double x = i * 3.14159;
-        x = x / 2.71828;
-        x = x * 1.61803;
-        x = x - 0.57721;
-        x = x + 42.0;
-        (void)x;
-    }
-}
-#endif
-
 int main()
 {
-    // (ANTI-DEBUGGING & EVASION)
-    #if defined(FF_PLATFORM_WINDOWS)
-        // Check for common debuggers (x64dbg, OllyDbg)
-        if (IsDebuggerPresent()) 
-        {
-            runDecoyBehavior();
-            return 1;
-        }
-        
-        // Check for remote debugging (IDA Pro Remote)
-        BOOL isRemoteDebugger = FALSE;
-        if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &isRemoteDebugger) && isRemoteDebugger) 
-        {
-            runDecoyBehavior();
-            return 1;
-        }
-    #endif
-
     std::cout << "=== Fast Forensic Triage Extractor (FFTE) [Init] ===\n";
     
     auto scanner = ff::createScanner();
