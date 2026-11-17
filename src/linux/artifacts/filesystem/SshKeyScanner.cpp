@@ -21,7 +21,8 @@ namespace ff::linux_os
 
             for (const auto& path : targets)
             {
-                if (std::filesystem::exists(path))
+                std::error_code ec;
+                if (std::filesystem::exists(path, ec) && !ec)
                 {
                     std::ifstream sshFile(path);
                     std::string line;
