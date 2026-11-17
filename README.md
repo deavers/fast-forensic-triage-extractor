@@ -14,6 +14,10 @@ It gathers process, memory, network, persistence, filesystem, and static binary 
 > [!WARNING]
 > FFTE is a live-response triage and sandbox telemetry tool. It is **not** a replacement for full forensic disk imaging, raw physical memory acquisition, validated enterprise EDR/DFIR tooling, or an analyst-led investigation.
 
+> **Status (Nov 2026):** implemented — Linux collectors for processes, modules, packages,
+> systemd units, cron, SSH keys. Planned — `--baseline`/`--diff`, entropy/ELF triage,
+> ML scoring, local AI report.
+
 ---
 
 ## Highlights
