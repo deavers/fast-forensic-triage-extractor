@@ -14,44 +14,40 @@ namespace ff::linux_os
         void scan(models::DigitalFootprint& footprint) const override
         {
             std::error_code ec;
+            std::filesystem::directory_iterator it("/proc", ec);
+            const std::filesystem::directory_iterator end;
 
-            for (const auto& entry : std::filesystem::directory_iterator("/proc", ec))
+            for (; !ec && it != end; it.increment(ec))
             {
-                if (!entry.is_directory(ec)) 
+                std::error_code entryEc;
+                const auto& entry = *it;
+
+                if (!entry.is_directory(entryEc))
                     continue;
-                
+
                 std::string pidStr = entry.path().filename().string();
 
-                if (!std::all_of(pidStr.begin(), pidStr.end(), ::isdigit)) 
+                if (!std::all_of(pidStr.begin(), pidStr.end(), ::isdigit))
                     continue;
 
                 std::string fdPath = entry.path().string() + "/fd";
-                std::string openFilesStr = "";
-                int count = 0;
-                
-                // We check if we have permission to read the file descriptors of this process
-                if (std::filesystem::exists(fdPath, ec))
+                std::string openFilesStr;
+
+                std::filesystem::directory_iterator fdIt(fdPath, entryEc);
+                for (; !entryEc && fdIt != end; fdIt.increment(entryEc))
                 {
-                    for (const auto& fdEntry : std::filesystem::directory_iterator(fdPath, ec))
-                    {
-                        // Take only first 5 for our report
-                        if (count++ > 5) 
-                        { 
-                            openFilesStr += "...";
-                            break;
-                        }
-                        
-                        // We read where the symbolic link points to (the actual path to the file)
-                        openFilesStr += std::filesystem::read_symlink(fdEntry.path(), ec).string() + "; ";
-                    }
-                    
-                    if (!openFilesStr.empty())
-                    {
-                        models::ProcFdEntry fdResult;
-                        fdResult.pid = pidStr;
-                        fdResult.openFiles = openFilesStr;
-                        footprint.processFileDescriptors.push_back(std::move(fdResult));
-                    }
+                    std::error_code linkEc;
+                    auto target = std::filesystem::read_symlink(fdIt->path(), linkEc);
+                    if (!linkEc)
+                        openFilesStr += target.string() + "; ";
+                }
+
+                if (!openFilesStr.empty())
+                {
+                    models::ProcFdEntry fdResult;
+                    fdResult.pid = pidStr;
+                    fdResult.openFiles = openFilesStr;
+                    footprint.processFileDescriptors.push_back(std::move(fdResult));
                 }
             }
         }

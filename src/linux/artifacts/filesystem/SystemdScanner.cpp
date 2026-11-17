@@ -4,6 +4,8 @@
 #include "linux/LinuxRegistry.h"
 #include <filesystem>
 #include <string>
+#include <algorithm>
+#include <vector>
 
 namespace ff::linux_os
 {
@@ -13,23 +15,22 @@ namespace ff::linux_os
         void scan(models::DigitalFootprint& footprint) const override
         {
             std::error_code ec;
-            std::string wantsPath = "/etc/systemd/system/multi-user.target.wants";
-            
-            if (std::filesystem::exists(wantsPath, ec))
-            {
-                int count = 0;
+            std::filesystem::directory_iterator it(
+                "/etc/systemd/system/multi-user.target.wants", ec);
+            const std::filesystem::directory_iterator end;
 
-                for (const auto& entry : std::filesystem::directory_iterator(wantsPath, ec))
-                {
-                    models::SystemdUnit unit;
-                    unit.name = entry.path().filename().string();
-                    unit.state = "enabled"; // If a symlink exists here, the service is enabled
-                    
-                    footprint.systemdUnits.push_back(std::move(unit));
-                    
-                    if (count++ > 20) 
-                        break; // Limit for demo report
-                }
+            std::vector<std::string> names;
+            for (; !ec && it != end; it.increment(ec))
+                names.push_back(it->path().filename().string());
+
+            std::sort(names.begin(), names.end());
+
+            for (auto& name : names)
+            {
+                models::SystemdUnit unit;
+                unit.name = std::move(name);
+                unit.state = "enabled"; // If a symlink exists here, the service is enabled
+                footprint.systemdUnits.push_back(std::move(unit));
             }
         }
     };

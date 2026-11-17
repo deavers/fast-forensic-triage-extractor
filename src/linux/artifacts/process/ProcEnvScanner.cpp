@@ -15,10 +15,17 @@ namespace ff::linux_os
     public:
         void scan(models::DigitalFootprint& footprint) const override
         {
+            std::error_code ec;
+            std::filesystem::directory_iterator it("/proc", ec);
+            const std::filesystem::directory_iterator end;
+
             // We iterate through all process folders in /proc
-            for (const auto& entry : std::filesystem::directory_iterator("/proc"))
+            for (; !ec && it != end; it.increment(ec))
             {
-                if (!entry.is_directory()) continue;
+                const auto& entry = *it;
+
+                if (!entry.is_directory(ec)) 
+                    continue;
                 
                 std::string pidStr = entry.path().filename().string();
                 

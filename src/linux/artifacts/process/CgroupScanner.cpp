@@ -15,9 +15,13 @@ namespace ff::linux_os
         void scan(models::DigitalFootprint& footprint) const override
         {
             std::error_code ec;
+            std::filesystem::directory_iterator it("/proc", ec);
+            const std::filesystem::directory_iterator end;
 
-            for (const auto& entry : std::filesystem::directory_iterator("/proc", ec))
+            for (; !ec && it != end; it.increment(ec))
             {
+                const auto& entry = *it;
+
                 if (!entry.is_directory(ec)) 
                     continue;
                 
